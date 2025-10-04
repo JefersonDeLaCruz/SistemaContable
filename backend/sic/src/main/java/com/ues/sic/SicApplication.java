@@ -1,0 +1,16 @@
+package com.ues.sic;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class SicApplication {
+
+	public static void main(String[] args) {
+
+
+		System.out.println("Avla que jopa");
+		SpringApplication.run(SicApplication.class, args);
+	}
+
+}
