@@ -8,18 +8,18 @@
     <link rel="stylesheet" th:href="@{/css/output.css}">
     
 </head>
-<body>
+<body class="bg-red-900">
     
 
     <div class="box">
-        <div class="login-box">
+        <div class="login-box bg-red-800">
 
             <div class="brand-box">
                 <img src="logo.png" alt="Logo">
                 <h3>Bienvenido</h3>
             </div>
 
-            <div class="form-box">
+            <div class="form-box bg-blue-900">
 
                 <form action="/login" method="post" id="loginForm">
                     <div>
@@ -31,7 +31,7 @@
                         <input type="password" id="password" name="password" required>
                     </div>
                     <div>
-                        <button type="submit">Iniciar Sesión</button>
+                        <button type="submit" class="btn btn-soft btn-secondary">Iniciar Sesión</button>
                     </div>
                 </form>
 

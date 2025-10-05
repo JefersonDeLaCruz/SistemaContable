@@ -18,6 +18,7 @@ services:
     container_name: tailwind-test
     volumes:
       - ./backend/sic/src/main/resources/static/css:/app/css
+      - ./backend/sic/src/main/resources/templates:/app/templates
     tty: true
     stdin_open: true
 
