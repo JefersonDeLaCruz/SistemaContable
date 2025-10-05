@@ -1,114 +1,101 @@
 <!DOCTYPE html>
 <html lang="es" xhtml:th="http://www.thymeleaf.org">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Iniciar sesion</title>
-  <!-- Tailwind + daisyUI compilado -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="${titulo}">Titulo</title>
   <link rel="stylesheet" th:href="@{/css/output.css}" />
+  <link rel="stylesheet" th:href="@{/css/style.css}" />
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 
-<body class="min-h-screen bg-base-200">
-  <main class="min-h-screen grid grid-cols-1 md:grid-cols-[2fr_1fr]">
-    <!-- Columna izquierda: formulario -->
-    <section class="flex items-center justify-center p-6 md:p-10">
-      <div class="w-full max-w-md">
-        <!-- Avatar / marca -->
-        <div class="flex justify-center mb-8">
-          <div class="avatar placeholder">
-            <div class="bg-primary/10 text-primary w-16 rounded-full">
-              <span class="text-2xl font-semibold">R</span>
+
+<body data-theme="corporate">
+
+
+  <main class="">
+
+    <!-- contenedor principal, EL GRID DE ESTE CONTENEDOR DEBE OCUPAR 3 COLS COMO MAXIMO PERO SE ajusta de manera que en moviles ocupo 1 col y el solo se muestra el login el contenedor de la imagen desaparece ppara moviles-->
+    <div class="contenedor-principal grid md:grid-cols-3 h-dvh">
+      <!-- contenedor del login ocupa 2 de 3 cols-->
+      <div class="contenedor-login-form col-span-2 border-solid border-2 border-red-600">
+
+        <!-- contenedor del formulario de login -->
+        <div class="formulario-contenedor flex flex-col justify-center items-center h-full gap-4 p-4">
+
+
+          <div class="avatar">
+            <div class="w-24 rounded-full">
+              <img src="https://img.daisyui.com/images/profile/demo/yellingcat@192.webp" />
             </div>
           </div>
+          <h1 class="font-bold">Bienvenido!</h1>
+
+          <form th:action="@{/login}" method="post" class="flex flex-col justify-center items-center gap-4 p-4">
+
+            <!-- LABEL PARA NOMBRE DE USUARIO -->
+            <label class="input validator">
+              <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <g stroke-linejoin="round" stroke-linecap="round" stroke-width="2.5" fill="none" stroke="currentColor">
+                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </g>
+              </svg>
+              <input type="text" name="username" required placeholder="Nombre de usuario" minlength="3"
+              maxlength="30" title="Solo letras, números o guión" />
+              <!-- pattern="[A-Za-z][A-Za-z0-9\-]*" esto iba dentro del input -->
+            </label>
+            <!-- <p class="validator-hint p-4 m-3 hidden">
+              Debe tener de 3 a 30 caracteres
+              <br />conteniendo solo letras, números o guión
+            </p> -->
+
+
+            <!-- LABEL PARA CONTRASEÑA -->
+            <label class="input validator">
+              <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <g stroke-linejoin="round" stroke-linecap="round" stroke-width="2.5" fill="none" stroke="currentColor">
+                  <path
+                    d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z">
+                  </path>
+                  <circle cx="16.5" cy="7.5" r=".5" fill="currentColor"></circle>
+                </g>
+              </svg>
+              <input type="password" name="password" required placeholder="Clave" minlength="8"
+                
+                title="Debe tener más de 8 caracteres, incluyendo número, letra minúscula y mayúscula" />
+                <!-- pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" esto iba dentro del input -->
+            </label>
+            <!-- <p class="validator-hint hidden">
+              Debe tener más de 8 caracteres, incluyendo
+              <br />Al menos un número <br />Al menos una letra minúscula <br />Al menos una letra mayúscula
+            </p> -->
+
+            <input type="submit" class="btn btn-dash" value="Acceder" />
+
+
+          </form>
+
         </div>
 
-        <h1 class="text-3xl font-bold text-center mb-2">Bienvenido de nuevo</h1>
-        
 
-        <form id="loginForm" method="post" th:action="@{/login}" class="space-y-5">
-          <!-- Email -->
-          <div class="form-control">
-            <label for="username" class="label">
-              <span class="label-text">Correo</span>
-            </label>
-            <input
-              id="username"
-              name="username"
-             
-              autocomplete="username"
-         
-              class="input input-bordered w-full"
-              placeholder="correo@ejemplo.com" />
-          </div>
-
-          <!-- Password -->
-          <div class="form-control">
-            <label for="password" class="label">
-              <span class="label-text">Contrasena</span>
-            </label>
-            <label class="input input-bordered flex items-center gap-2">
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autocomplete="current-password"
-                required
-                class="grow"
-                placeholder="********" />
-              <button type="button" class="btn btn-ghost btn-xs" onclick="togglePass()" aria-label="mostrar u ocultar">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                        d="M2.25 12s3.75-6.75 9.75-6.75S21.75 12 21.75 12 18 18.75 12 18.75 2.25 12 2.25 12z" />
-                  <circle cx="12" cy="12" r="2.25" stroke-width="1.5" />
-                </svg>
-              </button>
-            </label>
-            <div class="flex items-center justify-between mt-2">
-              <label class="label cursor-pointer gap-2">
-                <input type="checkbox" name="remember-me" class="checkbox checkbox-sm" />
-                <span class="label-text">Recordarme</span>
-              </label>
-              <a class="link link-primary text-sm" th:href="@{/forgot-password}">Olvidaste tu contrasena?</a>
-            </div>
-          </div>
-
-          <!-- Boton principal -->
-          <button type="submit" class="btn btn-primary w-full">Iniciar sesion</button>
-
-        </form>
-
-        <!-- Recaptcha o nota legal opcional
-        <p class="mt-6 text-xs text-base-content/60 text-center">
-          Este sitio esta protegido por un servicio anti bot.
-        </p> -->
       </div>
-    </section>
 
-    <!-- Columna derecha: solo imagen decorativa (sin contenido) -->
-    <aside class="hidden md:block">
-      <!-- Usa una imagen de patron propia. Mantener object-cover para llenar toda la columna -->
-      <div class="w-full h-full bg-base-200">
-        <div
-          class="w-full h-full"
-          style="
-            background-image: url('/img/pattern-login.png');
-            background-size: cover;
-            background-position: center;
-          ">
-        </div>
+
+
+      <div class="contenedor-img hidden md:block bg-black">
+
       </div>
-    </aside>
+
+    </div>
+
+
+
+
+
   </main>
-
-  <!-- JS simple para ver/ocultar contrasena -->
-  <script>
-    function togglePass() {
-      const input = document.getElementById('password');
-      input.type = input.type === 'password' ? 'text' : 'password';
-    }
-  </script>
-
-  <!-- Tu JS -->
-  <script th:src="@{/js/login.js}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/theme-change@2.0.2/index.js"></script>
 </body>
+
 </html>

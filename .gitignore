@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### CSS compiled files ###
+backend/sic/src/main/resources/static/css/output.css
