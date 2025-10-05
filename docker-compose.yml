@@ -12,6 +12,14 @@ services:
       POSTGRES_DB: sistema_contable
     volumes:
       - pgdata:/var/lib/postgresql/data
+  
+  tailwind:
+    image: node-img-test
+    container_name: tailwind-test
+    volumes:
+      - ./backend/sic/src/main/resources/static/css:/app/css
+    tty: true
+    stdin_open: true
 
 volumes:
   pgdata: {}
