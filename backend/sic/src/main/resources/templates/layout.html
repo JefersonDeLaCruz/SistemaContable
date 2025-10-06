@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" xhtml:th="http://www.thymeleaf.org" th:fragment="base" >
+<html lang="en" xhtml:th="http://www.thymeleaf.org" th:fragment="base">
 
-<head>
+<head th:fragment="head">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${titulo}">Titulo</title>
@@ -10,9 +10,17 @@
 </head>
 
 <body>
+    
+    <!-- <section th:fragment="sidebar">
+
+    </section> -->
+
     <main th:fragment="contenido">
 
     </main>
+
+    
+
 
     <script src="https://cdn.jsdelivr.net/npm/theme-change@2.0.2/index.js"></script>
 </body>

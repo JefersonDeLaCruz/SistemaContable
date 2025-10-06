@@ -25,6 +25,7 @@ public class AuthController {
         UsuariosModel user = (UsuariosModel) session.getAttribute("usuarioActivo");
         if (user != null) {
             model.addAttribute("usuario", user);
+            model.addAttribute("titulo", "Dashboard");
             return "dashboard";
         }
         return "redirect:/login";

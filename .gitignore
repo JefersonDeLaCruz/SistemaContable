@@ -34,3 +34,4 @@ build/
 
 ### CSS compiled files ###
 backend/sic/src/main/resources/static/css/output.css
+tailwind.config.js
