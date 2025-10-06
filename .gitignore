@@ -48,3 +48,5 @@ credentials/
 ### Logs ###
 *.log
 logs/
+### CSS compiled files ###
+backend/sic/src/main/resources/static/css/output.css
