@@ -4,25 +4,64 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Sistema Contable</title>
-    <link rel="stylesheet" th:href="@{/css/output.css}" />
+     <link rel="stylesheet" th:href="@{/css/output.css}"
 </head>
-<body class="min-h-screen bg-base-200">
-    <div class="navbar bg-base-100 shadow-lg">
-        <div class="flex-1">
-            <a class="btn btn-ghost text-xl">Sistema Contable</a>
+<body>
+    <div class="header">
+        <h1>Sistema Contable</h1>
+        <div class="user-info">
+            <span>Bienvenido, <strong th:text="${usuario.username}">Usuario</strong></span>
+            <span class="role-badge" th:classappend="${'role-' + usuario.role.toLowerCase()}" th:text="${usuario.role}">ADMIN</span>
+            <a href="/logout" class="logout-btn">Cerrar Sesión</a>
         </div>
-        <div class="flex-none">
-            <div class="dropdown dropdown-end">
-                <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
-                    <div class="avatar placeholder">
-                        <div class="bg-primary/10 text-primary w-10 rounded-full">
-                            <span class="text-lg font-semibold" th:text="${usuario.username.substring(0,1).toUpperCase()}">A</span>
-                        </div>
-                    </div>
+    </div>
+
+    <div class="container">
+        <div class="welcome-card">
+            <h2>Dashboard Principal</h2>
+            <p>Email: <strong th:text="${usuario.email}">admin@sistema.local</strong></p>
+            <p>Rol: <strong th:text="${usuario.role}">ADMIN</strong></p>
+        </div>
+
+        <div class="cards-grid">
+            <!-- Card de Administración de Usuarios (solo para ADMIN) -->
+            <div class="card" th:if="${usuario.role == 'ADMIN'}">
+                <h3>👥 Administración de Usuarios</h3>
+                <p>Gestiona usuarios del sistema, crea nuevas cuentas y administra permisos.</p>
+                <div class="btn-group">
+                    <a href="/admin/crear-usuario" class="btn btn-success">+ Crear Usuario</a>
+                    <a href="/admin/listar-usuarios" class="btn btn-primary">Ver Usuarios</a>
                 </div>
-                <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
-                    <li><a href="/logout">Cerrar Sesión</a></li>
-                </ul>
+            </div>
+
+            <!-- Card de Partidas Contables -->
+            <div class="card">
+                <h3>Partidas Contables</h3>
+                <p>Gestiona las partidas contables del sistema.</p>
+                <div class="btn-group">
+                    <a href="/partidas/crear" class="btn btn-success">+ Nueva Partida</a>
+                    <a href="/partidas/listar" class="btn btn-primary">Ver Partidas</a>
+                </div>
+            </div>
+
+            <!-- Card de Reportes -->
+            <div class="card">
+                <h3>Reportes</h3>
+                <p>Genera y consulta reportes contables.</p>
+                <div class="btn-group">
+                    <a href="/reportes/balance" class="btn btn-info">Balance General</a>
+                    <a href="/reportes/estado-resultados" class="btn btn-info">Estado de Resultados</a>
+                </div>
+            </div>
+
+            <!-- Card de Configuración (solo para ADMIN) -->
+            <div class="card" th:if="${usuario.role == 'ADMIN'}">
+                <h3>Configuración</h3>
+                <p>Configuraciones del sistema y parámetros generales.</p>
+                <div class="btn-group">
+                    <a href="/config/empresa" class="btn btn-primary">Datos de Empresa</a>
+                    <a href="/config/periodos" class="btn btn-primary">Períodos Contables</a>
+                </div>
             </div>
         </div>
     </div>

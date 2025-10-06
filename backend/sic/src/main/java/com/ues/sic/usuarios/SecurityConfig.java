@@ -34,8 +34,8 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(authz -> authz
-              
                 .requestMatchers("/", "/login", "/css/**", "/js/**", "/images/**", "/api/usuarios/**").permitAll()
+                .requestMatchers("/admin/**").hasRole("ADMIN")
                 // Requerir autenticación para todas las demás rutas
                 .anyRequest().authenticated()
             )
@@ -51,11 +51,11 @@ public class SecurityConfig {
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/login?logout=true")
                 .permitAll()
-            );
-            // Deshabilitar CSRF para APIs 
-/*             .csrf(csrf -> csrf
+            )
+            // Deshabilitar CSRF para APIs ojo que al desaghbilitar CSRF postman no funciona
+            .csrf(csrf -> csrf
                 .ignoringRequestMatchers("/api/**")
-            ); */
+            );
 
         return http.build();
     }
