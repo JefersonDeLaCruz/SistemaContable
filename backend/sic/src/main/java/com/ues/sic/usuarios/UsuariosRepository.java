@@ -1,7 +1,7 @@
 package com.ues.sic.usuarios;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.repository.PagingAndSortingRepository;
+/* import org.springframework.data.repository.PagingAndSortingRepository; */
 
 public interface UsuariosRepository extends JpaRepository<UsuariosModel, Long>{
     
