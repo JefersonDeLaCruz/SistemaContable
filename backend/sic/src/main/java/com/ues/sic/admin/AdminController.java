@@ -1,4 +1,4 @@
-package com.ues.sic.usuarios;
+package com.ues.sic.admin;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import com.ues.sic.usuarios.UsuariosModel;
+import com.ues.sic.usuarios.UsuariosRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

@@ -1,10 +1,13 @@
-package com.ues.sic.usuarios;
+package com.ues.sic.config;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import com.ues.sic.usuarios.UsuariosModel;
+import com.ues.sic.usuarios.UsuariosRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
