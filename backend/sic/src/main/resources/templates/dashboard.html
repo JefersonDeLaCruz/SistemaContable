@@ -1,12 +1,30 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>Dashboard - Sistema Contable</title>
+    <link rel="stylesheet" th:href="@{/css/output.css}" />
 </head>
-<body>
-    <h1>Bienvenido al Dashboard</h1>
-    <p th:text="'Usuario: ' + ${usuario.username}"></p>
+<body class="min-h-screen bg-base-200">
+    <div class="navbar bg-base-100 shadow-lg">
+        <div class="flex-1">
+            <a class="btn btn-ghost text-xl">Sistema Contable</a>
+        </div>
+        <div class="flex-none">
+            <div class="dropdown dropdown-end">
+                <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
+                    <div class="avatar placeholder">
+                        <div class="bg-primary/10 text-primary w-10 rounded-full">
+                            <span class="text-lg font-semibold" th:text="${usuario.username.substring(0,1).toUpperCase()}">A</span>
+                        </div>
+                    </div>
+                </div>
+                <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
+                    <li><a href="/logout">Cerrar Sesión</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

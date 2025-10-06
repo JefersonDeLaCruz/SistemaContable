@@ -22,9 +22,9 @@ public class ViewController {
         return "error";
     }
 
-    @GetMapping("/login")
-    public String login(Model model){
-        // model.addAttribute("message", "Welcome to the SIC API");
-        return "login";
-    }
+    // Método movido a AuthController para manejar parámetros de error/logout
+    // @GetMapping("/login")
+    // public String login(Model model){
+    //     return "login";
+    // }
 }
