@@ -32,6 +32,22 @@ build/
 ### VS Code ###
 .vscode/
 
+### Environment Variables ###
+.env
+.env.local
+.env.production
+.env.staging
+
+### Security ###
+*.key
+*.pem
+*.p12
+secrets/
+credentials/
+
+### Logs ###
+*.log
+logs/
 ### CSS compiled files ###
 backend/sic/src/main/resources/static/css/output.css
 tailwind.config.js
