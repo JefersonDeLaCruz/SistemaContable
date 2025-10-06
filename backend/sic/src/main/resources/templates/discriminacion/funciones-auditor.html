@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Funciones de Auditor</title>
+  
+</head>
+<body>
+    <div class="header">
+        <h1>🔍 Panel de Auditor</h1>
+        <div class="user-info">
+            <span>Auditor: <strong th:text="${usuario.username}">Usuario</strong></span>
+            <span class="auditor-badge">AUDITOR</span>
+            <a href="/logout" class="logout-btn">Cerrar Sesión</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="back-link">
+            <a href="/discriminacion/dashboard">← Volver al Dashboard Discriminado</a>
+        </div>
+
+        <div class="access-card">
+            <h2>Auditor</h2>
+            <p>Tienes acceso a todas las funciones de auditoría y control de calidad del sistema.</p>
+        </div>
+
+
+
+        <div class="access-card" style="margin-top: 30px;">
+            <h3>🧪 Para Probar la Discriminación</h3>
+            <p>1. Intenta acceder a: <code>/discriminacion/admin</code> → Error 403</p>
+            <p>2. Intenta acceder a: <code>/discriminacion/contador</code> → Error 403</p>
+            <p>3. Solo puedes acceder a: <code>/discriminacion/auditor</code> ✅</p>
+            <p>4. Tu acceso es principalmente de <strong>SOLO LECTURA</strong></p>
+        </div>
+    </div>
+</body>
+</html>

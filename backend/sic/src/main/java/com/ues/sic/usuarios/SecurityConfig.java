@@ -36,6 +36,10 @@ public class SecurityConfig {
             .authorizeHttpRequests(authz -> authz
                 .requestMatchers("/", "/login", "/css/**", "/js/**", "/images/**", "/api/usuarios/**").permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/discriminacion/admin").hasRole("ADMIN")
+                .requestMatchers("/discriminacion/contador").hasRole("CONTADOR")
+                .requestMatchers("/discriminacion/auditor").hasRole("AUDITOR")
+                .requestMatchers("/discriminacion/dashboard").authenticated()
                 // Requerir autenticación para todas las demás rutas
                 .anyRequest().authenticated()
             )
@@ -55,6 +59,11 @@ public class SecurityConfig {
             // Deshabilitar CSRF para APIs ojo que al desaghbilitar CSRF postman no funciona
             .csrf(csrf -> csrf
                 .ignoringRequestMatchers("/api/**")
+            )
+            // Configurar headers de seguridad para evitar cache
+            .headers(headers -> headers
+                .frameOptions(frameOptions -> frameOptions.deny())
+                .httpStrictTransportSecurity(hstsHeaderWriter -> hstsHeaderWriter.disable())
             );
 
         return http.build();

@@ -54,6 +54,15 @@
                 </div>
             </div>
 
+            <!-- Card de Discriminación de Usuarios -->
+            <div class="card">
+                <h3>🔐 Demo Discriminación</h3>
+                <p>Demostración de cómo funciona la discriminación de usuarios por roles.</p>
+                <div class="btn-group">
+                    <a href="/discriminacion/dashboard" class="btn btn-primary">Ver Dashboard Discriminado</a>
+                </div>
+            </div>
+
             <!-- Card de Configuración (solo para ADMIN) -->
             <div class="card" th:if="${usuario.role == 'ADMIN'}">
                 <h3>Configuración</h3>
