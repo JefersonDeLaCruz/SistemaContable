@@ -1,78 +1,168 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" data-theme="corporate">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="layout :: head">
-    <!-- <title th:text="${titulo}">Dashboard</title> -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Sistema Contable</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .role-admin { @apply bg-red-100 text-red-800 border-red-200; }
+        .role-auditor { @apply bg-blue-100 text-blue-800 border-blue-200; }
+        .role-contador { @apply bg-green-100 text-green-800 border-green-200; }
+        .btn-admin { @apply bg-red-500 hover:bg-red-600 text-white; }
+        .btn-auditor { @apply bg-blue-500 hover:bg-blue-600 text-white; }
+        .btn-contador { @apply bg-green-500 hover:bg-green-600 text-white; }
+    </style>
 </head>
 
-<body>
-
-
-    <div class="drawer">
-        <input id="my-drawer-3" type="checkbox" class="drawer-toggle" />
-        <div class="drawer-content flex flex-col">
-            <!-- Navbar -->
-            <div class="navbar bg-base-300 w-full">
-                <div class="flex-none ">
-                    <!-- se puede hacer lg:hidden aqui para que el boton solo aparezca en pantallas pequeñas -->
-                    <label for="my-drawer-3" aria-label="open sidebar" class="btn btn-square btn-ghost">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                            class="inline-block h-6 w-6 stroke-current">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 6h16M4 12h16M4 18h16"></path>
-                        </svg>
-                    </label>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">Sistema Contable</h1>
+                    <p class="text-sm text-gray-500">Dashboard Principal</p>
                 </div>
-                <div class="mx-2 flex-1 px-2">Dashboard</div>
-                <div class="hidden flex-none lg:block">
-                    <ul class="menu menu-horizontal">
-                        <!-- Navbar menu content here -->
-                        <li><a>Navbar Item 1</a></li>
-                        <li><a>Navbar Item 2</a></li>
-                    </ul>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm text-gray-600">
+                        <strong th:text="${usuario.username}">Usuario</strong>
+                    </span>
+                    <span class="px-2 py-1 text-xs font-medium rounded-full border" 
+                          th:classappend="${'role-' + usuario.role.toLowerCase()}" 
+                          th:text="${usuario.role}">ROL</span>
+                    <a href="/logout" class="text-red-600 hover:text-red-800 text-sm font-medium">Cerrar Sesión</a>
                 </div>
             </div>
-            <!-- Page content here -->
-            Content
-        </div>
-        <div class="drawer-side">
-            <label for="my-drawer-3" aria-label="close sidebar" class="drawer-overlay"></label>
-            <ul class="menu bg-base-200 min-h-full w-60 sm:w-80 p-2 flex justify-between">
-                <!-- Sidebar content here -->
-
-                <div class="brand">
-                    <h1 class="text-3xl font-bold">SIC</h1>
-                    <p class="text-sm">Sistema de Información Contable</p>
-                </div>
-                <div class="border-2 border-solid border black">
-                    <ul class="menu bg-base-200 w-full">
-                        <li><a class="menu-active">Dashboard</a></li>
-                        <li><a>Registrar partida</a></li>
-                        <li><a>Libro diario</a></li>
-                        <li><a>Libro mayor</a></li>
-                        <li><a>Balances</a></li>
-                        <li><a>Subir Documento</a></li>
-                        <li><a>Configuración</a></li>
-                        <li th:unless="${usuario.role == 'ADMIN'}"><a>PRUEBA</a></li>
-                        <!-- Si el usuario.role **es igual a 'ADMIN' → la condición es verdadera → th:unless lo niega → el <li> NO se mostrará. -->
-                    </ul>
-
-                </div>
-
-                <div class="">
-                    <div class="divider"></div>
-                    <form th:action="@{/logout}" method="post">
-                        <button type="submit" class="btn btn-outline btn-error w-full">Cerrar sesión</button>
-                    </form>
-                </div>
-
-
-
-            </ul>
         </div>
     </div>
 
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Welcome Section -->
+        <div class="bg-white rounded-lg shadow p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-2">
+                Bienvenido, <span th:text="${usuario.username}">Usuario</span>
+            </h2>
+            <p class="text-gray-600">
+                Email: <span th:text="${usuario.email}">email@example.com</span>
+            </p>
+            <p class="text-gray-600 mt-1">
+                Rol: <span class="px-2 py-1 text-xs font-medium rounded border" 
+                          th:classappend="${'role-' + usuario.role.toLowerCase()}" 
+                          th:text="${usuario.role}">ROL</span>
+            </p>
+        </div>
 
+        <!-- Role-based Navigation -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            <!-- ADMIN Functions -->
+            <div th:if="${usuario.role == 'ADMIN'}" class="space-y-4">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">🔧 Funciones de Administrador</h3>
+                
+                <a href="/admin/explorador-partidas" class="block p-4 rounded-lg border-2 btn-admin transition-colors">
+                    <div class="font-medium">📋 Explorador de Partidas</div>
+                    <div class="text-sm opacity-90">Gestionar todas las partidas</div>
+                </a>
+                
+                <a href="/admin/libro-diario" class="block p-4 rounded-lg border-2 btn-admin transition-colors">
+                    <div class="font-medium">📖 Libro Diario</div>
+                    <div class="text-sm opacity-90">Registro cronológico</div>
+                </a>
+                
+                <a href="/admin/libro-mayor" class="block p-4 rounded-lg border-2 btn-admin transition-colors">
+                    <div class="font-medium">📊 Libro Mayor</div>
+                    <div class="text-sm opacity-90">Cuentas generales</div>
+                </a>
+                
+                <a href="/admin/usuarios" class="block p-4 rounded-lg border-2 btn-admin transition-colors">
+                    <div class="font-medium">👥 Gestión de Usuarios</div>
+                    <div class="text-sm opacity-90">CRUD completo de usuarios</div>
+                </a>
+                
+                <a href="/admin/bitacora" class="block p-4 rounded-lg border-2 btn-admin transition-colors">
+                    <div class="font-medium">📝 Bitácora</div>
+                    <div class="text-sm opacity-90">Log del sistema</div>
+                </a>
+                
+                <a href="/admin/configuracion" class="block p-4 rounded-lg border-2 btn-admin transition-colors">
+                    <div class="font-medium">⚙️ Configuración</div>
+                    <div class="text-sm opacity-90">Parámetros del sistema</div>
+                </a>
+            </div>
+
+            <!-- AUDITOR Functions -->
+            <div th:if="${usuario.role == 'AUDITOR'}" class="space-y-4">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">🔍 Funciones de Auditor</h3>
+                
+                <a href="/auditor/explorador-partidas" class="block p-4 rounded-lg border-2 btn-auditor transition-colors">
+                    <div class="font-medium">📋 Explorador de Partidas</div>
+                    <div class="text-sm opacity-90">Revisar partidas contables</div>
+                </a>
+                
+                <a href="/auditor/libro-diario" class="block p-4 rounded-lg border-2 btn-auditor transition-colors">
+                    <div class="font-medium">📖 Libro Diario</div>
+                    <div class="text-sm opacity-90">Solo lectura</div>
+                </a>
+                
+                <a href="/auditor/libro-mayor" class="block p-4 rounded-lg border-2 btn-auditor transition-colors">
+                    <div class="font-medium">📊 Libro Mayor</div>
+                    <div class="text-sm opacity-90">Consulta de cuentas</div>
+                </a>
+                
+                <a href="/auditor/bitacora" class="block p-4 rounded-lg border-2 btn-auditor transition-colors">
+                    <div class="font-medium">📝 Bitácora</div>
+                    <div class="text-sm opacity-90">Registro de actividades</div>
+                </a>
+                
+                <a href="/auditor/ver-pdfs" class="block p-4 rounded-lg border-2 btn-auditor transition-colors">
+                    <div class="font-medium">📄 Ver PDFs</div>
+                    <div class="text-sm opacity-90">Documentos generados</div>
+                </a>
+                
+                <a href="/auditor/configuracion" class="block p-4 rounded-lg border-2 btn-auditor transition-colors">
+                    <div class="font-medium">⚙️ Configuración</div>
+                    <div class="text-sm opacity-90">Solo lectura</div>
+                </a>
+            </div>
+
+            <!-- CONTADOR Functions -->
+            <div th:if="${usuario.role == 'CONTADOR'}" class="space-y-4">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">📊 Funciones de Contador</h3>
+                
+                <div class="p-4 rounded-lg border-2 border-gray-200 bg-gray-50">
+                    <div class="font-medium text-gray-700">🚧 En Desarrollo</div>
+                    <div class="text-sm text-gray-500">Las funciones específicas del contador están en desarrollo</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions (visible to all roles) -->
+        <div class="mt-8 bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Acciones Rápidas</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="text-sm font-medium text-gray-900">📈 Últimas Partidas</div>
+                    <div class="text-xs text-gray-500">0 registradas</div>
+                </div>
+                <div class="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="text-sm font-medium text-gray-900">💰 Balance Total</div>
+                    <div class="text-xs text-gray-500">$0.00</div>
+                </div>
+                <div class="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="text-sm font-medium text-gray-900">📄 Reportes</div>
+                    <div class="text-xs text-gray-500">0 generados</div>
+                </div>
+                <div class="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="text-sm font-medium text-gray-900">👤 Usuarios</div>
+                    <div class="text-xs text-gray-500" th:if="${usuario.role == 'ADMIN'}">Gestionar usuarios</div>
+                    <div class="text-xs text-gray-500" th:unless="${usuario.role == 'ADMIN'}">Solo lectura</div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
