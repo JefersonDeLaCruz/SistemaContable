@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balances</title>
+</head>
+<body>
+    <div>
+        <h1>Balances</h1>
+        <div>
+            <span>Contador: <strong th:text="${usuario.username}">Usuario</strong></span>
+            <span>CONTADOR</span>
+            <a href="/logout">Cerrar Sesión</a>
+        </div>
+    </div>
+
+    <div>
+        <div>
+            <a href="/dashboard">← Volver al Dashboard</a>
+        </div>
+
+        <div>
+            <h2>Balances y Estados Financieros - Contador</h2>
+            <p>Generación y análisis de balances contables con capacidad de ajustes y correcciones.</p>
+            
+            <div>
+                <h3>Configuración de Período</h3>
+                <form>
+                    <div>
+                        <label for="tipo-balance">Tipo de Balance:</label>
+                        <select id="tipo-balance" name="tipoBalance">
+                            <option value="comprobacion">Balance de Comprobación</option>
+                            <option value="general">Balance General</option>
+                            <option value="resultados">Estado de Resultados</option>
+                            <option value="flujo-efectivo">Flujo de Efectivo</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="fecha-corte">Fecha de Corte:</label>
+                        <input type="date" id="fecha-corte" name="fechaCorte" value="2024-12-31">
+                    </div>
+                    <div>
+                        <label for="comparativo">Período Comparativo:</label>
+                        <input type="date" id="comparativo" name="comparativo">
+                    </div>
+                    <button type="submit">Generar Balance</button>
+                    <button type="button">Exportar PDF</button>
+                    <button type="button">Exportar Excel</button>
+                </form>
+            </div>
+
+            <div>
+                <h3>Balance de Comprobación</h3>
+                <p><strong>Al:</strong> 31 de Diciembre de 2024</p>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Nombre de Cuenta</th>
+                            <th>Saldo Deudor</th>
+                            <th>Saldo Acreedor</th>
+                            <th>Ajustes Débito</th>
+                            <th>Ajustes Crédito</th>
+                            <th>Saldo Ajustado Débito</th>
+                            <th>Saldo Ajustado Crédito</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="9"><strong>ACTIVOS</strong></td>
+                        </tr>
+                        <tr>
+                            <td>1001</td>
+                            <td>Caja</td>
+                            <td>$9,500.00</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>$9,500.00</td>
+                            <td>-</td>
+                            <td><button type="button">Ajustar</button></td>
+                        </tr>
+                        <tr>
+                            <td>1002</td>
+                            <td>Bancos</td>
+                            <td>$15,000.00</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>$15,000.00</td>
+                            <td>-</td>
+                            <td><button type="button">Ajustar</button></td>
+                        </tr>
+                        <tr>
+                            <td colspan="9"><strong>PASIVOS</strong></td>
+                        </tr>
+                        <tr>
+                            <td>2001</td>
+                            <td>Proveedores</td>
+                            <td>-</td>
+                            <td>$3,000.00</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>$3,000.00</td>
+                            <td><button type="button">Ajustar</button></td>
+                        </tr>
+                        <tr>
+                            <td colspan="9"><strong>PATRIMONIO</strong></td>
+                        </tr>
+                        <tr>
+                            <td>3001</td>
+                            <td>Capital</td>
+                            <td>-</td>
+                            <td>$20,000.00</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>$20,000.00</td>
+                            <td><button type="button">Ajustar</button></td>
+                        </tr>
+                        <tr>
+                            <td colspan="9"><strong>GASTOS</strong></td>
+                        </tr>
+                        <tr>
+                            <td>5001</td>
+                            <td>Gastos de Oficina</td>
+                            <td>$1,500.00</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>$1,500.00</td>
+                            <td>-</td>
+                            <td><button type="button">Ajustar</button></td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="2">TOTALES</th>
+                            <th>$26,000.00</th>
+                            <th>$23,000.00</th>
+                            <th>$0.00</th>
+                            <th>$0.00</th>
+                            <th>$26,000.00</th>
+                            <th>$23,000.00</th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <div>
+                <h3>Balance General</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <h4>ACTIVOS</h4>
+                        <div>
+                            <h5>Activos Corrientes</h5>
+                            <ul>
+                                <li>Caja: $9,500.00</li>
+                                <li>Bancos: $15,000.00</li>
+                                <li>Clientes: $2,000.00</li>
+                            </ul>
+                            <p><strong>Total Activos Corrientes: $26,500.00</strong></p>
+                        </div>
+                        <div>
+                            <h5>Activos No Corrientes</h5>
+                            <ul>
+                                <li>Equipo de Oficina: $5,000.00</li>
+                                <li>Dep. Acum. Equipo: ($500.00)</li>
+                            </ul>
+                            <p><strong>Total Activos No Corrientes: $4,500.00</strong></p>
+                        </div>
+                        <p><strong>TOTAL ACTIVOS: $31,000.00</strong></p>
+                    </div>
+                    
+                    <div>
+                        <h4>PASIVOS Y PATRIMONIO</h4>
+                        <div>
+                            <h5>Pasivos Corrientes</h5>
+                            <ul>
+                                <li>Proveedores: $3,000.00</li>
+                                <li>Gastos por Pagar: $1,000.00</li>
+                            </ul>
+                            <p><strong>Total Pasivos Corrientes: $4,000.00</strong></p>
+                        </div>
+                        <div>
+                            <h5>Patrimonio</h5>
+                            <ul>
+                                <li>Capital: $20,000.00</li>
+                                <li>Utilidades Retenidas: $5,500.00</li>
+                                <li>Utilidad del Ejercicio: $1,500.00</li>
+                            </ul>
+                            <p><strong>Total Patrimonio: $27,000.00</strong></p>
+                        </div>
+                        <p><strong>TOTAL PASIVOS Y PATRIMONIO: $31,000.00</strong></p>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h3>Herramientas de Análisis</h3>
+                <div>
+                    <div>
+                        <h4>Indicadores Financieros</h4>
+                        <ul>
+                            <li><strong>Liquidez Corriente:</strong> 6.63 (Excelente)</li>
+                            <li><strong>Endeudamiento:</strong> 12.9% (Bajo)</li>
+                            <li><strong>ROE:</strong> 5.6% (Satisfactorio)</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4>Acciones de Contador</h4>
+                        <button type="button">Crear Asiento de Ajuste</button>
+                        <button type="button">Cerrar Período</button>
+                        <button type="button">Análisis Comparativo</button>
+                        <button type="button">Validar Balance</button>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h3>Estado de Resultados</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Concepto</th>
+                            <th>Período Actual</th>
+                            <th>Período Anterior</th>
+                            <th>Variación</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>INGRESOS</strong></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Ventas</td>
+                            <td>$8,000.00</td>
+                            <td>$7,500.00</td>
+                            <td>+6.7%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Total Ingresos</strong></td>
+                            <td><strong>$8,000.00</strong></td>
+                            <td><strong>$7,500.00</strong></td>
+                            <td><strong>+6.7%</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>GASTOS</strong></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Gastos de Oficina</td>
+                            <td>$1,500.00</td>
+                            <td>$1,200.00</td>
+                            <td>+25%</td>
+                        </tr>
+                        <tr>
+                            <td>Gastos de Ventas</td>
+                            <td>$5,000.00</td>
+                            <td>$4,800.00</td>
+                            <td>+4.2%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Total Gastos</strong></td>
+                            <td><strong>$6,500.00</strong></td>
+                            <td><strong>$6,000.00</strong></td>
+                            <td><strong>+8.3%</strong></td>
+                        </tr>
+                        <tr>
+                            <td><strong>UTILIDAD NETA</strong></td>
+                            <td><strong>$1,500.00</strong></td>
+                            <td><strong>$1,500.00</strong></td>
+                            <td><strong>0%</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

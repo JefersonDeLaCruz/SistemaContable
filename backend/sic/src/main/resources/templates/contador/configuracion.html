@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración</title>
+</head>
+<body>
+    <div>
+        <h1>Configuración</h1>
+        <div>
+            <span>Contador: <strong th:text="${usuario.username}">Usuario</strong></span>
+            <span>CONTADOR</span>
+            <a href="/logout">Cerrar Sesión</a>
+        </div>
+    </div>
+
+    <div>
+        <div>
+            <a href="/dashboard">← Volver al Dashboard</a>
+        </div>
+
+        <div>
+            <h2>Configuración del Sistema - Contador</h2>
+            <p>Panel de configuración con acceso completo a parámetros contables y del sistema.</p>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <h3>Configuración Contable</h3>
+                    <form>
+                        <div>
+                            <label for="ejercicio-fiscal">Ejercicio Fiscal:</label>
+                            <select id="ejercicio-fiscal" name="ejercicioFiscal">
+                                <option value="2024">2024</option>
+                                <option value="2025" selected>2025</option>
+                                <option value="2026">2026</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="moneda-base">Moneda Base:</label>
+                            <select id="moneda-base" name="monedaBase">
+                                <option value="USD" selected>Dólar Estadounidense (USD)</option>
+                                <option value="EUR">Euro (EUR)</option>
+                                <option value="MXN">Peso Mexicano (MXN)</option>
+                                <option value="GTQ">Quetzal (GTQ)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="decimales">Decimales en Montos:</label>
+                            <select id="decimales" name="decimales">
+                                <option value="2" selected>2 decimales</option>
+                                <option value="3">3 decimales</option>
+                                <option value="4">4 decimales</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="metodo-costeo">Método de Costeo:</label>
+                            <select id="metodo-costeo" name="metodoCosteo">
+                                <option value="FIFO" selected>FIFO (Primero en Entrar, Primero en Salir)</option>
+                                <option value="LIFO">LIFO (Último en Entrar, Primero en Salir)</option>
+                                <option value="PROMEDIO">Costo Promedio Ponderado</option>
+                            </select>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="periodo-mensual" name="periodoMensual" checked>
+                            <label for="periodo-mensual">Cierre Mensual Obligatorio</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="validacion-partidas" name="validacionPartidas" checked>
+                            <label for="validacion-partidas">Validación Automática de Partidas</label>
+                        </div>
+                        <button type="submit">Guardar Configuración Contable</button>
+                    </form>
+                </div>
+
+                <div>
+                    <h3>Plan de Cuentas</h3>
+                    <form>
+                        <div>
+                            <label for="estructura-cuentas">Estructura de Cuentas:</label>
+                            <select id="estructura-cuentas" name="estructuraCuentas">
+                                <option value="4-2-2">4-2-2 (Grupo-Subgrupo-Cuenta)</option>
+                                <option value="3-3-2" selected>3-3-2 (Clase-Grupo-Cuenta)</option>
+                                <option value="2-2-2-2">2-2-2-2 (Detallado)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="cuentas-automaticas">Cuentas Automáticas:</label>
+                            <input type="checkbox" id="resultado-ejercicio" name="resultadoEjercicio" checked>
+                            <label for="resultado-ejercicio">Resultado del Ejercicio</label>
+                            <input type="checkbox" id="diferencia-cambio" name="diferenciaCambio" checked>
+                            <label for="diferencia-cambio">Diferencias de Cambio</label>
+                        </div>
+                        <div>
+                            <button type="button">Gestionar Plan de Cuentas</button>
+                            <button type="button">Importar Plan Estándar</button>
+                            <button type="button">Exportar Plan Actual</button>
+                        </div>
+                        <button type="submit">Aplicar Cambios</button>
+                    </form>
+                </div>
+
+                <div>
+                    <h3>Reportes y Exportación</h3>
+                    <form>
+                        <div>
+                            <label for="formato-exportacion">Formato de Exportación:</label>
+                            <select id="formato-exportacion" name="formatoExportacion">
+                                <option value="PDF" selected>PDF</option>
+                                <option value="EXCEL">Excel</option>
+                                <option value="CSV">CSV</option>
+                                <option value="XML">XML</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="plantilla-reportes">Plantilla de Reportes:</label>
+                            <select id="plantilla-reportes" name="plantillaReportes">
+                                <option value="empresarial" selected>Empresarial</option>
+                                <option value="gobierno">Gobierno</option>
+                                <option value="ong">ONG</option>
+                                <option value="personalizada">Personalizada</option>
+                            </select>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="firma-digital" name="firmaDigital">
+                            <label for="firma-digital">Firma Digital en Reportes</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="marca-agua" name="marcaAgua" checked>
+                            <label for="marca-agua">Marca de Agua en PDF</label>
+                        </div>
+                        <button type="submit">Guardar Configuración de Reportes</button>
+                    </form>
+                </div>
+
+                <div>
+                    <h3>Seguridad y Auditoría</h3>
+                    <form>
+                        <div>
+                            <label for="backup-automatico">Backup Automático:</label>
+                            <select id="backup-automatico" name="backupAutomatico">
+                                <option value="diario" selected>Diario</option>
+                                <option value="semanal">Semanal</option>
+                                <option value="mensual">Mensual</option>
+                                <option value="manual">Solo Manual</option>
+                            </select>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="log-cambios" name="logCambios" checked>
+                            <label for="log-cambios">Registro de Cambios Detallado</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="notificaciones-email" name="notificacionesEmail" checked>
+                            <label for="notificaciones-email">Notificaciones por Email</label>
+                        </div>
+                        <div>
+                            <label for="email-notificaciones">Email para Notificaciones:</label>
+                            <input type="email" id="email-notificaciones" name="emailNotificaciones" 
+                                   th:value="${usuario.email}" placeholder="contador@empresa.com">
+                        </div>
+                        <button type="submit">Guardar Configuración de Seguridad</button>
+                    </form>
+                </div>
+            </div>
+
+            <div>
+                <h3>Gestión de Usuarios</h3>
+                <div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Usuario</th>
+                                <th>Rol</th>
+                                <th>Estado</th>
+                                <th>Último Acceso</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>admin</td>
+                                <td>ADMIN</td>
+                                <td>Activo</td>
+                                <td>2024-12-31 14:30</td>
+                                <td>
+                                    <button type="button">Ver Perfil</button>
+                                    <button type="button">Modificar</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td th:text="${usuario.username}">contador</td>
+                                <td>CONTADOR</td>
+                                <td>Activo</td>
+                                <td>2024-12-31 15:45</td>
+                                <td>
+                                    <button type="button">Ver Perfil</button>
+                                    <button type="button">Modificar</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>auditor</td>
+                                <td>AUDITOR</td>
+                                <td>Activo</td>
+                                <td>2024-12-30 09:15</td>
+                                <td>
+                                    <button type="button">Ver Perfil</button>
+                                    <button type="button">Modificar</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+                    <button type="button">Crear Nuevo Usuario</button>
+                    <button type="button">Gestionar Permisos</button>
+                    <button type="button">Exportar Lista de Usuarios</button>
+                </div>
+            </div>
+
+            <div>
+                <h3>Herramientas de Mantenimiento</h3>
+                <div>
+                    <div>
+                        <h4>Base de Datos</h4>
+                        <button type="button">Optimizar Base de Datos</button>
+                        <button type="button">Verificar Integridad</button>
+                        <button type="button">Limpiar Logs Antiguos</button>
+                        <button type="button">Crear Backup Manual</button>
+                    </div>
+                    <div>
+                        <h4>Sistema</h4>
+                        <p><strong>Versión:</strong> SIC v2.1.0</p>
+                        <p><strong>Base de Datos:</strong> MySQL 8.0</p>
+                        <p><strong>Espacio Disponible:</strong> 85 GB</p>
+                        <p><strong>Último Backup:</strong> 31/12/2024 03:00 AM</p>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h3>Configuración Personal</h3>
+                <form>
+                    <div>
+                        <label for="zona-horaria">Zona Horaria:</label>
+                        <select id="zona-horaria" name="zonaHoraria">
+                            <option value="America/El_Salvador" selected>El Salvador (GMT-6)</option>
+                            <option value="America/Guatemala">Guatemala (GMT-6)</option>
+                            <option value="America/Mexico_City">México Central (GMT-6)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="formato-fecha">Formato de Fecha:</label>
+                        <select id="formato-fecha" name="formatoFecha">
+                            <option value="dd/mm/yyyy" selected>DD/MM/YYYY</option>
+                            <option value="mm/dd/yyyy">MM/DD/YYYY</option>
+                            <option value="yyyy-mm-dd">YYYY-MM-DD</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="idioma">Idioma:</label>
+                        <select id="idioma" name="idioma">
+                            <option value="es" selected>Español</option>
+                            <option value="en">English</option>
+                        </select>
+                    </div>
+                    <button type="submit">Guardar Preferencias</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

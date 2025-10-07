@@ -70,10 +70,12 @@
                         
                         <!-- CONTADOR routes -->
                         <div th:if="${usuario.role == 'CONTADOR'}">
-                            <li><a>Registrar partida</a></li>
-                            <li><a>Libro diario</a></li>
-                            <li><a>Libro mayor</a></li>
-                            <li><a>Balances</a></li>
+                            <li><a href="/contador/registrar-partida">Registrar partida</a></li>
+                            <li><a href="/contador/libro-diario">Libro diario</a></li>
+                            <li><a href="/contador/libro-mayor">Libro mayor</a></li>
+                            <li><a href="/contador/balances">Balances</a></li>
+                            <li><a href="/contador/subir-pdf">Subir PDF</a></li>
+                            <li><a href="/contador/configuracion">Configuración</a></li>
                         </div>
                         
                         <li><a>Subir Documento</a></li>
