@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ver PDFs Generados</title>
+</head>
+<body>
+    <div>
+        <h1>Ver PDFs Generados</h1>
+        <div>
+            <span>Admin: <strong th:text="${usuario.username}">Usuario</strong></span>
+            <span>ADMIN</span>
+            <a href="/logout">Cerrar Sesión</a>
+        </div>
+    </div>
+
+    <div>
+        <div>
+            <a href="/discriminacion/dashboard">← Volver al Dashboard</a>
+        </div>
+
+        <div>
+            <h2>Documentos PDF Generados</h2>
+            <p>Listado de todos los reportes y documentos PDF generados en el sistema.</p>
+            
+            <div>
+                <h3>Filtros</h3>
+                <form>
+                    <div>
+                        <label for="tipo-documento">Tipo de Documento:</label>
+                        <select id="tipo-documento" name="tipoDocumento">
+                            <option value="">Todos los tipos...</option>
+                            <option value="libro-diario">Libro Diario</option>
+                            <option value="libro-mayor">Libro Mayor</option>
+                            <option value="balance-general">Balance General</option>
+                            <option value="estado-resultados">Estado de Resultados</option>
+                            <option value="partidas">Partidas Contables</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="fecha-generacion">Fecha de Generación:</label>
+                        <input type="date" id="fecha-generacion" name="fechaGeneracion">
+                    </div>
+                    <div>
+                        <label for="usuario-generador">Generado por:</label>
+                        <input type="text" id="usuario-generador" name="usuarioGenerador" placeholder="Nombre de usuario...">
+                    </div>
+                    <button type="submit">Buscar</button>
+                </form>
+            </div>
+
+            <div>
+                <h3>Documentos Disponibles</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre del Archivo</th>
+                            <th>Tipo</th>
+                            <th>Fecha de Generación</th>
+                            <th>Generado por</th>
+                            <th>Tamaño</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="6">No hay documentos PDF generados</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div>
+                <h3>Estadísticas</h3>
+                <div>
+                    <p><strong>Total de documentos:</strong> 0</p>
+                    <p><strong>Espacio utilizado:</strong> 0 MB</p>
+                    <p><strong>Último documento generado:</strong> N/A</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

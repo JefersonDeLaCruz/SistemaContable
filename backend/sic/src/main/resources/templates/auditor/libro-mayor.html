@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Libro Mayor</title>
+</head>
+<body>
+    <div>
+        <h1>Libro Mayor</h1>
+        <div>
+            <span>Auditor: <strong th:text="${usuario.username}">Usuario</strong></span>
+            <span>AUDITOR</span>
+            <a href="/logout">Cerrar Sesión</a>
+        </div>
+    </div>
+
+    <div>
+        <div>
+            <a href="/discriminacion/dashboard">← Volver al Dashboard</a>
+        </div>
+
+        <div>
+            <h2>Libro Mayor</h2>
+            <p>Registro de movimientos por cuenta contable.</p>
+            
+            <div>
+                <h3>Selección de Cuenta</h3>
+                <form>
+                    <div>
+                        <label for="tipo-cuenta">Tipo de Cuenta:</label>
+                        <select id="tipo-cuenta" name="tipoCuenta">
+                            <option value="">Todos los tipos...</option>
+                            <option value="activo">Activo</option>
+                            <option value="pasivo">Pasivo</option>
+                            <option value="patrimonio">Patrimonio</option>
+                            <option value="ingresos">Ingresos</option>
+                            <option value="gastos">Gastos</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="cuenta">Cuenta Específica:</label>
+                        <select id="cuenta" name="cuenta">
+                            <option value="">Seleccionar cuenta...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="periodo">Período:</label>
+                        <input type="month" id="periodo" name="periodo">
+                    </div>
+                    <button type="submit">Consultar</button>
+                    <button type="button">Exportar PDF</button>
+                </form>
+            </div>
+
+            <div>
+                <h3>Movimientos de la Cuenta</h3>
+                <div>
+                    <h4>Cuenta: <span>No seleccionada</span></h4>
+                    <p>Saldo Inicial: $0.00</p>
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Nº Asiento</th>
+                            <th>Concepto</th>
+                            <th>Debe</th>
+                            <th>Haber</th>
+                            <th>Saldo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="6">Selecciona una cuenta para ver sus movimientos</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div>
+                    <p><strong>Saldo Final:</strong> $0.00</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

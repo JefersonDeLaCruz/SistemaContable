@@ -1,6 +1,8 @@
 package com.ues.sic.admin;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,6 +26,16 @@ public class AdminController {
     
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    private UsuariosModel getAuthenticatedUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+        return usuariosRepository.findByUsername(username);
+    }
+
+    private boolean hasRequiredRole(UsuariosModel user, String requiredRole) {
+        return user != null && requiredRole.equals(user.getRole());
+    }
 
     @GetMapping("/crear-usuario")
     public String mostrarFormularioCrearUsuario(Model model) {
@@ -80,5 +92,99 @@ public class AdminController {
     public String listarUsuarios(Model model) {
         model.addAttribute("usuarios", usuariosRepository.findAll());
         return "admin/listar-usuarios";
+    }
+
+    // ===== FUNCIONES ADMINISTRATIVAS CONSOLIDADAS =====
+
+    @GetMapping("/explorador-partidas")
+    public String exploradorPartidas(Model model) {
+        UsuariosModel user = getAuthenticatedUser();
+        
+        if (!hasRequiredRole(user, "ADMIN")) {
+            throw new org.springframework.security.access.AccessDeniedException("Acceso denegado: Se requiere rol ADMIN");
+        }
+        
+        model.addAttribute("usuario", user);
+        model.addAttribute("titulo", "Explorador de Partidas");
+        return "admin/explorador-partidas";
+    }
+
+    @GetMapping("/libro-diario")
+    public String libroDiario(Model model) {
+        UsuariosModel user = getAuthenticatedUser();
+        
+        if (!hasRequiredRole(user, "ADMIN")) {
+            throw new org.springframework.security.access.AccessDeniedException("Acceso denegado: Se requiere rol ADMIN");
+        }
+        
+        model.addAttribute("usuario", user);
+        model.addAttribute("titulo", "Libro Diario");
+        return "admin/libro-diario";
+    }
+
+    @GetMapping("/libro-mayor")
+    public String libroMayor(Model model) {
+        UsuariosModel user = getAuthenticatedUser();
+        
+        if (!hasRequiredRole(user, "ADMIN")) {
+            throw new org.springframework.security.access.AccessDeniedException("Acceso denegado: Se requiere rol ADMIN");
+        }
+        
+        model.addAttribute("usuario", user);
+        model.addAttribute("titulo", "Libro Mayor");
+        return "admin/libro-mayor";
+    }
+
+    @GetMapping("/ver-pdfs")
+    public String verPdfs(Model model) {
+        UsuariosModel user = getAuthenticatedUser();
+        
+        if (!hasRequiredRole(user, "ADMIN")) {
+            throw new org.springframework.security.access.AccessDeniedException("Acceso denegado: Se requiere rol ADMIN");
+        }
+        
+        model.addAttribute("usuario", user);
+        model.addAttribute("titulo", "Ver PDFs Generados");
+        return "admin/ver-pdfs";
+    }
+
+    @GetMapping("/bitacora")
+    public String bitacora(Model model) {
+        UsuariosModel user = getAuthenticatedUser();
+        
+        if (!hasRequiredRole(user, "ADMIN")) {
+            throw new org.springframework.security.access.AccessDeniedException("Acceso denegado: Se requiere rol ADMIN");
+        }
+        
+        model.addAttribute("usuario", user);
+        model.addAttribute("titulo", "Bitácora");
+        return "admin/bitacora";
+    }
+
+    @GetMapping("/configuracion")
+    public String configuracion(Model model) {
+        UsuariosModel user = getAuthenticatedUser();
+        
+        if (!hasRequiredRole(user, "ADMIN")) {
+            throw new org.springframework.security.access.AccessDeniedException("Acceso denegado: Se requiere rol ADMIN");
+        }
+        
+        model.addAttribute("usuario", user);
+        model.addAttribute("titulo", "Configuración");
+        return "admin/configuracion";
+    }
+
+    @GetMapping("/usuarios")
+    public String gestionUsuarios(Model model) {
+        UsuariosModel user = getAuthenticatedUser();
+        
+        if (!hasRequiredRole(user, "ADMIN")) {
+            throw new org.springframework.security.access.AccessDeniedException("Acceso denegado: Se requiere rol ADMIN");
+        }
+        
+        model.addAttribute("usuario", user);
+        model.addAttribute("titulo", "Gestión de Usuarios");
+        model.addAttribute("usuarios", usuariosRepository.findAll());
+        return "admin/usuarios";
     }
 }

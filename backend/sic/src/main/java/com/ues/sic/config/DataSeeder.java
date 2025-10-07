@@ -25,6 +25,7 @@ public class DataSeeder {
     CommandLineRunner seedDefaultUser(UsuariosRepository repo,  PasswordEncoder encoder, Environment env) {
         return args -> {
             createDefaultAdminUser(repo, encoder, env);
+            createTestUsers(repo, encoder);
         };
     }
     
@@ -35,7 +36,7 @@ public class DataSeeder {
                            || repo.existsByEmailIgnoreCase(DEFAULT_ADMIN_EMAIL);
         
         if (adminExists) {
-            System.out.println("INFO: Usuario administrador ya existe, omitiendo creacion.");
+            System.out.println("INFO: Usuario admin ya existe, omitiendo creacion.");
             return;
         }
         
@@ -59,7 +60,7 @@ public class DataSeeder {
         // Guardar usuario
         try {
             repo.save(adminUser);
-            System.out.println("SUCCESS: Usuario administrador creado exitosamente.");
+            System.out.println("SUCCESS: Usuario admin creado exitosamente.");
             System.out.println("INFO: Username: " + DEFAULT_ADMIN_USERNAME);
             System.out.println("INFO: Email: " + DEFAULT_ADMIN_EMAIL);
             
@@ -72,7 +73,7 @@ public class DataSeeder {
             }
             
         } catch (Exception e) {
-            System.err.println("ERROR: No se pudo crear el usuario administrador: " + e.getMessage());
+            System.err.println("ERROR: No se pudo crear el usuario admin: " + e.getMessage());
         }
     }
     
@@ -117,5 +118,37 @@ public class DataSeeder {
         
         // Asegurar que tenga al menos 12 caracteres
         return password.length() >= 12 ? password.substring(0, 12) : password + "Adm1n";
+    }
+    
+    /**
+     * Crea usuarios de prueba para testing
+     */
+    private void createTestUsers(UsuariosRepository repo, PasswordEncoder encoder) {
+        createUserIfNotExists(repo, encoder, "auditor", "auditor@test.com", "AUDITOR", "123456");
+        createUserIfNotExists(repo, encoder, "contador", "contador@test.com", "CONTADOR", "123456");
+    }
+    
+    private void createUserIfNotExists(UsuariosRepository repo, PasswordEncoder encoder, 
+                                      String username, String email, String role, String password) {
+        if (!repo.existsByUsernameIgnoreCase(username) && !repo.existsByEmailIgnoreCase(email)) {
+            UsuariosModel user = new UsuariosModel();
+            user.setUsername(username);
+            user.setEmail(email);
+            user.setRole(role);
+            user.setActive(true);
+            user.setPassword(encoder.encode(password));
+            
+            String currentTimestamp = LocalDateTime.now()
+                .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            user.setCreatedAt(currentTimestamp);
+            user.setUpdatedAt(currentTimestamp);
+            
+            try {
+                repo.save(user);
+                System.out.println("SUCCESS: Usuario de prueba creado - " + username + " (" + role + ")");
+            } catch (Exception e) {
+                System.err.println("ERROR: No se pudo crear el usuario de prueba " + username + ": " + e.getMessage());
+            }
+        }
     }
 }

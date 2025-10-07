@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración</title>
+</head>
+<body>
+    <div>
+        <h1>Configuración del Sistema</h1>
+        <div>
+            <span>Admin: <strong th:text="${usuario.username}">Usuario</strong></span>
+            <span>ADMIN</span>
+            <a href="/logout">Cerrar Sesión</a>
+        </div>
+    </div>
+
+    <div>
+        <div>
+            <a href="/discriminacion/dashboard">← Volver al Dashboard</a>
+        </div>
+
+        <div>
+            <h2>Configuración del Sistema</h2>
+            <p>Configuraciones y parámetros del sistema contable.</p>
+            
+            <div>
+                <h3>Parámetros Contables</h3>
+                <form>
+                    <div>
+                        <label for="moneda-base">Moneda Base:</label>
+                        <select id="moneda-base" name="monedaBase">
+                            <option value="USD">USD - Dólar Estadounidense</option>
+                            <option value="EUR">EUR - Euro</option>
+                            <option value="MXN">MXN - Peso Mexicano</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="decimales">Decimales en Montos:</label>
+                        <input type="number" id="decimales" name="decimales" value="2" min="0" max="4">
+                    </div>
+                    <div>
+                        <label for="ejercicio-fiscal">Ejercicio Fiscal:</label>
+                        <input type="number" id="ejercicio-fiscal" name="ejercicioFiscal" value="2024">
+                    </div>
+                    <button type="submit">Guardar Cambios</button>
+                </form>
+            </div>
+
+            <div>
+                <h3>Configuración de Reportes</h3>
+                <form>
+                    <div>
+                        <label for="formato-fecha">Formato de Fecha:</label>
+                        <select id="formato-fecha" name="formatoFecha">
+                            <option value="dd/MM/yyyy">dd/MM/yyyy</option>
+                            <option value="MM/dd/yyyy">MM/dd/yyyy</option>
+                            <option value="yyyy-MM-dd">yyyy-MM-dd</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="incluir-logo">Incluir Logo en PDFs:</label>
+                        <input type="checkbox" id="incluir-logo" name="incluirLogo" checked>
+                    </div>
+                    <div>
+                        <label for="pie-pagina">Pie de Página:</label>
+                        <textarea id="pie-pagina" name="piePagina" rows="3" placeholder="Texto para pie de página en reportes..."></textarea>
+                    </div>
+                    <button type="submit">Guardar Preferencias</button>
+                </form>
+            </div>
+
+            <div>
+                <h3>Información del Sistema</h3>
+                <table>
+                    <tr>
+                        <td><strong>Versión del Sistema:</strong></td>
+                        <td>1.0.0</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Última Actualización:</strong></td>
+                        <td>2024-10-07</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Base de Datos:</strong></td>
+                        <td>Conectada</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Espacio Utilizado:</strong></td>
+                        <td>25.6 MB</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Usuarios Activos:</strong></td>
+                        <td>1</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div>
+                <h3>Herramientas de Administración</h3>
+                <div>
+                    <button type="button">Verificar Integridad de Datos</button>
+                    <button type="button">Generar Reporte de Sistema</button>
+                    <button type="button">Exportar Log de Auditoría</button>
+                    <button type="button">Respaldar Base de Datos</button>
+                    <button type="button">Limpiar Cache del Sistema</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
