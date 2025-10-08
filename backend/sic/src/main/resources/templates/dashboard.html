@@ -44,16 +44,16 @@
                     <h1 class="text-3xl font-bold">SIC</h1>
                     <p class="text-sm">Sistema de Información Contable</p>
                 </div>
-                <div class="border-2 border-solid border black">
+                <div class="">
                     <ul class="menu bg-base-200 w-full">
-                        <li><a class="menu-active">Dashboard</a></li>
-                        <li><a>Registrar partida</a></li>
-                        <li><a>Libro diario</a></li>
-                        <li><a>Libro mayor</a></li>
-                        <li><a>Balances</a></li>
-                        <li><a>Subir Documento</a></li>
-                        <li><a>Configuración</a></li>
-                        <li th:unless="${usuario.role == 'ADMIN'}"><a>PRUEBA</a></li>
+                        <li><a class="menu-active transition-transform duration-200 hover:scale-[1.05]">Dashboard</a></li>
+                        <li><a class="transition-transform duration-200 hover:scale-[1.05]">Registrar partida</a></li>
+                        <li><a class="transition-transform duration-200 hover:scale-[1.05]">Libro diario</a></li>
+                        <li><a class="transition-transform duration-200 hover:scale-[1.05]">Libro mayor</a></li>
+                        <li><a class="transition-transform duration-200 hover:scale-[1.05]">Balances</a></li>
+                        <li><a class="transition-transform duration-200 hover:scale-[1.05]">Subir Documento</a></li>
+                        <li><a class="transition-transform duration-200 hover:scale-[1.05]">Configuración</a></li>
+                        <li th:unless="${usuario.role == 'CONTADOR'}"><a>PRUEBA</a></li>
                         <!-- Si el usuario.role **es igual a 'ADMIN' → la condición es verdadera → th:unless lo niega → el <li> NO se mostrará. -->
                     </ul>
 
