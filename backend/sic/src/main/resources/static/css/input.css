@@ -3,6 +3,20 @@
     themes: all;
 }
 
+@layer utilities {
+  .anim-fade {
+    @apply transition-all duration-300 ease-in-out opacity-0 scale-95;
+  }
+
+  .anim-fade.show {
+    @apply opacity-100 scale-100;
+  }
+
+  .anim-fade.hide {
+    @apply opacity-0 scale-95;
+  }
+}
+
 
 
 

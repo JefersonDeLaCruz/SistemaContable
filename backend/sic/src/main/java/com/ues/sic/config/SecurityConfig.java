@@ -42,6 +42,7 @@ public class SecurityConfig {
                 .requestMatchers("/discriminacion/contador").hasRole("CONTADOR")
                 .requestMatchers("/discriminacion/auditor").hasRole("AUDITOR")
                 .requestMatchers("/discriminacion/dashboard").authenticated()
+                .requestMatchers("/partida").authenticated() // Permitir POST a /partida para usuarios autenticados
                 // Requerir autenticación para todas las demás rutas
                 .anyRequest().authenticated()
             )
