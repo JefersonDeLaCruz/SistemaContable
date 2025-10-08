@@ -17,8 +17,8 @@ import java.util.Base64;
 @Configuration
 public class DataSeeder {
 
-    private static final String DEFAULT_ADMIN_USERNAME = "admin";
-    private static final String DEFAULT_ADMIN_EMAIL = "admin@sistema.local";
+    private static final String DEFAULT_ADMIN_USERNAME = "admino";
+    private static final String DEFAULT_ADMIN_EMAIL = "admin@sistema.locala";
     private static final String DEFAULT_ADMIN_ROLE = "ADMIN";
     
     @Bean
