@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dracula">
+
+<head th:replace="layout :: head">
+
+</head>
+
+<body>
+
+    <div class="drawer">
+        <input id="my-drawer-3" type="checkbox" class="drawer-toggle" />
+        <div class="drawer-content flex flex-col">
+            <!-- Navbar -->
+            <div class="navbar bg-base-300 w-full">
+                <div class="flex-none ">
+                    <!-- se puede hacer lg:hidden aqui para que el boton solo aparezca en pantallas pequeñas -->
+                    <label for="my-drawer-3" aria-label="open sidebar" class="btn btn-square btn-ghost">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            class="inline-block h-6 w-6 stroke-current">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </label>
+                </div>
+                <div class="mx-2 flex-1 px-2">Dashboard</div>
+                <div class="hidden flex-none lg:block">
+                    <ul class="menu menu-horizontal">
+                        <!-- Navbar menu content here -->
+                        <li><a>Navbar Item 1</a></li>
+                        <li><a>Navbar Item 2</a></li>
+                    </ul>
+                </div>
+            </div>
+            <!-- Page content here -->
+            Content
+
+            <div class="p-10">
+                <form action="/partida" method="post" class="">
+
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <!-- contenedor de la fila de inputs superior -->
+                    <div class="flex gap-10">
+                        <fieldset class="fieldset">
+                            <legend class="fieldset-legend">Detalle</legend>
+                            <input name="descripcion" type="text" class="input" placeholder="Detalle de la transaccion" required />
+                            <!-- <p class="label">AVLA</p> -->
+                        </fieldset>
+
+                        <fieldset class="fieldset">
+                            <legend class="fieldset-legend">Periodo</legend>
+                            <select name="idPeriodo" id="" class="select" required>
+                                <option value="">Seleccionar periodo...</option>
+                                <option value="2024-01">Enero 2024</option>
+                                <option value="2024-02">Febrero 2024</option>
+                                <option value="2024-03">Marzo 2024</option>
+                                <!-- traer periodos de db -->
+                            </select>
+                            <!-- <p class="label">AVLA</p> -->
+                        </fieldset>
+
+
+                    </div>
+
+                    <div class="flex w-full flex-col">
+                        <div class="divider"></div>
+                    </div>
+
+                    <div class="contenedor-movimientos flex flex-col gap-10">
+
+                        <div role="alert" id="alerta" class="alert alert-warning hidden w-[50%] m-auto anim-fade absolute z-10 top-[50px] left-0 right-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 stroke-current" fill="none"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            <span>Advertencia: Debe haber al menos dos líneas de movimiento.</span>
+                        </div>
+
+                        <div class="linea flex gap-10 justify-items-center">
+
+                            <fieldset class="fieldset">
+                                <legend class="fieldset-legend">Cuenta</legend>
+                                <select name="detalles[0].idCuenta" id="" class="select" required>
+                                    <option value="">Seleccionar cuenta...</option>
+                                    <option value="1001">1001 - Caja</option>
+                                    <option value="1002">1002 - Bancos</option>
+                                    <option value="1003">1003 - Cuentas por Cobrar</option>
+                                    <!-- traer cuentas de db -->
+                                </select>
+                            </fieldset>
+
+                            <fieldset class="fieldset">
+                                <legend class="fieldset-legend">Debito (debe)</legend>
+                                <input name="detalles[0].debito" type="number" step="0.01" class="input debito-input" placeholder="0.00" min="0" />
+                                <!-- <p class="label">AVLA</p> -->
+                            </fieldset>
+
+                            <fieldset class="fieldset">
+                                <legend class="fieldset-legend">Credito (haber)</legend>
+                                <input name="detalles[0].credito" type="number" step="0.01" class="input credito-input" placeholder="0.00" min="0" />
+                                <!-- <p class="label">AVLA</p> -->
+                            </fieldset>
+
+                            <fieldset class="fieldset self-end">
+                                <button type="button" class="eliminar btn btn-error">Eliminar</button>
+                            </fieldset>
+                        </div>
+
+                        <!-- <div class="flex w-full flex-col">
+                            <div class="divider"></div>
+                        </div> -->
+
+
+
+
+                    </div>
+
+                    <div class="flex w-full flex-col">
+                        <div class="divider"></div>
+                    </div>
+
+                    <div class="flex gap-10">
+
+
+                        <fieldset class="fieldset">
+                            <button class="agregar-movimiento btn">Agregar Movimiento</button>
+                        </fieldset>
+
+                        <fieldset class="fieldset">
+                            <div class="tooltip">
+                                <div class="tooltip-content">
+                                    <div class="animate-bounce text-orange-400 -rotate-10 text-2xl font-black">Debe =
+                                        Haber!
+                                    </div>
+                                </div>
+                                <button class="btn btn-info btn-soft">Protip!</button>
+                            </div>
+                        </fieldset>
+
+                        <fieldset class="fieldset">
+                            <label for="">Total credito</label>
+                            <h1 id="total-credito"></h1>
+                        </fieldset>
+
+                        <fieldset class="fieldset">
+                            <label for="">Total de debito</label>
+                            <h1 id="total-debito"></h1>
+                        </fieldset>
+
+                        <fieldset class="fieldset">
+                            <label for="">Estado</label>
+                            <h1 id="estado"></h1>
+                        </fieldset>
+
+                    </div>
+
+                    <input type="submit" value="Registrar Partida" class="btn btn-secondary mt-10" />
+
+
+                </form>
+            </div>
+            <h1 th:text="'mi rol actual: ' + ${usuario.role}">test</h1>
+        </div>
+        <div class="drawer-side">
+            <label for="my-drawer-3" aria-label="close sidebar" class="drawer-overlay"></label>
+            <ul class="menu bg-base-200 min-h-full w-60 sm:w-80 p-2 flex justify-between">
+                <!-- Sidebar content here -->
+
+                <div class="brand">
+                    <h1 class="text-3xl font-bold">SIC</h1>
+                    <p class="text-sm">Sistema de Información Contable</p>
+                </div>
+                <div class="">
+                    <ul class="menu bg-base-200 w-full">
+                        <li><a th:href="@{/dashboard}" class="transition-transform duration-200 hover:scale-[1.05]">Dashboard</a>
+                        </li>
+                        <li><a class="transition-transform duration-200 hover:scale-[1.05] menu-active">Registrar partida</a></li>
+                        <li><a class="transition-transform duration-200 hover:scale-[1.05]">Libro diario</a></li>
+                        <li><a class="transition-transform duration-200 hover:scale-[1.05]">Libro mayor</a></li>
+                        <li><a class="transition-transform duration-200 hover:scale-[1.05]">Balances</a></li>
+                        <li><a class="transition-transform duration-200 hover:scale-[1.05]">Subir Documento</a></li>
+                        <li><a class="transition-transform duration-200 hover:scale-[1.05]">Configuración</a></li>
+                        <li th:if="${usuario.role == 'ADMIN'}">
+                            <a th:href="@{/admin/crear-usuario}"
+                                class="transition-transform duration-200 hover:scale-[1.05]">Gestionar Usuarios</a>
+                        </li>
+                        <li th:if="${usuario.role == 'ADMIN'}">
+                            <a th:href="@{/admin/crear-usuario}"
+                                class="transition-transform duration-200 hover:scale-[1.05]">Gestionar Cuentas</a>
+                        </li>
+                    </ul>
+
+                </div>
+
+                <div class="">
+                    <div class="divider"></div>
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit" class="btn btn-outline btn-error w-full">Cerrar sesión</button>
+                    </form>
+                </div>
+
+
+
+            </ul>
+        </div>
+    </div>
+    <script th:src="@{/js/registrar-partida.js}"></script>
+</body>
+
+</html>

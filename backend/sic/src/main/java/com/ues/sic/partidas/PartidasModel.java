@@ -24,7 +24,12 @@ public class PartidasModel {
     @NotNull
     @Column(name = "descripcion")
     private String descripcion;
-    
+
+    @NotEmpty
+    @NotNull
+    @Column(name = "fecha")
+    private String fecha;
+
     @NotEmpty
     @NotNull
     @Column(name = "idPeriodo")
@@ -42,6 +47,10 @@ public class PartidasModel {
     
     public String getDescripcion() {
         return descripcion;
+    }
+    
+    public String getFecha() {
+        return fecha;
     }
     
     public String getIdPeriodo() {
@@ -67,6 +76,10 @@ public class PartidasModel {
     
     public void setIdUsuario(String idUsuario) {
         this.idUsuario = idUsuario;
+    }
+
+    public void setFecha(String string) {
+        this.fecha = string;
     }
 
 }

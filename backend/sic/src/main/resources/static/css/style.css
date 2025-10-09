@@ -10,3 +10,15 @@ input:-webkit-autofill {
   -webkit-text-fill-color: #111827; /* cambia el color del texto */
   transition: background-color 5000s ease-in-out 0s; /* evita parpadeo */
 }
+
+
+#alerta {
+    transition: all 0.3s ease-in-out;
+    transform: translateY(-10px);
+    opacity: 0;
+}
+
+#alerta:not(.hidden) {
+    transform: translateY(0);
+    opacity: 1;
+}

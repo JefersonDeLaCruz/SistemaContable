@@ -1,4 +1,11 @@
 package com.ues.sic.partidas;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 /* 
 import java.util.List;
 import java.util.Optional;
@@ -14,19 +21,21 @@ import org.springframework.web.bind.annotation.RequestBody; */
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+
 @RestController
 @RequestMapping("/api/partidas")
 public class PartidasController {
     
-   /*  @Autowired
+    @Autowired
     private PartidasRepository partidasRepository;
-
+    
     // Obtener todas las partidas
     @GetMapping
     public List<PartidasModel> getAllPartidas() {
         return partidasRepository.findAll();
     }
 
+    /*
     // Obtener partida por ID
     @GetMapping("/{id}")
     public ResponseEntity<PartidasModel> getPartidaById(@PathVariable Long id) {
@@ -73,4 +82,14 @@ public class PartidasController {
         
         return ResponseEntity.notFound().build();
     } */
+
+    //implementar el método para registrar una partida mediante POST usando desde forms de html
+    
+    @PostMapping("/registrar")
+    public ResponseEntity<PartidasModel> registrarPartida(@ModelAttribute PartidasModel partida) {
+        partida.setFecha(java.time.LocalDate.now().toString()); // Asignar la fecha actual en formato ISO
+        PartidasModel nuevaPartida = partidasRepository.save(partida);
+        return ResponseEntity.ok(nuevaPartida);
+    }
+
 }

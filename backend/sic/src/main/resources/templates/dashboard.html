@@ -33,6 +33,73 @@
             </div>
             <!-- Page content here -->
             Content
+
+            <div class="p-10">
+                <h2 class="text-2xl font-bold mb-4">DEBUG: Todas las Partidas Registradas</h2>
+                
+                <!-- Mostrar partidas -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold mb-2">PARTIDAS:</h3>
+                    <div th:if="${partidas.empty}">
+                        <p>No hay partidas registradas en la base de datos.</p>
+                    </div>
+                    <div th:each="partida : ${partidas}" class="border p-4 mb-4 bg-gray-100">
+                        <p><strong>ID:</strong> <span th:text="${partida.id}"></span></p>
+                        <p><strong>Descripción:</strong> <span th:text="${partida.descripcion}"></span></p>
+                        <p><strong>Fecha:</strong> <span th:text="${partida.fecha}"></span></p>
+                        <p><strong>ID Período:</strong> <span th:text="${partida.idPeriodo}"></span></p>
+                        <p><strong>ID Usuario:</strong> <span th:text="${partida.idUsuario}"></span></p>
+                    </div>
+                </div>
+
+                <!-- Mostrar detalles -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold mb-2">DETALLES DE PARTIDAS:</h3>
+                    <div th:if="${detalles.empty}">
+                        <p>No hay detalles de partidas registrados en la base de datos.</p>
+                    </div>
+                    <div th:each="detalle : ${detalles}" class="border p-4 mb-4 bg-blue-100">
+                        <p><strong>ID:</strong> <span th:text="${detalle.id}"></span></p>
+                        <p><strong>ID Partida:</strong> <span th:text="${detalle.partida != null ? detalle.partida.id : 'N/A'}"></span></p>
+                        <p><strong>ID Cuenta:</strong> <span th:text="${detalle.idCuenta}"></span></p>
+                        <p><strong>Descripción:</strong> <span th:text="${detalle.descripcion}"></span></p>
+                        <p><strong>Débito:</strong> <span th:text="${detalle.debito}"></span></p>
+                        <p><strong>Crédito:</strong> <span th:text="${detalle.credito}"></span></p>
+                    </div>
+                </div>
+                
+                <!-- Resumen -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold mb-2">RESUMEN:</h3>
+                    <p><strong>Total Partidas:</strong> <span th:text="${partidas.size()}"></span></p>
+                    <p><strong>Total Detalles:</strong> <span th:text="${detalles.size()}"></span></p>
+                </div>
+                
+                <!-- Partidas con sus detalles agrupados -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold mb-2">PARTIDAS CON SUS DETALLES:</h3>
+                    <div th:each="partida : ${partidas}" class="border-2 border-green-500 p-4 mb-6 bg-green-50">
+                        <h4 class="text-lg font-bold text-green-800 mb-2">PARTIDA #<span th:text="${partida.id}"></span></h4>
+                        <p><strong>Descripción:</strong> <span th:text="${partida.descripcion}"></span></p>
+                        <p><strong>Fecha:</strong> <span th:text="${partida.fecha}"></span></p>
+                        <p><strong>Período:</strong> <span th:text="${partida.idPeriodo}"></span></p>
+                        
+                        <div class="mt-4">
+                            <h5 class="font-semibold text-green-700">Detalles de esta partida:</h5>
+                            <div th:if="${detalles.?[partida.id == #this.partida.id].empty}">
+                                <p class="text-red-500">No hay detalles para esta partida</p>
+                            </div>
+                            <div th:each="detalle : ${detalles.?[partida.id == #this.partida.id]}" class="ml-4 p-2 mb-2 bg-white border">
+                                <p><strong>Cuenta:</strong> <span th:text="${detalle.idCuenta}"></span></p>
+                                <p><strong>Débito:</strong> $<span th:text="${detalle.debito}"></span></p>
+                                <p><strong>Crédito:</strong> $<span th:text="${detalle.credito}"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h1 th:text="'mi rol actual: ' + ${usuario.role}">test</h1>
         </div>
         <div class="drawer-side">
             <label for="my-drawer-3" aria-label="close sidebar" class="drawer-overlay"></label>
@@ -43,44 +110,21 @@
                     <h1 class="text-3xl font-bold">SIC</h1>
                     <p class="text-sm">Sistema de Información Contable</p>
                 </div>
-                <div class="border-2 border-solid border black">
+                <div class="">
                     <ul class="menu bg-base-200 w-full">
-                        <li><a class="menu-active">Dashboard</a></li>
-                        
-                        <!-- ADMIN routes -->
-                        <div th:if="${usuario.role == 'ADMIN'}">
-                            <li><a href="/admin/explorador-partidas">Explorador de Partidas</a></li>
-                            <li><a href="/admin/libro-diario">Libro diario</a></li>
-                            <li><a href="/admin/libro-mayor">Libro mayor</a></li>
-                            <li><a href="/admin/usuarios">Gestión de Usuarios</a></li>
-                            <li><a href="/admin/bitacora">Bitácora</a></li>
-                            <li><a href="/admin/ver-pdfs">Ver PDFs</a></li>
-                            <li><a href="/admin/configuracion">Configuración</a></li>
-                        </div>
-                        
-                        <!-- AUDITOR routes -->
-                        <div th:if="${usuario.role == 'AUDITOR'}">
-                            <li><a href="/auditor/explorador-partidas">Explorador de Partidas</a></li>
-                            <li><a href="/auditor/libro-diario">Libro diario</a></li>
-                            <li><a href="/auditor/libro-mayor">Libro mayor</a></li>
-                            <li><a href="/auditor/bitacora">Bitácora</a></li>
-                            <li><a href="/auditor/ver-pdfs">Ver PDFs</a></li>
-                            <li><a href="/auditor/configuracion">Configuración</a></li>
-                        </div>
-                        
-                        <!-- CONTADOR routes -->
-                        <div th:if="${usuario.role == 'CONTADOR'}">
-                            <li><a href="/contador/registrar-partida">Registrar partida</a></li>
-                            <li><a href="/contador/libro-diario">Libro diario</a></li>
-                            <li><a href="/contador/libro-mayor">Libro mayor</a></li>
-                            <li><a href="/contador/balances">Balances</a></li>
-                            <li><a href="/contador/subir-pdf">Subir PDF</a></li>
-                            <li><a href="/contador/configuracion">Configuración</a></li>
-                        </div>
-                        
-                        <li><a>Subir Documento</a></li>
-                        <li th:unless="${usuario.role == 'ADMIN'}"><a>PRUEBA</a></li>
-                        <!-- Si el usuario.role **es igual a 'ADMIN' → la condición es verdadera → th:unless lo niega → el <li> NO se mostrará. -->
+                        <li><a class="menu-active transition-transform duration-200 hover:scale-[1.05]">Dashboard</a></li>
+                        <li><a th:href="@{/registrar-partida}" class="transition-transform duration-200 hover:scale-[1.05]">Registrar partida</a></li>
+                        <li><a class="transition-transform duration-200 hover:scale-[1.05]">Libro diario</a></li>
+                        <li><a class="transition-transform duration-200 hover:scale-[1.05]">Libro mayor</a></li>
+                        <li><a class="transition-transform duration-200 hover:scale-[1.05]">Balances</a></li>
+                        <li><a class="transition-transform duration-200 hover:scale-[1.05]">Subir Documento</a></li>
+                        <li><a class="transition-transform duration-200 hover:scale-[1.05]">Configuración</a></li>
+                        <li th:if="${usuario.role == 'ADMIN'}">
+                            <a th:href="@{/admin/crear-usuario}" class="transition-transform duration-200 hover:scale-[1.05]">Gestionar Usuarios</a>
+                        </li>
+                        <li th:if="${usuario.role == 'ADMIN'}">
+                            <a th:href="@{/admin/crear-usuario}" class="transition-transform duration-200 hover:scale-[1.05]">Gestionar Cuentas</a>
+                        </li>
                     </ul>
 
                 </div>
