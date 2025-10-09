@@ -12,17 +12,25 @@ public class CuentaController {
     @Autowired
     private CuentaRepository cuentaRepository;
 
+    // Obtener todas las cuentas
+    @GetMapping
+    public List<CuentaModel> getAllCuentas() {
+        return cuentaRepository.findAll();
+    }
+
+    // Inserta solo una cuenta 
     @PostMapping("/insertar")
     public CuentaModel insertarCuenta(@RequestBody CuentaModel cuenta) {
         // Puedes usar el método estático o directamente el repositorio
-        return CuentaModel.insertar(cuentaRepository, cuenta.getCodigo(), cuenta.getNombre(),
+        return CuentaModel.insertarCuenta(cuentaRepository, cuenta.getCodigo(), cuenta.getNombre(),
                 cuenta.getTipo(), cuenta.getSaldoNormal(), cuenta.getIdPadre());
     }
 
+    // Inserta un conjunto de cuentas que vienen en un json
     @PostMapping("/insertar-masivo")
     public List<CuentaModel> insertarCuentas(@RequestBody List<CuentaModel> cuentas) {
         return cuentas.stream()
-                .map(c -> CuentaModel.insertar(cuentaRepository,
+                .map(c -> CuentaModel.insertarCuenta(cuentaRepository,
                         c.getCodigo(), c.getNombre(), c.getTipo(),
                         c.getSaldoNormal(), c.getIdPadre()))
                 .toList();

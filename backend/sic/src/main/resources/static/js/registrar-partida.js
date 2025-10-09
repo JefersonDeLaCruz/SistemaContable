@@ -1,9 +1,28 @@
-console.log("avla que jopa");
+// Para cargar cuentas en cada select 
+ async function cargarCuentas() {
+    try {
+      const response = await fetch('/api/cuentas'); // URL del endpoint
+      const cuentas = await response.json();
+
+      const select = document.querySelectorAll('select');
+      select.forEach(selectItem => {
+        cuentas.forEach(cuenta => {
+        const option = document.createElement('option');
+        option.value = cuenta.id; // o cuenta.codigo si preferís
+        option.textContent = `${cuenta.codigo} - ${cuenta.nombre}`;
+        selectItem.appendChild(option);
+      });
+      });
+    } catch (error) {
+      console.error('Error cargando las cuentas:', error);
+    }
+  }
 
 const contenedor = document.querySelector(".contenedor-movimientos");
 const btnAgregarMovimiento = document.querySelector(".agregar-movimiento");
 const body = document.body;
 
+// Agrega una nueva linea de detalle de transaccion
 function agregarLinea() {
     const primeraLinea = contenedor.querySelector(".linea");
     const nuevaLinea = primeraLinea.cloneNode(true);
@@ -21,6 +40,7 @@ function agregarLinea() {
     contenedor.appendChild(nuevaLinea);
     actualizarEventosEliminar();
     actualizarIndices();
+    cargarCuentas(); // Carga las cuentas en cada select
 }
 
 function actualizarIndices() {

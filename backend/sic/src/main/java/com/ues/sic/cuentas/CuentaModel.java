@@ -11,13 +11,13 @@ public class CuentaModel {
     @Column(name = "id_cuenta")
     private Integer idCuenta;
 
-    @Column(nullable = false)
+    @Column(name = "codigo", nullable = false)
     private String codigo;
 
-    @Column(nullable = false)
+    @Column(name = "nombre", nullable = false)
     private String nombre;
 
-    @Column(nullable = false)
+    @Column(name = "tipo", nullable = false)
     private String tipo;
 
     @Column(name = "saldo_normal", nullable = false)
@@ -87,8 +87,8 @@ public class CuentaModel {
         this.idPadre = idPadre;
     }
 
-    // Método para insertar (usando el repositorio)
-    public static CuentaModel insertar(CuentaRepository repository, String codigo, String nombre, String tipo, String saldoNormal, Integer idPadre) {
+    // Método para insertar una nueva cuenta
+    public static CuentaModel insertarCuenta(CuentaRepository repository, String codigo, String nombre, String tipo, String saldoNormal, Integer idPadre) {
         CuentaModel cuenta = new CuentaModel(codigo, nombre, tipo, saldoNormal, idPadre);
         return repository.save(cuenta);
     }
