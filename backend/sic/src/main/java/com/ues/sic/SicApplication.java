@@ -11,7 +11,6 @@ public class SicApplication {
 
 		System.out.println("Avla que jopa");
 		SpringApplication.run(SicApplication.class, args);
-
 		
 	}
 
