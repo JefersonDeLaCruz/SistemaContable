@@ -60,6 +60,18 @@ public class ViewController {
         model.addAttribute("titulo", "Registrar Partida");
         return "registrar-partida";
     }
+
+    @GetMapping("/libro-mayor")
+    public String verLibroMayor(Model model){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+        
+        UsuariosModel user = usuariosRepository.findByUsername(username);
+
+        model.addAttribute("usuario", user);
+        model.addAttribute("titulo", "Libro Mayor");
+        return "libro-mayor";
+    }
     
     @PostMapping("/partida")
     public ResponseEntity<?> crearPartida(@ModelAttribute PartidaConDetallesDTO dto) {

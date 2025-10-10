@@ -43,7 +43,6 @@
                         <fieldset class="fieldset">
                             <legend class="fieldset-legend">Detalle</legend>
                             <input name="descripcion" type="text" class="input" placeholder="Detalle de la transaccion" required />
-                            <!-- <p class="label">AVLA</p> -->
                         </fieldset>
 
                         <fieldset class="fieldset">
@@ -52,10 +51,7 @@
                                 <option value="">Seleccionar periodo...</option>
                                 <!-- traer periodos de db -->
                             </select>
-                            <!-- <p class="label">AVLA</p> -->
                         </fieldset>
-
-
                     </div>
 
                     <div class="flex w-full flex-col">
@@ -155,6 +151,8 @@
             </div>
             <h1 th:text="'mi rol actual: ' + ${usuario.role}">test</h1>
         </div>
+
+        
         <div class="drawer-side">
             <label for="my-drawer-3" aria-label="close sidebar" class="drawer-overlay"></label>
             <ul class="menu bg-base-200 min-h-full w-60 sm:w-80 p-2 flex justify-between">
@@ -192,8 +190,6 @@
                         <button type="submit" class="btn btn-outline btn-error w-full">Cerrar sesión</button>
                     </form>
                 </div>
-
-
 
             </ul>
         </div>
