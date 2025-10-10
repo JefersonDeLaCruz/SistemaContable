@@ -9,6 +9,7 @@ RUN npm install tailwindcss @tailwindcss/cli
 RUN npm i -D daisyui@latest
 RUN mkdir css
 RUN mkdir templates
+RUN mkdir js
 
 # ENTRYPOINT ["npx", "tailwindcss", "-i", "./css/input.css", "-o", "./css/output.css", "--watch"]
 ENTRYPOINT ["npx", "tailwindcss", "-i", "./css/input.css", "-o", "./css/output.css", "--watch", "--content", "./templates/**/*.html ./static/**/*.html ./static/**/*.js"]

@@ -19,6 +19,7 @@ services:
     volumes:
       - ./backend/sic/src/main/resources/static/css:/app/css
       - ./backend/sic/src/main/resources/templates:/app/templates
+      - ./backend/sic/src/main/resources/static/js:/app/js
     tty: true
     stdin_open: true
 

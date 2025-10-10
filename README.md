@@ -1,7 +1,7 @@
 Avla
 
 1.Clonar el repositorio
-2. en terminal: cd
+2. en terminal: docker build -f dockerfile.node -t node-img-test .
 3.docker compose up --build
 4.Solo queda ejecutar el proyecto de java, desde la clase SicApplication.java
 
