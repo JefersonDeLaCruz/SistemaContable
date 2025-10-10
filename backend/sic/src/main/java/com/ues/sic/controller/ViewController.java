@@ -64,6 +64,10 @@ public class ViewController {
 
 
 
+    @GetMapping("/test")
+    public String test(){
+        return "test";
+    }
 
 
     @GetMapping("/libro-diario")

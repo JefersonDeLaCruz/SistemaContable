@@ -11,144 +11,110 @@ import com.ues.sic.usuarios.UsuariosRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.security.SecureRandom;
-import java.util.Base64;
 
 @Configuration
 public class DataSeeder {
 
-    private static final String DEFAULT_ADMIN_USERNAME = "admino";
-    private static final String DEFAULT_ADMIN_EMAIL = "admin@sistema.locala";
-    private static final String DEFAULT_ADMIN_ROLE = "ADMIN";
+    // Usuarios por defecto para cada rol
+    private static final String DEFAULT_ADMIN_USERNAME = "admin";
+    private static final String DEFAULT_ADMIN_PASSWORD = "admin123";
+    private static final String DEFAULT_ADMIN_EMAIL = "admin@sic.com";
+    
+    private static final String DEFAULT_CONTADOR_USERNAME = "contador";
+    private static final String DEFAULT_CONTADOR_PASSWORD = "contador123";
+    private static final String DEFAULT_CONTADOR_EMAIL = "contador@sic.com";
+    
+    private static final String DEFAULT_AUDITOR_USERNAME = "auditor";
+    private static final String DEFAULT_AUDITOR_PASSWORD = "auditor123";
+    private static final String DEFAULT_AUDITOR_EMAIL = "auditor@sic.com";
     
     @Bean
-    CommandLineRunner seedDefaultUser(UsuariosRepository repo,  PasswordEncoder encoder, Environment env) {
+    CommandLineRunner seedDefaultUser(UsuariosRepository repo, PasswordEncoder encoder, Environment env) {
         return args -> {
-            createDefaultAdminUser(repo, encoder, env);
-            createTestUsers(repo, encoder);
+            System.out.println("\n========================================");
+            System.out.println("  INICIANDO SEED DE USUARIOS DEFAULT");
+            System.out.println("========================================\n");
+            
+            createDefaultUsers(repo, encoder);
+            
+            System.out.println("\n========================================");
+            System.out.println("  SEED DE USUARIOS COMPLETADO");
+            System.out.println("========================================\n");
         };
     }
     
-    private void createDefaultAdminUser(UsuariosRepository repo, PasswordEncoder encoder,  Environment env) {
+    /**
+     * Crea usuarios por defecto para cada rol si no existen
+     */
+    private void createDefaultUsers(UsuariosRepository repo, PasswordEncoder encoder) {
+        // Crear usuario ADMIN
+        createUserIfNotExists(
+            repo, encoder, 
+            DEFAULT_ADMIN_USERNAME, 
+            DEFAULT_ADMIN_EMAIL, 
+            "ADMIN", 
+            DEFAULT_ADMIN_PASSWORD
+        );
         
-        // Verificar si ya existe un usuario admin
-        boolean adminExists = repo.existsByUsernameIgnoreCase(DEFAULT_ADMIN_USERNAME) 
-                           || repo.existsByEmailIgnoreCase(DEFAULT_ADMIN_EMAIL);
+        // Crear usuario CONTADOR
+        createUserIfNotExists(
+            repo, encoder, 
+            DEFAULT_CONTADOR_USERNAME, 
+            DEFAULT_CONTADOR_EMAIL, 
+            "CONTADOR", 
+            DEFAULT_CONTADOR_PASSWORD
+        );
         
-        if (adminExists) {
-            System.out.println("INFO: Usuario admin ya existe, omitiendo creacion.");
+        // Crear usuario AUDITOR
+        createUserIfNotExists(
+            repo, encoder, 
+            DEFAULT_AUDITOR_USERNAME, 
+            DEFAULT_AUDITOR_EMAIL, 
+            "AUDITOR", 
+            DEFAULT_AUDITOR_PASSWORD
+        );
+    }
+    
+    /**
+     * Crea un usuario si no existe
+     */
+    private void createUserIfNotExists(UsuariosRepository repo, PasswordEncoder encoder, 
+                                      String username, String email, String role, String password) {
+        
+        // Verificar si el usuario ya existe
+        boolean userExists = repo.existsByUsernameIgnoreCase(username) 
+                          || repo.existsByEmailIgnoreCase(email);
+        
+        if (userExists) {
+            System.out.println(" Usuario '" + username + "' (" + role + ") ya existe - omitiendo creación");
             return;
         }
         
-        // Crear usuario admin
-        UsuariosModel adminUser = new UsuariosModel();
-        adminUser.setUsername(DEFAULT_ADMIN_USERNAME);
-        adminUser.setEmail(DEFAULT_ADMIN_EMAIL);
-        adminUser.setRole(DEFAULT_ADMIN_ROLE);
-        adminUser.setActive(true);
+        // Crear nuevo usuario
+        UsuariosModel user = new UsuariosModel();
+        user.setUsername(username);
+        user.setEmail(email);
+        user.setRole(role);
+        user.setActive(true);
+        user.setPassword(encoder.encode(password));
         
         // Establecer timestamps
         String currentTimestamp = LocalDateTime.now()
             .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-        adminUser.setCreatedAt(currentTimestamp);
-        adminUser.setUpdatedAt(currentTimestamp);
+        user.setCreatedAt(currentTimestamp);
+        user.setUpdatedAt(currentTimestamp);
         
-        // Obtener contraseña de manera segura
-        String password = getSecureAdminPassword(env);
-        adminUser.setPassword(encoder.encode(password));
-        
-        // Guardar usuario
         try {
-            repo.save(adminUser);
-            System.out.println("SUCCESS: Usuario admin creado exitosamente.");
-            System.out.println("INFO: Username: " + DEFAULT_ADMIN_USERNAME);
-            System.out.println("INFO: Email: " + DEFAULT_ADMIN_EMAIL);
-            
-            // Solo mostrar la contraseña si fue generada automáticamente
-            if (isPasswordAutoGenerated(env)) {
-                System.out.println("IMPORTANTE: Contraseña temporal generada: " + password);
-                System.out.println("SEGURIDAD: Cambie esta contraseña inmediatamente después del primer login.");
-            } else {
-                System.out.println("INFO: Usando contraseña configurada desde variable de entorno.");
-            }
-            
+            repo.save(user);
+            System.out.println("Usuario creado exitosamente:");
+            System.out.println("   ├─ Usuario: " + username);
+            System.out.println("   ├─ Email: " + email);
+            System.out.println("   ├─ Rol: " + role);
+            System.out.println("   └─ Contraseña: " + password);
+            System.out.println();
         } catch (Exception e) {
-            System.err.println("ERROR: No se pudo crear el usuario admin: " + e.getMessage());
-        }
-    }
-    
-    /**Obtiene la contraseña de admin de manera segura Prioridad: Variable de entorno -> Generada automáticamente*/
-    private String getSecureAdminPassword(Environment env) {
-        // 1. Intentar obtener desde variable de entorno
-        String envPassword = env.getProperty("ADMIN_PASSWORD");
-        if (envPassword != null && !envPassword.trim().isEmpty()) {
-            return envPassword.trim();
-        }
-        
-        // 2. Intentar obtener desde system property (para desarrollo)
-        String sysPassword = System.getProperty("admin.password");
-        if (sysPassword != null && !sysPassword.trim().isEmpty()) {
-            return sysPassword.trim();
-        }
-        
-        // 3. Generar contraseña segura automáticamente
-        return generateSecurePassword();
-    }
-    
-    /**
-     * Verifica si la contraseña fue generada automáticamente
-     */
-    private boolean isPasswordAutoGenerated(Environment env) {
-        String envPassword = env.getProperty("ADMIN_PASSWORD");
-        String sysPassword = System.getProperty("admin.password");
-        return (envPassword == null || envPassword.trim().isEmpty()) &&
-               (sysPassword == null || sysPassword.trim().isEmpty());
-    }
-    
-    /**
-     * Genera una contraseña segura de 16 caracteres
-     */
-    private String generateSecurePassword() {
-        SecureRandom random = new SecureRandom();
-        byte[] bytes = new byte[12]; // 12 bytes = 16 caracteres en base64
-        random.nextBytes(bytes);
-        
-        // Usar base64 URL-safe sin padding para evitar caracteres problemáticos
-        String password = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
-        
-        // Asegurar que tenga al menos 12 caracteres
-        return password.length() >= 12 ? password.substring(0, 12) : password + "Adm1n";
-    }
-    
-    /**
-     * Crea usuarios de prueba para testing
-     */
-    private void createTestUsers(UsuariosRepository repo, PasswordEncoder encoder) {
-        createUserIfNotExists(repo, encoder, "auditor", "auditor@test.com", "AUDITOR", "123456");
-        createUserIfNotExists(repo, encoder, "contador", "contador@test.com", "CONTADOR", "123456");
-    }
-    
-    private void createUserIfNotExists(UsuariosRepository repo, PasswordEncoder encoder, 
-                                      String username, String email, String role, String password) {
-        if (!repo.existsByUsernameIgnoreCase(username) && !repo.existsByEmailIgnoreCase(email)) {
-            UsuariosModel user = new UsuariosModel();
-            user.setUsername(username);
-            user.setEmail(email);
-            user.setRole(role);
-            user.setActive(true);
-            user.setPassword(encoder.encode(password));
-            
-            String currentTimestamp = LocalDateTime.now()
-                .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-            user.setCreatedAt(currentTimestamp);
-            user.setUpdatedAt(currentTimestamp);
-            
-            try {
-                repo.save(user);
-                System.out.println("SUCCESS: Usuario de prueba creado - " + username + " (" + role + ")");
-            } catch (Exception e) {
-                System.err.println("ERROR: No se pudo crear el usuario de prueba " + username + ": " + e.getMessage());
-            }
+            System.err.println("ERROR al crear usuario '" + username + "': " + e.getMessage());
+            System.err.println();
         }
     }
 }

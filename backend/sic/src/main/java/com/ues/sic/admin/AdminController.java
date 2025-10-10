@@ -39,7 +39,29 @@ public class AdminController {
 
     @GetMapping("/crear-usuario")
     public String mostrarFormularioCrearUsuario(Model model) {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+        
+        UsuariosModel user = usuariosRepository.findByUsername(username);
+
+        model.addAttribute("usuario", user);
+        model.addAttribute("titulo", "Gestionar Usuarios");
         return "admin/crear-usuario";
+    }
+
+    @GetMapping("/gestionar-cuentas")
+    public String mostrarFormularioGestionarCuenta(Model model) {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+        
+        UsuariosModel user = usuariosRepository.findByUsername(username);
+
+        model.addAttribute("usuario", user);
+        model.addAttribute("titulo", "Gestionar Cuentas");
+
+        return "admin/gestionar-cuentas";
     }
 
     @PostMapping("/crear-usuario")
@@ -84,6 +106,14 @@ public class AdminController {
             model.addAttribute("error", "Error al crear usuario: " + e.getMessage());
             System.err.println("Error creando usuario: " + e.getMessage());
         }
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String usernameActive = auth.getName();
+
+        UsuariosModel user = usuariosRepository.findByUsername(usernameActive);
+
+        model.addAttribute("usuario", user);
+        model.addAttribute("titulo", "Registrar Partida");
         
         return "admin/crear-usuario";
     }
