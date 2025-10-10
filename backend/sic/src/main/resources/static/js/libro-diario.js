@@ -1,79 +1,5 @@
 
 
-// Función para mostrar notificaciones toast
-function mostrarNotificacion(mensaje, tipo = 'info', duracion = 5000) {
-    // Crear contenedor de notificaciones si no existe
-    let contenedorToast = document.getElementById('toast-container');
-    if (!contenedorToast) {
-        contenedorToast = document.createElement('div');
-        contenedorToast.id = 'toast-container';
-        contenedorToast.className = 'fixed top-4 right-4 z-50 flex flex-col gap-2';
-        contenedorToast.style.maxWidth = '400px';
-        document.body.appendChild(contenedorToast);
-    }
-
-    // Determinar el tipo de alerta
-    let alertClass = 'alert-info';
-    let iconSVG = `
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>
-    `;
-
-    if (tipo === 'success') {
-        alertClass = 'alert-success';
-        iconSVG = `
-            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-        `;
-    } else if (tipo === 'warning') {
-        alertClass = 'alert-warning';
-        iconSVG = `
-            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-        `;
-    } else if (tipo === 'error') {
-        alertClass = 'alert-error';
-        iconSVG = `
-            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-        `;
-    }
-
-    // Crear el elemento de notificación
-    const toast = document.createElement('div');
-    toast.className = `alert ${alertClass} shadow-lg transition-all duration-300 transform translate-x-full opacity-0`;
-    toast.innerHTML = `
-        <div>
-            ${iconSVG}
-            <span>${mensaje}</span>
-        </div>
-    `;
-
-    // Agregar al contenedor
-    contenedorToast.appendChild(toast);
-
-    // Animar entrada
-    setTimeout(() => {
-        toast.classList.remove('translate-x-full', 'opacity-0');
-    }, 10);
-
-    // Animar salida y eliminar
-    setTimeout(() => {
-        toast.classList.add('translate-x-full', 'opacity-0');
-        setTimeout(() => {
-            toast.remove();
-            // Limpiar contenedor si está vacío
-            if (contenedorToast.children.length === 0) {
-                contenedorToast.remove();
-            }
-        }, 300);
-    }, duracion);
-}
-
 const btnFiltrar = document.getElementById('btnFiltrar');
 
 async function cargarPeriodos() {
@@ -190,12 +116,12 @@ async function renderizarLibroDiario(partidas, mapaCuentas) {
                 <p class="text-sm">para el período seleccionado</p>
             </div>
         `;
-        mostrarNotificacion('No se encontraron partidas para el período seleccionado', 'info', 4000);
+        mostrarToast('No se encontraron partidas para el período seleccionado', 'info', 4000);
         return;
     }
     
     // Notificación de éxito
-    mostrarNotificacion(`Se cargaron ${partidas.length} partida(s) correctamente`, 'success', 3000);
+    mostrarToast(`Se cargaron ${partidas.length} partida(s) correctamente`, 'success', 3000);
     
     // Para cada partida, crear una tabla con diseño consistente
     for (let i = 0; i < partidas.length; i++) {
@@ -291,29 +217,12 @@ function obtenerNombreCuenta(idCuenta, mapaCuentas) {
     return `<span class="text-error">Cuenta no encontrada (ID: ${idCuenta})</span>`;
 }
 
-// Función auxiliar para formatear moneda
-function formatearMoneda(valor) {
-    return new Intl.NumberFormat('es-SV', {
-        style: 'currency',
-        currency: 'USD',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    }).format(valor);
-}
-
-// Función auxiliar para formatear fecha
-function formatearFecha(fecha) {
-    const [year, month, day] = fecha.split('-');
-    const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-    return `${day} ${meses[parseInt(month) - 1]} ${year}`;
-}
-
 btnFiltrar.addEventListener('click', async (event) => {
     event.preventDefault();
     
     if (!periodoSeleccionado) {
         // Mostrar notificación de advertencia
-        mostrarNotificacion('Por favor seleccione un período contable antes de filtrar', 'warning', 4000);
+        mostrarToast('Por favor seleccione un período contable antes de filtrar', 'warning', 4000);
         return;
     }
     
@@ -341,7 +250,7 @@ btnFiltrar.addEventListener('click', async (event) => {
         console.error('Error al filtrar partidas:', error);
         
         // Mostrar notificación de error
-        mostrarNotificacion('Error al cargar las partidas. Por favor intente nuevamente', 'error', 5000);
+        mostrarToast('Error al cargar las partidas. Por favor intente nuevamente', 'error', 5000);
         
         // Limpiar el contenedor
         const diarioContainer = document.querySelector('.diario-container');
