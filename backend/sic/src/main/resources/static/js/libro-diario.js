@@ -95,15 +95,8 @@ async function obtenerDetallesPartida(partidaId) {
 async function renderizarLibroDiario(partidas, mapaCuentas) {
     const diarioContainer = document.querySelector('.diario-container');
     
-    // Limpiar contenido existente
-    const tablasExistentes = diarioContainer.querySelectorAll('table');
-    tablasExistentes.forEach((tabla) => {
-        tabla.remove();
-    });
-    
-    // Limpiar divisores
-    const divisores = diarioContainer.querySelectorAll('.divider, .partida-separator');
-    divisores.forEach(div => div.remove());
+    // Limpiar TODO el contenido existente del contenedor
+    diarioContainer.innerHTML = '';
     
     if (partidas.length === 0) {
         // Mostrar mensaje en el contenedor y notificación
