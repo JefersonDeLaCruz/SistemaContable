@@ -62,6 +62,12 @@
                         <p><strong>ID:</strong> <span th:text="${detalle.id}"></span></p>
                         <p><strong>ID Partida:</strong> <span th:text="${detalle.partida != null ? detalle.partida.id : 'N/A'}"></span></p>
                         <p><strong>ID Cuenta:</strong> <span th:text="${detalle.idCuenta}"></span></p>
+                        <p><strong>Cuenta:</strong> 
+                            <span th:if="${mapaCuentas.containsKey(detalle.idCuenta)}" 
+                                  th:text="${mapaCuentas[detalle.idCuenta].codigo + ' - ' + mapaCuentas[detalle.idCuenta].nombre}"></span>
+                            <span th:unless="${mapaCuentas.containsKey(detalle.idCuenta)}" 
+                                  class="text-red-500">Cuenta no encontrada</span>
+                        </p>
                         <p><strong>Descripción:</strong> <span th:text="${detalle.descripcion}"></span></p>
                         <p><strong>Débito:</strong> <span th:text="${detalle.debito}"></span></p>
                         <p><strong>Crédito:</strong> <span th:text="${detalle.credito}"></span></p>
@@ -90,7 +96,12 @@
                                 <p class="text-red-500">No hay detalles para esta partida</p>
                             </div>
                             <div th:each="detalle : ${detalles.?[partida.id == #this.partida.id]}" class="ml-4 p-2 mb-2 bg-white border">
-                                <p><strong>Cuenta:</strong> <span th:text="${detalle.idCuenta}"></span></p>
+                                <p><strong>Cuenta:</strong> 
+                                    <span th:if="${mapaCuentas.containsKey(detalle.idCuenta)}" 
+                                          th:text="${mapaCuentas[detalle.idCuenta].codigo + ' - ' + mapaCuentas[detalle.idCuenta].nombre}"></span>
+                                    <span th:unless="${mapaCuentas.containsKey(detalle.idCuenta)}" 
+                                          class="text-red-500">Cuenta no encontrada (ID: <span th:text="${detalle.idCuenta}"></span>)</span>
+                                </p>
                                 <p><strong>Débito:</strong> $<span th:text="${detalle.debito}"></span></p>
                                 <p><strong>Crédito:</strong> $<span th:text="${detalle.credito}"></span></p>
                             </div>

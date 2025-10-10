@@ -14,7 +14,7 @@ async function cargarCuentasEnSelect(select) {
         // Agregar las cuentas
         cuentas.forEach(cuenta => {
             const option = document.createElement('option');
-            option.value = cuenta.id;
+            option.value = cuenta.idCuenta;
             option.textContent = `${cuenta.codigo} - ${cuenta.nombre}`;
             select.appendChild(option);
         });

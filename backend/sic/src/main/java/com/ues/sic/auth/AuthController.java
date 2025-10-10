@@ -14,8 +14,12 @@ import com.ues.sic.partidas.PartidasModel;
 import com.ues.sic.partidas.PartidasService;
 import com.ues.sic.detalle_partida.DetallePartidaModel;
 import com.ues.sic.detalle_partida.DetallePartidaService;
+import com.ues.sic.cuentas.CuentaModel;
+import com.ues.sic.cuentas.CuentaRepository;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 public class AuthController {
@@ -28,6 +32,9 @@ public class AuthController {
     
     @Autowired
     private DetallePartidaService detallePartidaService;
+    
+    @Autowired
+    private CuentaRepository cuentaRepository;
 
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
@@ -44,8 +51,17 @@ public class AuthController {
             List<PartidasModel> todasLasPartidas = partidasService.findAll();
             List<DetallePartidaModel> todosLosDetalles = detallePartidaService.findAll();
             
+            // Obtener todas las cuentas y crear un mapa ID -> Cuenta
+            List<CuentaModel> todasLasCuentas = cuentaRepository.findAll();
+            Map<String, CuentaModel> mapaCuentas = todasLasCuentas.stream()
+                .collect(Collectors.toMap(
+                    cuenta -> cuenta.getIdCuenta().toString(),
+                    cuenta -> cuenta
+                ));
+            
             model.addAttribute("partidas", todasLasPartidas);
             model.addAttribute("detalles", todosLosDetalles);
+            model.addAttribute("mapaCuentas", mapaCuentas);
             
             return "dashboard";
         }
