@@ -95,86 +95,107 @@ async function obtenerDetallesPartida(partidaId) {
 async function renderizarLibroDiario(partidas, mapaCuentas) {
     const diarioContainer = document.querySelector('.diario-container');
     
-    // Limpiar contenido existente excepto la primera tabla (que sirve como template)
-    const tablas = diarioContainer.querySelectorAll('table');
-    tablas.forEach((tabla, index) => {
-        if (index > 0) {
-            tabla.remove();
-        }
+    // Limpiar contenido existente
+    const tablasExistentes = diarioContainer.querySelectorAll('table');
+    tablasExistentes.forEach((tabla) => {
+        tabla.remove();
     });
     
-    // Limpiar el tbody de la primera tabla
-    const primeraTabla = diarioContainer.querySelector('table tbody');
-    primeraTabla.innerHTML = '';
+    // Limpiar divisores
+    const divisores = diarioContainer.querySelectorAll('.divider, .partida-separator');
+    divisores.forEach(div => div.remove());
     
     if (partidas.length === 0) {
-        primeraTabla.innerHTML = '<tr><td colspan="6" class="text-center">No hay partidas para el período seleccionado</td></tr>';
+        diarioContainer.innerHTML = `
+            <div class="alert alert-info shadow-lg">
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current flex-shrink-0 w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span>No hay partidas registradas para el período seleccionado</span>
+                </div>
+            </div>
+        `;
         return;
     }
     
-    // Para cada partida, crear una tabla separada
+    // Para cada partida, crear una tabla con diseño consistente
     for (let i = 0; i < partidas.length; i++) {
         const partida = partidas[i];
         const detalles = await obtenerDetallesPartida(partida.id);
         
-        // Si es la primera partida, usar la tabla existente
-        let tabla, tbody;
-        if (i === 0) {
-            tabla = diarioContainer.querySelector('table');
-            tbody = tabla.querySelector('tbody');
-        } else {
-            // Crear nueva tabla para las siguientes partidas
-            tabla = crearNuevaTabla();
-            diarioContainer.appendChild(tabla);
-            
-            // Agregar divisor entre tablas
-            const divider = document.createElement('div');
-            divider.className = 'divider';
-            diarioContainer.insertBefore(divider, tabla);
-            
-            tbody = tabla.querySelector('tbody');
-        }
+        // Crear nueva tabla para cada partida
+        const tabla = crearNuevaTabla();
+        const tbody = tabla.querySelector('tbody');
+        
+        // Calcular totales
+        let totalDebito = 0;
+        let totalCredito = 0;
         
         // Renderizar los detalles de la partida
         detalles.forEach((detalle, index) => {
+            totalDebito += detalle.debito || 0;
+            totalCredito += detalle.credito || 0;
+            
             const fila = document.createElement('tr');
+            fila.className = 'hover';
             
             // Solo mostrar fecha, ID y descripción en la primera fila de cada partida
             if (index === 0) {
                 fila.innerHTML = `
-                    <td rowspan="${detalles.length}">${partida.fecha}</td>
-                    <td rowspan="${detalles.length}">${partida.id}</td>
-                    <td rowspan="${detalles.length}">${partida.descripcion}</td>
-                    <td>${obtenerNombreCuenta(detalle.idCuenta, mapaCuentas)}</td>
-                    <td>${detalle.debito > 0 ? '$' + detalle.debito.toFixed(2) : ''}</td>
-                    <td>${detalle.credito > 0 ? '$' + detalle.credito.toFixed(2) : ''}</td>
+                    <td rowspan="${detalles.length}" class="align-top bg-base-200 font-semibold">${formatearFecha(partida.fecha)}</td>
+                    <td rowspan="${detalles.length}" class="align-top bg-base-200 text-center font-semibold">#${partida.id}</td>
+                    <td rowspan="${detalles.length}" class="align-top bg-base-200">${partida.descripcion}</td>
+                    <td class="pl-4">${obtenerNombreCuenta(detalle.idCuenta, mapaCuentas)}</td>
+                    <td class="text-right font-mono">${detalle.debito > 0 ? formatearMoneda(detalle.debito) : '-'}</td>
+                    <td class="text-right font-mono">${detalle.credito > 0 ? formatearMoneda(detalle.credito) : '-'}</td>
                 `;
             } else {
                 fila.innerHTML = `
-                    <td>${obtenerNombreCuenta(detalle.idCuenta, mapaCuentas)}</td>
-                    <td>${detalle.debito > 0 ? '$' + detalle.debito.toFixed(2) : ''}</td>
-                    <td>${detalle.credito > 0 ? '$' + detalle.credito.toFixed(2) : ''}</td>
+                    <td class="pl-4">${obtenerNombreCuenta(detalle.idCuenta, mapaCuentas)}</td>
+                    <td class="text-right font-mono">${detalle.debito > 0 ? formatearMoneda(detalle.debito) : '-'}</td>
+                    <td class="text-right font-mono">${detalle.credito > 0 ? formatearMoneda(detalle.credito) : '-'}</td>
                 `;
             }
             
             tbody.appendChild(fila);
         });
+        
+        // Agregar fila de totales
+        const filaTotales = document.createElement('tr');
+        filaTotales.className = 'font-bold bg-base-300 border-t-2 border-primary';
+        filaTotales.innerHTML = `
+            <td colspan="4" class="text-right">TOTALES:</td>
+            <td class="text-right font-mono text-primary">${formatearMoneda(totalDebito)}</td>
+            <td class="text-right font-mono text-primary">${formatearMoneda(totalCredito)}</td>
+        `;
+        tbody.appendChild(filaTotales);
+        
+        // Agregar la tabla al contenedor
+        diarioContainer.appendChild(tabla);
+        
+        // Agregar separador entre partidas (excepto después de la última)
+        if (i < partidas.length - 1) {
+            const separador = document.createElement('div');
+            separador.className = 'partida-separator my-6 border-t-2 border-dashed border-base-300';
+            diarioContainer.appendChild(separador);
+        }
     }
 }
 
 // Función para crear una nueva tabla
 function crearNuevaTabla() {
     const tabla = document.createElement('table');
-    tabla.className = 'table w-full';
+    tabla.className = 'table w-full table-zebra mb-4';
     tabla.innerHTML = `
-        <thead>
+        <thead class="bg-primary text-primary-content sticky top-0">
             <tr>
-                <th>Fecha</th>
-                <th>ID</th>
-                <th>Descripción</th>
-                <th>Cuenta</th>
-                <th>Débito</th>
-                <th>Crédito</th>
+                <th class="w-24">Fecha</th>
+                <th class="w-16">ID</th>
+                <th class="w-1/4">Descripción</th>
+                <th class="w-1/3">Cuenta</th>
+                <th class="w-32 text-right">Débito</th>
+                <th class="w-32 text-right">Crédito</th>
             </tr>
         </thead>
         <tbody>
@@ -187,21 +208,53 @@ function crearNuevaTabla() {
 function obtenerNombreCuenta(idCuenta, mapaCuentas) {
     const cuenta = mapaCuentas[idCuenta];
     if (cuenta) {
-        return `${cuenta.codigo} - ${cuenta.nombre}`;
+        return `<span class="font-semibold">${cuenta.codigo}</span> - ${cuenta.nombre}`;
     }
-    return `Cuenta no encontrada (ID: ${idCuenta})`;
+    return `<span class="text-error">Cuenta no encontrada (ID: ${idCuenta})</span>`;
+}
+
+// Función auxiliar para formatear moneda
+function formatearMoneda(valor) {
+    return new Intl.NumberFormat('es-SV', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(valor);
+}
+
+// Función auxiliar para formatear fecha
+function formatearFecha(fecha) {
+    const [year, month, day] = fecha.split('-');
+    const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    return `${day} ${meses[parseInt(month) - 1]} ${year}`;
 }
 
 btnFiltrar.addEventListener('click', async (event) => {
     event.preventDefault();
     
     if (!periodoSeleccionado) {
-        alert('Por favor seleccione un período');
+        // Mostrar alerta con DaisyUI
+        const diarioContainer = document.querySelector('.diario-container');
+        diarioContainer.innerHTML = `
+            <div class="alert alert-warning shadow-lg">
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <span>Por favor seleccione un período contable antes de filtrar.</span>
+                </div>
+            </div>
+        `;
         return;
     }
     
-    // Mostrar indicador de carga
-    btnFiltrar.textContent = 'Cargando...';
+    // Mostrar indicador de carga con spinner
+    const textoOriginal = btnFiltrar.innerHTML;
+    btnFiltrar.innerHTML = `
+        <span class="loading loading-spinner"></span>
+        Cargando...
+    `;
     btnFiltrar.disabled = true;
     
     try {
@@ -218,10 +271,20 @@ btnFiltrar.addEventListener('click', async (event) => {
         
     } catch (error) {
         console.error('Error al filtrar partidas:', error);
-        alert('Error al cargar las partidas. Por favor intente nuevamente.');
+        const diarioContainer = document.querySelector('.diario-container');
+        diarioContainer.innerHTML = `
+            <div class="alert alert-error shadow-lg">
+                <div>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Error al cargar las partidas. Por favor intente nuevamente.</span>
+                </div>
+            </div>
+        `;
     } finally {
         // Restaurar botón
-        btnFiltrar.textContent = 'Filtrar';
+        btnFiltrar.innerHTML = textoOriginal;
         btnFiltrar.disabled = false;
     }
 });
