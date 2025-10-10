@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dracula">
+
 <head th:replace="layout :: head"></head>
 
 <body>
@@ -12,145 +13,98 @@
 
 
             <!-- Navbar -->
-            <div class="navbar bg-base-300 w-full">
-                <div class="flex-none">
-                    <label for="my-drawer-3" aria-label="open sidebar" class="btn btn-square btn-ghost">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                            class="inline-block h-6 w-6 stroke-current">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 6h16M4 12h16M4 18h16"></path>
-                        </svg>
-                    </label>
-                </div>
-                <div class="mx-2 flex-1 px-2 text-lg font-semibold">LIBRO MAYOR</div>
+            <div th:replace="layout :: navbar">
+
             </div>
 
-            <!-- Filtros -->
-            <div class="p-7 md:p-6 px-6 py-6 ms-10 border-gray-100">
-                <h2 class="text-2xl font-bold">
-                    Filtrar en el Libro Mayor
-                </h2>
-                <form class="p-4 flex flex-col gap-3 md:flex-row md:items-center md:gap-4" th:action="@{/libro-mayor}"
-                    method="get">
-                    <label class="form-control max-w-xs">
-                        <span class="fieldset-legend">Periodo:</span>
-                        <select id="selectPeriodo" class="select" required>
-                            <option value="">Seleccionar periodo...</option>
-                            <!-- traer cuentas de db -->
-                        </select>
-                    </label>
-
-                    <label class="form-control max-w-xs">
-                        <span class="fieldset-legend">Cuenta:</span>
-                        <select id="selectCuenta" class="select" required>
-                            <option value="">Seleccionar cuenta...</option>
-                            <!-- traer cuentas de db -->
-                        </select>
-                    </label>
-                    <button class="btn btn-sm btn-primary mt-2 md:mt-7">Filtrar</button>
-                </form>
-            </div>
-
-
-            <div class="w-full p-4 md:p-6">
-                <!-- Encabezado de la cuenta -->
-                <header class="px-6 py-6 bg-base-200 mb-1">
-                    <h2 class="text-2xl font-bold text-center">
-                        1101 - Banco
+            <!-- contenido -->
+            <div>
+                <!-- Filtros -->
+                <div class="p-7 md:p-6 px-6 py-6 ms-10 border-gray-100">
+                    <h2 class="text-2xl font-bold">
+                        Filtrar en el Libro Mayor
                     </h2>
-                </header>
+                    <form class="p-4 flex flex-col gap-3 md:flex-row md:items-center md:gap-4"
+                        th:action="@{/libro-mayor}" method="get">
+                        <label class="form-control max-w-xs">
+                            <span class="fieldset-legend">Periodo:</span>
+                            <select id="selectPeriodo" class="select" required>
+                                <option value="">Seleccionar periodo...</option>
+                                <!-- traer cuentas de db -->
+                            </select>
+                        </label>
 
-                <!-- Tabla de movimientos -->
-                <table class="table-auto w-full">
-                    <thead class="bg-base-200 text-sm uppercase">
-                        <tr>
-                            <th class="px-6 py-3 text-left">Fecha</th>
-                            <th class="px-6 py-3 text-left">Referencia</th>
-                            <th class="px-6 py-3 text-left">Descripción</th>
-                            <th class="px-6 py-3 text-left">Débito</th>
-                            <th class="px-6 py-3 text-left">Crédito</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-sm">
-                        <tr class="border-t border-gray-100">
-                            <td class="px-6 py-3">2025-09-01</td>
-                            <td class="px-6 py-3">Saldo inicial</td>
-                            <td class="px-6 py-3">-</td>
-                            <td class="px-6 py-3 text-green-600 font-medium">10,000.00</td>
-                            <td class="px-6 py-3 text-red-600 font-medium">0.00</td>
-                        </tr>
-                        <tr class="border-t border-gray-100">
-                            <td class="px-6 py-3">2025-09-10</td>
-                            <td class="px-6 py-3">PD-2025-09-10-001</td>
-                            <td class="px-6 py-3">Pago a proveedores</td>
-                            <td class="px-6 py-3 text-green-600 font-medium">0.00</td>
-                            <td class="px-6 py-3 text-red-600 font-medium">1,250.00</td>
-                        </tr>
-                        <tr class="border-t border-gray-100">
-                            <td class="px-6 py-3"></td>
-                            <td class="px-6 py-3"></td>
-                            <td class="px-6 py-3 font-bold">SUMA</td>
-                            <td class="px-6 py-3 text-green-600 font-medium">10,000.00</td>
-                            <td class="px-6 py-3 text-red-600 font-medium">1,250.00</td>
-                        </tr>
-                        <tr class="border-t border-gray-100">
-                            <td class="px-6 py-3"></td>
-                            <td class="px-6 py-3"></td>
-                            <td class="px-6 py-3 font-bold">SALDO</td>
-                            <td class="px-6 py-3 text-green-600 font-medium">8,750.00</td>
-                            <td class="px-6 py-3 text-red-600 font-medium"></td>
-                        </tr>
-                    </tbody>
-                </table>
+                        <label class="form-control max-w-xs">
+                            <span class="fieldset-legend">Cuenta:</span>
+                            <select id="selectCuenta" class="select" required>
+                                <option value="">Seleccionar cuenta...</option>
+                                <!-- traer cuentas de db -->
+                            </select>
+                        </label>
+                        <button class="btn btn-sm btn-primary mt-2 md:mt-7">Filtrar</button>
+                    </form>
+                </div>
+
+
+                <div class="w-full p-4 md:p-6">
+                    <!-- Encabezado de la cuenta -->
+                    <header class="px-6 py-6 bg-base-200 mb-1">
+                        <h2 class="text-2xl font-bold text-center">
+                            1101 - Banco
+                        </h2>
+                    </header>
+
+                    <!-- Tabla de movimientos -->
+                    <table class="table-auto w-full">
+                        <thead class="bg-base-200 text-sm uppercase">
+                            <tr>
+                                <th class="px-6 py-3 text-left">Fecha</th>
+                                <th class="px-6 py-3 text-left">Referencia</th>
+                                <th class="px-6 py-3 text-left">Descripción</th>
+                                <th class="px-6 py-3 text-left">Débito</th>
+                                <th class="px-6 py-3 text-left">Crédito</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm">
+                            <tr class="border-t border-gray-100">
+                                <td class="px-6 py-3">2025-09-01</td>
+                                <td class="px-6 py-3">Saldo inicial</td>
+                                <td class="px-6 py-3">-</td>
+                                <td class="px-6 py-3 text-green-600 font-medium">10,000.00</td>
+                                <td class="px-6 py-3 text-red-600 font-medium">0.00</td>
+                            </tr>
+                            <tr class="border-t border-gray-100">
+                                <td class="px-6 py-3">2025-09-10</td>
+                                <td class="px-6 py-3">PD-2025-09-10-001</td>
+                                <td class="px-6 py-3">Pago a proveedores</td>
+                                <td class="px-6 py-3 text-green-600 font-medium">0.00</td>
+                                <td class="px-6 py-3 text-red-600 font-medium">1,250.00</td>
+                            </tr>
+                            <tr class="border-t border-gray-100">
+                                <td class="px-6 py-3"></td>
+                                <td class="px-6 py-3"></td>
+                                <td class="px-6 py-3 font-bold">SUMA</td>
+                                <td class="px-6 py-3 text-green-600 font-medium">10,000.00</td>
+                                <td class="px-6 py-3 text-red-600 font-medium">1,250.00</td>
+                            </tr>
+                            <tr class="border-t border-gray-100">
+                                <td class="px-6 py-3"></td>
+                                <td class="px-6 py-3"></td>
+                                <td class="px-6 py-3 font-bold">SALDO</td>
+                                <td class="px-6 py-3 text-green-600 font-medium">8,750.00</td>
+                                <td class="px-6 py-3 text-red-600 font-medium"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
+
 
 
         </div>
 
 
-        <div class="drawer-side">
-
-
-            <label for="my-drawer-3" aria-label="close sidebar" class="drawer-overlay"></label>
-            <ul class="menu bg-base-200 min-h-full w-60 sm:w-80 p-2 flex justify-between">
-                <!-- Sidebar content here -->
-
-                <div class="brand">
-                    <h1 class="text-3xl font-bold">SIC</h1>
-                    <p class="text-sm">Sistema de Información Contable</p>
-                </div>
-                <div class="">
-                    <ul class="menu bg-base-200 w-full">
-                        <li><a th:href="@{/dashboard}"
-                                class="transition-transform duration-200 hover:scale-[1.05]">Dashboard</a>
-                        </li>
-                        <li><a class="transition-transform duration-200 hover:scale-[1.05] menu-active">Registrar
-                                partida</a>
-                        </li>
-                        <li><a class="transition-transform duration-200 hover:scale-[1.05]">Libro diario</a></li>
-                        <li><a class="transition-transform duration-200 hover:scale-[1.05]">Libro mayor</a></li>
-                        <li><a class="transition-transform duration-200 hover:scale-[1.05]">Balances</a></li>
-                        <li><a class="transition-transform duration-200 hover:scale-[1.05]">Subir Documento</a></li>
-                        <li><a class="transition-transform duration-200 hover:scale-[1.05]">Configuración</a></li>
-                        <li th:if="${usuario.role == 'ADMIN'}">
-                            <a th:href="@{/admin/crear-usuario}"
-                                class="transition-transform duration-200 hover:scale-[1.05]">Gestionar Usuarios</a>
-                        </li>
-                        <li th:if="${usuario.role == 'ADMIN'}">
-                            <a th:href="@{/admin/crear-usuario}"
-                                class="transition-transform duration-200 hover:scale-[1.05]">Gestionar Cuentas</a>
-                        </li>
-                    </ul>
-                </div>
-
-                <div class="">
-                    <div class="divider"></div>
-                    <form th:action="@{/logout}" method="post">
-                        <button type="submit" class="btn btn-outline btn-error w-full">Cerrar sesión</button>
-                    </form>
-                </div>
-            </ul>
-
+        <div th:replace="layout :: sidebar('libro-mayor')">
 
         </div>
 

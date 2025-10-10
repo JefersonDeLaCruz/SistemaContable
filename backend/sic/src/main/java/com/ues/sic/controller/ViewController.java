@@ -72,14 +72,38 @@ public class ViewController {
         model.addAttribute("titulo", "Libro Mayor");
         return "libro-mayor";
     }
+
+
+    @GetMapping("/configuracion")
+    public String configuracion(Model model){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+        
+        UsuariosModel user = usuariosRepository.findByUsername(username);
+
+        model.addAttribute("usuario", user);
+        model.addAttribute("titulo", "Configuración");
+        return "configuracion";
+    }
+
+
+    @GetMapping("/subir-documento")
+    public String subirDocumento(Model model){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+        
+        UsuariosModel user = usuariosRepository.findByUsername(username);
+
+        model.addAttribute("usuario", user);
+        model.addAttribute("titulo", "Subir Documento");
+        return "subir-documento";
+    }
+
+
+       
     
 
 
-
-    @GetMapping("/test")
-    public String test(){
-        return "test";
-    }
 
 
     @GetMapping("/libro-diario")
