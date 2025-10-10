@@ -6,7 +6,7 @@ import java.util.List;
 
 @Repository
 public interface DetallePartidaRepository extends JpaRepository<DetallePartidaModel, Long> {
-    List<DetallePartidaModel> findByPartidaId(Long partidaId);
+    List<DetallePartidaModel> findByPartida_Id(Long partidaId);
 
     
 }

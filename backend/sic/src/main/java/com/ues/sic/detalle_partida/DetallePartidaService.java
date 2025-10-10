@@ -15,7 +15,7 @@ public class DetallePartidaService {
     }
     
     public List<DetallePartidaModel> findByPartidaId(Long partidaId) {
-        return detallePartidaRepository.findByPartidaId(partidaId);
+        return detallePartidaRepository.findByPartida_Id(partidaId);
     }
     
     public DetallePartidaModel findById(Long id) {

@@ -61,6 +61,23 @@ public class ViewController {
         return "registrar-partida";
     }
     
+
+
+
+
+
+    @GetMapping("/libro-diario")
+    public String libroDiario(Model model){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+
+        UsuariosModel user = usuariosRepository.findByUsername(username);
+
+        model.addAttribute("usuario", user);
+        model.addAttribute("titulo", "Libro Diario");
+        return "libro-diario";
+    }
+
     @PostMapping("/partida")
     public ResponseEntity<?> crearPartida(@ModelAttribute PartidaConDetallesDTO dto) {
         try {

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head th:insert="layout :: head">
+
+</head>
+
+<body>
+    <div class="drawer">
+        <input id="my-drawer-3" type="checkbox" class="drawer-toggle" />
+        <div class="drawer-content flex flex-col">
+            <!-- Navbar -->
+            <div class="navbar bg-base-300 w-full">
+                <div class="flex-none ">
+                    <!-- se puede hacer lg:hidden aqui para que el boton solo aparezca en pantallas pequeñas -->
+                    <label for="my-drawer-3" aria-label="open sidebar" class="btn btn-square btn-ghost">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            class="inline-block h-6 w-6 stroke-current">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </label>
+                </div>
+                <div class="mx-2 flex-1 px-2">Dashboard</div>
+                <div class="hidden flex-none lg:block">
+                    <ul class="menu menu-horizontal">
+                        <!-- Navbar menu content here -->
+                        <li><a>Navbar Item 1</a></li>
+                        <li><a>Navbar Item 2</a></li>
+                    </ul>
+                </div>
+            </div>
+            <!-- Page content here -->
+            Content
+
+            
+
+            <h1 th:text="'mi rol actual: ' + ${usuario.role}">test</h1>
+
+
+            <div class="w-full p-10 border-2 border-black border-solid">
+                
+                <div class="flex justify-around">
+                    <h1 class="mes-actual">Libro Diario</h1>
+
+                    <fieldset class="fieldset">
+                        <select name="idPeriodo">
+                            <option value="">Seleccionar periodo...</option>
+                            <!-- traer periodos de db -->
+                        </select>
+                    </fieldset>
+
+                    <fieldset>
+                        <button class="btn btn-info" id="btnFiltrar">Filtrar</button>
+                    </fieldset>
+                </div>
+
+                <div class="divider">
+                    
+                </div>
+
+                <div class="diario-container">
+
+                    <table class="table w-full">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>ID</th>
+                                <th>Descripción</th>
+                                <th>Cuenta</th>
+                                <th>Débito</th>
+                                <th>Crédito</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Aquí se llenarán las filas de la tabla dinámicamente -->
+                        </tbody>
+                    </table>
+
+
+                    <!-- /*y aqui se insertaria otra tabla con la siguiente partida y sus detalles y asi sucesivamente
+                    de manera que 1 tabla conteiene una partida y sus detalles*/ -->
+                </div>
+            </div>  
+
+
+        </div>
+        <div class="drawer-side">
+            <label for="my-drawer-3" aria-label="close sidebar" class="drawer-overlay"></label>
+            <ul class="menu bg-base-200 min-h-full w-60 sm:w-80 p-2 flex justify-between">
+                <!-- Sidebar content here -->
+
+                <div class="brand">
+                    <h1 class="text-3xl font-bold">SIC</h1>
+                    <p class="text-sm">Sistema de Información Contable</p>
+                </div>
+                <div class="">
+                    <ul class="menu bg-base-200 w-full">
+                        <li><a class="menu-active transition-transform duration-200 hover:scale-[1.05]">Dashboard</a>
+                        </li>
+                        <li><a th:href="@{/registrar-partida}"
+                                class="transition-transform duration-200 hover:scale-[1.05]">Registrar partida</a></li>
+                        <li><a class="transition-transform duration-200 hover:scale-[1.05]">Libro diario</a></li>
+                        <li><a class="transition-transform duration-200 hover:scale-[1.05]">Libro mayor</a></li>
+                        <li><a class="transition-transform duration-200 hover:scale-[1.05]">Balances</a></li>
+                        <li><a class="transition-transform duration-200 hover:scale-[1.05]">Subir Documento</a></li>
+                        <li><a class="transition-transform duration-200 hover:scale-[1.05]">Configuración</a></li>
+                        <li th:if="${usuario.role == 'ADMIN'}">
+                            <a th:href="@{/admin/crear-usuario}"
+                                class="transition-transform duration-200 hover:scale-[1.05]">Gestionar Usuarios</a>
+                        </li>
+                        <li th:if="${usuario.role == 'ADMIN'}">
+                            <a th:href="@{/admin/crear-usuario}"
+                                class="transition-transform duration-200 hover:scale-[1.05]">Gestionar Cuentas</a>
+                        </li>
+                    </ul>
+
+                </div>
+
+                <div class="">
+                    <div class="divider"></div>
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit" class="btn btn-outline btn-error w-full">Cerrar sesión</button>
+                    </form>
+                </div>
+
+            </ul>
+        </div>
+    </div>
+
+    <script th:src="@{/js/libro-diario.js}"></script>
+</body>
+
+</html>
