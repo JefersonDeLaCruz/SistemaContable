@@ -91,6 +91,48 @@ async function obtenerDetallesPartida(partidaId) {
     }
 }
 
+// Función para obtener información de todos los períodos
+async function cargarTodosPeriodos() {
+    try {
+        const response = await fetch('/api/periodos');
+        const periodos = await response.json();
+        
+        // Crear un mapa de ID -> Periodo para fácil acceso
+        const mapaPeriodos = {};
+        periodos.forEach(periodo => {
+            mapaPeriodos[periodo.idPeriodo.toString()] = periodo;
+        });
+        
+        return mapaPeriodos;
+    } catch (error) {
+        console.error('Error cargando los periodos:', error);
+        return {};
+    }
+}
+
+// Función para agrupar partidas por período
+function agruparPartidasPorPeriodo(partidas, mapaPeriodos) {
+    const grupos = {};
+    
+    partidas.forEach(partida => {
+        const periodoId = partida.idPeriodo;
+        if (!grupos[periodoId]) {
+            grupos[periodoId] = {
+                periodo: mapaPeriodos[periodoId] || { nombre: `Período ${periodoId}` },
+                partidas: []
+            };
+        }
+        grupos[periodoId].partidas.push(partida);
+    });
+    
+    // Convertir a array y ordenar por fecha de inicio del período
+    return Object.values(grupos).sort((a, b) => {
+        const fechaA = a.periodo.fechaInicio || '0000-00-00';
+        const fechaB = b.periodo.fechaInicio || '0000-00-00';
+        return fechaA.localeCompare(fechaB);
+    });
+}
+
 // Función para renderizar las partidas en el libro diario
 async function renderizarLibroDiario(partidas, mapaCuentas) {
     const diarioContainer = document.querySelector('.diario-container');
@@ -116,66 +158,101 @@ async function renderizarLibroDiario(partidas, mapaCuentas) {
     // Notificación de éxito
     mostrarToast(`Se cargaron ${partidas.length} partida(s) correctamente`, 'success', 3000);
     
-    // Para cada partida, crear una tabla con diseño consistente
-    for (let i = 0; i < partidas.length; i++) {
-        const partida = partidas[i];
-        const detalles = await obtenerDetallesPartida(partida.id);
+    // Cargar mapa de períodos para agrupar
+    const mapaPeriodos = await cargarTodosPeriodos();
+    
+    // Agrupar partidas por período
+    const gruposPorPeriodo = agruparPartidasPorPeriodo(partidas, mapaPeriodos);
+    
+    // Renderizar cada grupo de período
+    for (let g = 0; g < gruposPorPeriodo.length; g++) {
+        const grupo = gruposPorPeriodo[g];
         
-        // Crear nueva tabla para cada partida
-        const tabla = crearNuevaTabla();
-        const tbody = tabla.querySelector('tbody');
+        // Agregar separador con el nombre del período (excepto antes del primero)
+        if (g > 0) {
+            const separadorPeriodo = document.createElement('div');
+            separadorPeriodo.className = 'periodo-separator my-8 flex items-center gap-4';
+            separadorPeriodo.innerHTML = `
+                <div class="flex-1 border-t-2 border-primary"></div>
+                <div class="badge badge-primary badge-lg px-6 py-4 text-base font-semibold">
+                    ${grupo.periodo.nombre}
+                </div>
+                <div class="flex-1 border-t-2 border-primary"></div>
+            `;
+            diarioContainer.appendChild(separadorPeriodo);
+        } else {
+            // Para el primer grupo, solo mostrar el nombre del período
+            const nombrePeriodo = document.createElement('div');
+            nombrePeriodo.className = 'mb-6 text-center';
+            nombrePeriodo.innerHTML = `
+                <div class="badge badge-primary badge-lg px-6 py-4 text-base font-semibold">
+                    ${grupo.periodo.nombre}
+                </div>
+            `;
+            diarioContainer.appendChild(nombrePeriodo);
+        }
         
-        // Calcular totales
-        let totalDebito = 0;
-        let totalCredito = 0;
-        
-        // Renderizar los detalles de la partida
-        detalles.forEach((detalle, index) => {
-            totalDebito += detalle.debito || 0;
-            totalCredito += detalle.credito || 0;
+        // Para cada partida del grupo, crear una tabla
+        for (let i = 0; i < grupo.partidas.length; i++) {
+            const partida = grupo.partidas[i];
+            const detalles = await obtenerDetallesPartida(partida.id);
             
-            const fila = document.createElement('tr');
-            fila.className = 'hover';
+            // Crear nueva tabla para cada partida
+            const tabla = crearNuevaTabla();
+            const tbody = tabla.querySelector('tbody');
             
-            // Solo mostrar fecha, ID y descripción en la primera fila de cada partida
-            if (index === 0) {
-                fila.innerHTML = `
-                    <td rowspan="${detalles.length}" class="align-top bg-base-200 font-semibold">${formatearFecha(partida.fecha)}</td>
-                    <td rowspan="${detalles.length}" class="align-top bg-base-200 text-center font-semibold">#${partida.id}</td>
-                    <td rowspan="${detalles.length}" class="align-top bg-base-200">${partida.descripcion}</td>
-                    <td class="pl-4">${obtenerNombreCuenta(detalle.idCuenta, mapaCuentas)}</td>
-                    <td class="text-right font-mono">${detalle.debito > 0 ? formatearMoneda(detalle.debito) : '-'}</td>
-                    <td class="text-right font-mono">${detalle.credito > 0 ? formatearMoneda(detalle.credito) : '-'}</td>
-                `;
-            } else {
-                fila.innerHTML = `
-                    <td class="pl-4">${obtenerNombreCuenta(detalle.idCuenta, mapaCuentas)}</td>
-                    <td class="text-right font-mono">${detalle.debito > 0 ? formatearMoneda(detalle.debito) : '-'}</td>
-                    <td class="text-right font-mono">${detalle.credito > 0 ? formatearMoneda(detalle.credito) : '-'}</td>
-                `;
+            // Calcular totales
+            let totalDebito = 0;
+            let totalCredito = 0;
+            
+            // Renderizar los detalles de la partida
+            detalles.forEach((detalle, index) => {
+                totalDebito += detalle.debito || 0;
+                totalCredito += detalle.credito || 0;
+                
+                const fila = document.createElement('tr');
+                fila.className = 'hover';
+                
+                // Solo mostrar fecha, ID y descripción en la primera fila de cada partida
+                if (index === 0) {
+                    fila.innerHTML = `
+                        <td rowspan="${detalles.length}" class="align-top bg-base-200 font-semibold">${formatearFecha(partida.fecha)}</td>
+                        <td rowspan="${detalles.length}" class="align-top bg-base-200 text-center font-semibold">#${partida.id}</td>
+                        <td rowspan="${detalles.length}" class="align-top bg-base-200">${partida.descripcion}</td>
+                        <td class="pl-4">${obtenerNombreCuenta(detalle.idCuenta, mapaCuentas)}</td>
+                        <td class="text-right font-mono">${detalle.debito > 0 ? formatearMoneda(detalle.debito) : '-'}</td>
+                        <td class="text-right font-mono">${detalle.credito > 0 ? formatearMoneda(detalle.credito) : '-'}</td>
+                    `;
+                } else {
+                    fila.innerHTML = `
+                        <td class="pl-4">${obtenerNombreCuenta(detalle.idCuenta, mapaCuentas)}</td>
+                        <td class="text-right font-mono">${detalle.debito > 0 ? formatearMoneda(detalle.debito) : '-'}</td>
+                        <td class="text-right font-mono">${detalle.credito > 0 ? formatearMoneda(detalle.credito) : '-'}</td>
+                    `;
+                }
+                
+                tbody.appendChild(fila);
+            });
+            
+            // Agregar fila de totales
+            const filaTotales = document.createElement('tr');
+            filaTotales.className = 'font-bold bg-base-300 border-t-2 border-primary';
+            filaTotales.innerHTML = `
+                <td colspan="4" class="text-right">TOTALES:</td>
+                <td class="text-right font-mono text-primary">${formatearMoneda(totalDebito)}</td>
+                <td class="text-right font-mono text-primary">${formatearMoneda(totalCredito)}</td>
+            `;
+            tbody.appendChild(filaTotales);
+            
+            // Agregar la tabla al contenedor
+            diarioContainer.appendChild(tabla);
+            
+            // Agregar separador entre partidas (excepto después de la última del grupo)
+            if (i < grupo.partidas.length - 1) {
+                const separador = document.createElement('div');
+                separador.className = 'partida-separator my-6 border-t-2 border-dashed border-base-300';
+                diarioContainer.appendChild(separador);
             }
-            
-            tbody.appendChild(fila);
-        });
-        
-        // Agregar fila de totales
-        const filaTotales = document.createElement('tr');
-        filaTotales.className = 'font-bold bg-base-300 border-t-2 border-primary';
-        filaTotales.innerHTML = `
-            <td colspan="4" class="text-right">TOTALES:</td>
-            <td class="text-right font-mono text-primary">${formatearMoneda(totalDebito)}</td>
-            <td class="text-right font-mono text-primary">${formatearMoneda(totalCredito)}</td>
-        `;
-        tbody.appendChild(filaTotales);
-        
-        // Agregar la tabla al contenedor
-        diarioContainer.appendChild(tabla);
-        
-        // Agregar separador entre partidas (excepto después de la última)
-        if (i < partidas.length - 1) {
-            const separador = document.createElement('div');
-            separador.className = 'partida-separator my-6 border-t-2 border-dashed border-base-300';
-            diarioContainer.appendChild(separador);
         }
     }
 }
