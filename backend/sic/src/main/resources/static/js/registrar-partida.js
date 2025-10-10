@@ -4,7 +4,7 @@
       const response = await fetch('/api/cuentas'); // URL del endpoint
       const cuentas = await response.json();
 
-      const select = document.querySelectorAll('select');
+      const select = document.querySelectorAll('select[name^="detalles["][name$=".idCuenta"]');
       select.forEach(selectItem => {
         cuentas.forEach(cuenta => {
         const option = document.createElement('option');
@@ -17,6 +17,32 @@
       console.error('Error cargando las cuentas:', error);
     }
   }
+
+ // Para cargar periodos en el <select>
+async function cargarPeriodos() {
+  try {
+    const response = await fetch('/api/periodos'); // Endpoint del backend
+    const periodos = await response.json();
+
+    // Selecciona correctamente el elemento <select> por su atributo name
+    const select = document.querySelector('select[name="idPeriodo"]');
+
+    // Limpia opciones previas (opcional)
+    select.innerHTML = '<option value="">Seleccione un periodo</option>';
+
+    // Crea las opciones dinámicamente
+    periodos.forEach(periodo => {
+      const option = document.createElement('option');
+      option.value = periodo.idPeriodo; // campo correcto según tu modelo
+      option.textContent = periodo.nombre;
+      select.appendChild(option);
+    });
+
+  } catch (error) {
+    console.error('Error cargando los periodos:', error);
+  }
+}
+
 
 const contenedor = document.querySelector(".contenedor-movimientos");
 const btnAgregarMovimiento = document.querySelector(".agregar-movimiento");
@@ -104,6 +130,7 @@ window.addEventListener("DOMContentLoaded", () => {
         agregarLinea();
     }
     actualizarEventosEliminar();
+    cargarPeriodos();
 });
 
 btnAgregarMovimiento.addEventListener("click", (event) => {
