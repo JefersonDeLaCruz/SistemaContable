@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{layout :: head}">
+
+</head>
+
+<body>
+    
+    <div class="drawer">
+        <input id="my-drawer-3" type="checkbox" class="drawer-toggle" />
+        <div class="drawer-content flex flex-col">
+            <!-- Navbar -->
+            <div th:replace="~{layout :: navbar}"></div>
+            
+            <!-- Page content here -->
+            <div class="w-full p-4 sm:p-6 lg:p-10 bg-base-100">
+                <h1 class="text-3xl font-bold mb-6">Gestionar Balances</h1>
+                
+                <div class="alert alert-info">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span>Funcionalidad en desarrollo - Próximamente podrás gestionar el catálogo de balances</span>
+                </div>
+
+
+            </div>  
+        </div>
+
+        <div th:replace="~{layout :: sidebar('balances')}"></div>
+    </div>
+
+</body>
+</html>

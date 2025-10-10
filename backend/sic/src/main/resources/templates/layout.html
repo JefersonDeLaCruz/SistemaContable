@@ -137,8 +137,8 @@
                                 Libro mayor
                             </a>
                         </li>
-                        <li>
-                            <a th:href="@{/balances}"
+                        <li th:if="${usuario.role == 'ADMIN' or usuario.role == 'AUDITOR'}">
+                            <a th:href="@{/auditor/balances}"
                                th:classappend="${paginaActual == 'balances'} ? 'menu-active' : ''"
                                class="transition-transform duration-200 hover:scale-[1.05]">
                                 Balances

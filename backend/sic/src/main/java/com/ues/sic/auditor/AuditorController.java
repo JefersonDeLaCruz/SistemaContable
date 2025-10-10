@@ -93,6 +93,22 @@ public class AuditorController {
         return "auditor/bitacora";
     }
 
+    @GetMapping("/balances")
+    public String balances(Model model) {
+        UsuariosModel user = getAuthenticatedUser();
+        
+        // Permitir acceso a AUDITOR y ADMIN
+        if (!hasRequiredRole(user, "AUDITOR") && !hasRequiredRole(user, "ADMIN")) {
+            throw new org.springframework.security.access.AccessDeniedException("Acceso denegado: Se requiere rol AUDITOR o ADMIN");
+        }
+
+        model.addAttribute("usuario", user);
+        model.addAttribute("titulo", "Balances");
+        return "auditor/balances";
+    }
+
+       
+
     @GetMapping("/configuracion")
     public String configuracion(Model model) {
         UsuariosModel user = getAuthenticatedUser();
