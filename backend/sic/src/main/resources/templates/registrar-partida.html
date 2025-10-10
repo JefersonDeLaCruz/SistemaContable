@@ -27,6 +27,15 @@
                 <form action="/partida" method="post" id="formPartida" class="bg-base-200 p-6 rounded-lg shadow-lg">
 
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+<<<<<<< HEAD
+=======
+                    <!-- contenedor de la fila de inputs superior -->
+                    <div class="flex gap-10">
+                        <fieldset class="fieldset">
+                            <legend class="fieldset-legend">Detalle</legend>
+                            <input name="descripcion" type="text" class="input" placeholder="Detalle de la transaccion" required />
+                        </fieldset>
+>>>>>>> periodos
 
                     <!-- Información General de la Partida -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -48,7 +57,11 @@
                                 required>
                                 <option value="">Seleccione un período...</option>
                             </select>
+<<<<<<< HEAD
                         </div>
+=======
+                        </fieldset>
+>>>>>>> periodos
                     </div>
 
                     <div class="divider">Movimientos de la Partida</div>
@@ -184,12 +197,56 @@
 
         </form>
         </div>
+<<<<<<< HEAD
             
         </div>
         
         <!-- Sidebar -->
         <div th:replace="~{layout :: sidebar('registrar-partida')}">
         
+=======
+
+        
+        <div class="drawer-side">
+            <label for="my-drawer-3" aria-label="close sidebar" class="drawer-overlay"></label>
+            <ul class="menu bg-base-200 min-h-full w-60 sm:w-80 p-2 flex justify-between">
+                <!-- Sidebar content here -->
+
+                <div class="brand">
+                    <h1 class="text-3xl font-bold">SIC</h1>
+                    <p class="text-sm">Sistema de Información Contable</p>
+                </div>
+                <div class="">
+                    <ul class="menu bg-base-200 w-full">
+                        <li><a th:href="@{/dashboard}" class="transition-transform duration-200 hover:scale-[1.05]">Dashboard</a>
+                        </li>
+                        <li><a class="transition-transform duration-200 hover:scale-[1.05] menu-active">Registrar partida</a></li>
+                        <li><a class="transition-transform duration-200 hover:scale-[1.05]">Libro diario</a></li>
+                        <li><a class="transition-transform duration-200 hover:scale-[1.05]">Libro mayor</a></li>
+                        <li><a class="transition-transform duration-200 hover:scale-[1.05]">Balances</a></li>
+                        <li><a class="transition-transform duration-200 hover:scale-[1.05]">Subir Documento</a></li>
+                        <li><a class="transition-transform duration-200 hover:scale-[1.05]">Configuración</a></li>
+                        <li th:if="${usuario.role == 'ADMIN'}">
+                            <a th:href="@{/admin/crear-usuario}"
+                                class="transition-transform duration-200 hover:scale-[1.05]">Gestionar Usuarios</a>
+                        </li>
+                        <li th:if="${usuario.role == 'ADMIN'}">
+                            <a th:href="@{/admin/crear-usuario}"
+                                class="transition-transform duration-200 hover:scale-[1.05]">Gestionar Cuentas</a>
+                        </li>
+                    </ul>
+
+                </div>
+
+                <div class="">
+                    <div class="divider"></div>
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit" class="btn btn-outline btn-error w-full">Cerrar sesión</button>
+                    </form>
+                </div>
+
+            </ul>
+>>>>>>> periodos
         </div>
     </div>
     
