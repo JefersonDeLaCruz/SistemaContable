@@ -1,29 +1,42 @@
-// Para cargar cuentas en cada select 
- async function cargarCuentas() {
+// Para cargar cuentas en un select específico
+async function cargarCuentasEnSelect(select) {
     try {
-      const response = await fetch('/api/cuentas'); // URL del endpoint
-      const cuentas = await response.json();
+        const response = await fetch('/api/cuentas');
+        const cuentas = await response.json();
 
-      const select = document.querySelectorAll('select');
-      select.forEach(selectItem => {
+        // Limpiar el select y agregar opción por defecto
+        select.innerHTML = '';
+        const optionDefault = document.createElement('option');
+        optionDefault.value = "";
+        optionDefault.textContent = "Seleccione una cuenta";
+        select.appendChild(optionDefault);
+        
+        // Agregar las cuentas
         cuentas.forEach(cuenta => {
-        const option = document.createElement('option');
-        option.value = cuenta.id; // o cuenta.codigo si preferís
-        option.textContent = `${cuenta.codigo} - ${cuenta.nombre}`;
-        selectItem.appendChild(option);
-      });
-      });
+            const option = document.createElement('option');
+            option.value = cuenta.id;
+            option.textContent = `${cuenta.codigo} - ${cuenta.nombre}`;
+            select.appendChild(option);
+        });
     } catch (error) {
-      console.error('Error cargando las cuentas:', error);
+        console.error('Error cargando las cuentas:', error);
     }
-  }
+}
+
+// Para cargar cuentas en todos los selects de cuenta existentes
+async function cargarTodasLasCuentas() {
+    const selects = contenedor.querySelectorAll('select[select_cuenta=""]');
+    for (const select of selects) {
+        await cargarCuentasEnSelect(select);
+    }
+}
 
 const contenedor = document.querySelector(".contenedor-movimientos");
 const btnAgregarMovimiento = document.querySelector(".agregar-movimiento");
 const body = document.body;
 
 // Agrega una nueva linea de detalle de transaccion
-function agregarLinea() {
+async function agregarLinea() {
     const primeraLinea = contenedor.querySelector(".linea");
     const nuevaLinea = primeraLinea.cloneNode(true);
     const lineas = contenedor.querySelectorAll(".linea");
@@ -38,9 +51,16 @@ function agregarLinea() {
     });
 
     contenedor.appendChild(nuevaLinea);
+    
+    // Cargar cuentas en el select de la nueva línea
+    const nuevoSelect = nuevaLinea.querySelector('select[select_cuenta=""]');
+    console.log(nuevoSelect, "nuevo select");
+    if (nuevoSelect) {
+        await cargarCuentasEnSelect(nuevoSelect);
+    }
+    
     actualizarEventosEliminar();
     actualizarIndices();
-    cargarCuentas(); // Carga las cuentas en cada select
 }
 
 function actualizarIndices() {
@@ -64,15 +84,15 @@ function eliminarLinea(event) {
     } else {
         // alert("Debe haber al menos dos líneas de movimiento.");
         const alerta = document.getElementById("alerta");
-        let timeoutId = alerta.dataset.timeoutId; 
+        let timeoutId = alerta.dataset.timeoutId;
 
-        
+
         if (timeoutId) {
             clearTimeout(timeoutId);
             alerta.dataset.timeoutId = "";
         }
 
-       
+
         if (alerta.classList.contains("hidden")) {
             alerta.classList.remove("hidden", "hide");
             setTimeout(() => alerta.classList.add("show"), 10);
@@ -84,8 +104,8 @@ function eliminarLinea(event) {
         const id = setTimeout(() => {
             alerta.classList.remove("show");
             alerta.classList.add("hide");
-            setTimeout(() => alerta.classList.add("hidden"), 300); 
-            alerta.dataset.timeoutId = ""; 
+            setTimeout(() => alerta.classList.add("hidden"), 300);
+            alerta.dataset.timeoutId = "";
         }, 3000);
 
         alerta.dataset.timeoutId = id;
@@ -98,15 +118,20 @@ function actualizarEventosEliminar() {
     });
 }
 
-window.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("DOMContentLoaded", async () => {
+    // Primero verificar si necesitamos agregar una segunda línea
     const lineas = contenedor.querySelectorAll(".linea");
     if (lineas.length < 2) {
-        agregarLinea();
+        await agregarLinea();
     }
+    
+    // Luego cargar cuentas en todos los selects existentes
+    await cargarTodasLasCuentas();
+    
     actualizarEventosEliminar();
 });
 
-btnAgregarMovimiento.addEventListener("click", (event) => {
+btnAgregarMovimiento.addEventListener("click", async (event) => {
     event.preventDefault();
-    agregarLinea();
+    await agregarLinea();
 });
