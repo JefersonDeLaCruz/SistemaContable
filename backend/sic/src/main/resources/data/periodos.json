@@ -1,0 +1,37 @@
+[
+  {
+    "nombre": "Enero 2025",
+    "frecuencia": "Mensual",
+    "fechaInicio": "2025-01-01",
+    "fechaFin": "2025-01-31",
+    "cerrado": false
+  },
+  {
+    "nombre": "Febrero 2025",
+    "frecuencia": "Mensual",
+    "fechaInicio": "2025-02-01",
+    "fechaFin": "2025-02-28",
+    "cerrado": false
+  },
+  {
+    "nombre": "Marzo 2025",
+    "frecuencia": "Mensual",
+    "fechaInicio": "2025-03-01",
+    "fechaFin": "2025-03-31",
+    "cerrado": false
+  },
+  {
+    "nombre": "Primer Trimestre 2025",
+    "frecuencia": "Trimestral",
+    "fechaInicio": "2025-01-01",
+    "fechaFin": "2025-03-31",
+    "cerrado": false
+  },
+  {
+    "nombre": "Año Fiscal 2025",
+    "frecuencia": "Anual",
+    "fechaInicio": "2025-01-01",
+    "fechaFin": "2025-12-31",
+    "cerrado": false
+  }
+]

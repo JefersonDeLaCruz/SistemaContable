@@ -4,18 +4,27 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.ues.sic.cuentas.CuentaModel;
+import com.ues.sic.cuentas.CuentaRepository;
+import com.ues.sic.periodos.PeriodoContableModel;
+import com.ues.sic.periodos.PeriodoContableRepository;
 import com.ues.sic.usuarios.UsuariosModel;
 import com.ues.sic.usuarios.UsuariosRepository;
 
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Configuration
 public class DataSeeder {
 
-<<<<<<< HEAD
     // Usuarios por defecto para cada rol
     private static final String DEFAULT_ADMIN_USERNAME = "admin";
     private static final String DEFAULT_ADMIN_PASSWORD = "admin123";
@@ -28,11 +37,6 @@ public class DataSeeder {
     private static final String DEFAULT_AUDITOR_USERNAME = "auditor";
     private static final String DEFAULT_AUDITOR_PASSWORD = "auditor123";
     private static final String DEFAULT_AUDITOR_EMAIL = "auditor@sic.com";
-=======
-    private static final String DEFAULT_ADMIN_USERNAME = "adminoa";
-    private static final String DEFAULT_ADMIN_EMAIL = "adminoa@sistema.local";
-    private static final String DEFAULT_ADMIN_ROLE = "ADMIN";
->>>>>>> Walt-discriminador
     
     @Bean
     CommandLineRunner seedDefaultUser(UsuariosRepository repo, PasswordEncoder encoder, Environment env) {
@@ -46,6 +50,114 @@ public class DataSeeder {
             System.out.println("\n========================================");
             System.out.println("  SEED DE USUARIOS COMPLETADO");
             System.out.println("========================================\n");
+        };
+    }
+    
+    @Bean
+    CommandLineRunner seedCatalogoCuentas(CuentaRepository cuentaRepo) {
+        return args -> {
+            // Verificar si ya existen cuentas en la base de datos
+            if (cuentaRepo.count() > 0) {
+                System.out.println("\n El catálogo de cuentas ya existe - omitiendo seed");
+                return;
+            }
+            
+            System.out.println("\n========================================");
+            System.out.println("  INICIANDO SEED DE CATÁLOGO DE CUENTAS");
+            System.out.println("========================================\n");
+            
+            try {
+                // Leer el archivo JSON desde resources/data/catalogo.json
+                ClassPathResource resource = new ClassPathResource("data/catalogo.json");
+                InputStream inputStream = resource.getInputStream();
+                
+                // Configurar ObjectMapper con soporte para LocalDate
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.registerModule(new JavaTimeModule());
+                
+                // Parsear el JSON a una lista de CuentaModel
+                List<CuentaModel> cuentas = mapper.readValue(
+                    inputStream, 
+                    new TypeReference<List<CuentaModel>>() {}
+                );
+                
+                // Insertar usando el método insertarCuenta de cada modelo
+                int contador = 0;
+                for (CuentaModel c : cuentas) {
+                    CuentaModel.insertarCuenta(
+                        cuentaRepo,
+                        c.getCodigo(),
+                        c.getNombre(),
+                        c.getTipo(),
+                        c.getSaldoNormal(),
+                        c.getIdPadre()
+                    );
+                    contador++;
+                }
+                
+                System.out.println(" Total de cuentas insertadas: " + contador);
+                System.out.println("\n========================================");
+                System.out.println("  SEED DE CATÁLOGO DE CUENTAS COMPLETADO");
+                System.out.println("========================================\n");
+                
+            } catch (Exception e) {
+                System.err.println("ERROR al cargar el catálogo de cuentas: " + e.getMessage());
+                e.printStackTrace();
+            }
+        };
+    }
+    
+    @Bean
+    CommandLineRunner seedPeriodosContables(PeriodoContableRepository periodoRepo) {
+        return args -> {
+            // Verificar si ya existen periodos en la base de datos
+            if (periodoRepo.count() > 0) {
+                System.out.println("\n Los periodos contables ya existen - omitiendo seed");
+                return;
+            }
+            
+            System.out.println("\n========================================");
+            System.out.println("  INICIANDO SEED DE PERIODOS CONTABLES");
+            System.out.println("========================================\n");
+            
+            try {
+                // Leer el archivo JSON desde resources/data/periodos.json
+                ClassPathResource resource = new ClassPathResource("data/periodos.json");
+                InputStream inputStream = resource.getInputStream();
+                
+                // Configurar ObjectMapper con soporte para LocalDate
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.registerModule(new JavaTimeModule());
+                
+                // Parsear el JSON a una lista de PeriodoContableModel
+                List<PeriodoContableModel> periodos = mapper.readValue(
+                    inputStream, 
+                    new TypeReference<List<PeriodoContableModel>>() {}
+                );
+                
+                // Insertar usando el método insertarPeriodo de cada modelo
+                int contador = 0;
+                for (PeriodoContableModel p : periodos) {
+                    PeriodoContableModel.insertarPeriodo(
+                        periodoRepo,
+                        p.getNombre(),
+                        p.getFrecuencia(),
+                        p.getFechaInicio(),
+                        p.getFechaFin(),
+                        p.getCerrado()
+                    );
+                    contador++;
+                }
+                
+                System.out.println(" Total de periodos insertados: " + contador);
+                System.out.println("\n========================================");
+                System.out.println("  SEED DE PERIODOS CONTABLES COMPLETADO");
+                System.out.println("========================================\n");
+                
+            } catch (Exception e) {
+                System.err.println("ERROR al cargar los periodos contables: " + e.getMessage());
+                e.printStackTrace();
+            }
         };
     }
     
