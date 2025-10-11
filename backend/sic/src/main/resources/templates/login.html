@@ -8,6 +8,7 @@
   <link rel="stylesheet" th:href="@{/css/output.css}" />
   <link rel="stylesheet" th:href="@{/css/style.css}" />
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  
 </head>
 
 
@@ -19,20 +20,40 @@
     <!-- contenedor principal, EL GRID DE ESTE CONTENEDOR DEBE OCUPAR 3 COLS COMO MAXIMO PERO SE ajusta de manera que en moviles ocupo 1 col y el solo se muestra el login el contenedor de la imagen desaparece ppara moviles-->
     <div class="contenedor-principal grid md:grid-cols-3 h-dvh">
       <!-- contenedor del login ocupa 2 de 3 cols-->
-      <div class="contenedor-login-form col-span-2 border-solid border-2 border-red-600">
+      <div class="contenedor-login-form col-span-2 ">
 
         <!-- contenedor del formulario de login -->
         <div class="formulario-contenedor flex flex-col justify-center items-center h-full gap-4 p-4">
 
 
-          <div class="avatar">
+          <div class="group ">
+            
             <div class="w-24 rounded-full">
               <img src="https://img.daisyui.com/images/profile/demo/yellingcat@192.webp" />
             </div>
           </div>
           <h1 class="font-bold">Bienvenido!</h1>
 
-          <form th:action="@{/login}" method="post" class="flex flex-col justify-center items-center gap-4 p-4">
+          <!-- Alertas de error y éxito -->
+          <div th:if="${error}" class="alert alert-error shadow-lg mb-4 max-w-md">
+            <div class="flex items-center">
+              <svg class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span th:text="${error}">Error</span>
+            </div>
+          </div>
+
+          <div th:if="${message}" class="alert alert-success shadow-lg mb-4 max-w-md">
+            <div class="flex items-center">
+              <svg class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <span th:text="${message}">Mensaje</span>
+            </div>
+          </div>
+    
+           <form th:action="@{/login}" method="post" class="flex flex-col justify-center items-center gap-4 p-4">
 
             <!-- LABEL PARA NOMBRE DE USUARIO -->
             <label class="input validator">
@@ -84,8 +105,22 @@
 
 
 
-      <div class="contenedor-img hidden md:block bg-black">
-
+      <div class="contenedor-img hidden md:block bg-cover bg-center bg-no-repeat" th:style="'background-image: url(' + @{/images/login-background.png} + ');'">
+        <!-- Overlay para mejor legibilidad -->
+        <div class="w-full h-full bg-black bg-opacity-30 flex items-center justify-center relative overflow-hidden">
+          <!-- Círculos flotantes decorativos -->
+          <div class="absolute top-10 left-10 w-20 h-20 bg-white bg-opacity-10 rounded-full animate-bounce" style="animation-delay: 0s; animation-duration: 3s;"></div>
+          <div class="absolute bottom-20 right-16 w-16 h-16 bg-white bg-opacity-15 rounded-full animate-bounce" style="animation-delay: 1s; animation-duration: 4s;"></div>
+          <div class="absolute top-1/3 right-8 w-12 h-12 bg-white bg-opacity-10 rounded-full animate-bounce" style="animation-delay: 2s; animation-duration: 5s;"></div>
+          
+          <div class="text-center text-white z-10">
+            <div class="mb-4">
+              <img th:src="@{/images/dwa.png}" alt="DWA Logo" class="w-24 h-24 mx-auto drop-shadow-2xl" />
+            </div>
+            <p class="text-xl opacity-90 drop-shadow-md">Sistema Contable</p>
+            <p class="text-sm opacity-75 mt-2">Gestión profesional</p>
+          </div>
+        </div>
       </div>
 
     </div>

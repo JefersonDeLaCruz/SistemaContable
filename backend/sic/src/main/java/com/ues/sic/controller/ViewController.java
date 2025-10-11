@@ -36,9 +36,8 @@ public class ViewController {
 
 
     @GetMapping("/")
-    public String home(Model model){
-        model.addAttribute("message", "Welcome to the SIC API");
-        return "home";
+    public String home(){
+        return "redirect:/login";
     }
 
     @GetMapping("/error")

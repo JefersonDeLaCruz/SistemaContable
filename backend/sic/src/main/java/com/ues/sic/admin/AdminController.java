@@ -123,6 +123,7 @@ public class AdminController {
         model.addAttribute("usuarios", usuariosRepository.findAll());
         return "admin/listar-usuarios";
     }
+    
 
     // ===== FUNCIONES ADMINISTRATIVAS CONSOLIDADAS =====
 
@@ -176,6 +177,32 @@ public class AdminController {
         model.addAttribute("usuario", user);
         model.addAttribute("titulo", "Ver PDFs Generados");
         return "admin/ver-pdfs";
+    }
+    
+    @GetMapping("/balance-comprobacion")
+    public String explorarPartidas(Model model) {
+        UsuariosModel user = getAuthenticatedUser();
+        
+        if (!hasRequiredRole(user, "ADMIN")) {
+            throw new org.springframework.security.access.AccessDeniedException("Acceso denegado: Se requiere rol ADMIN");
+        }
+
+        model.addAttribute("usuario", user);
+        model.addAttribute("titulo", "Explorar Partidas");
+        return "admin/balance-comprobacion";
+    }
+
+    @GetMapping("/balance-general")
+    public String balanceGeneral(Model model) {
+        UsuariosModel user = getAuthenticatedUser();
+        
+        if (!hasRequiredRole(user, "ADMIN")) {
+            throw new org.springframework.security.access.AccessDeniedException("Acceso denegado: Se requiere rol ADMIN");
+        }
+
+        model.addAttribute("usuario", user);
+        model.addAttribute("titulo", "Balance General");
+        return "admin/balance-general";
     }
 
     @GetMapping("/bitacora")

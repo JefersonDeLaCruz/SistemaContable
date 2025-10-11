@@ -15,6 +15,7 @@ import java.time.format.DateTimeFormatter;
 @Configuration
 public class DataSeeder {
 
+<<<<<<< HEAD
     // Usuarios por defecto para cada rol
     private static final String DEFAULT_ADMIN_USERNAME = "admin";
     private static final String DEFAULT_ADMIN_PASSWORD = "admin123";
@@ -27,6 +28,11 @@ public class DataSeeder {
     private static final String DEFAULT_AUDITOR_USERNAME = "auditor";
     private static final String DEFAULT_AUDITOR_PASSWORD = "auditor123";
     private static final String DEFAULT_AUDITOR_EMAIL = "auditor@sic.com";
+=======
+    private static final String DEFAULT_ADMIN_USERNAME = "adminoa";
+    private static final String DEFAULT_ADMIN_EMAIL = "adminoa@sistema.local";
+    private static final String DEFAULT_ADMIN_ROLE = "ADMIN";
+>>>>>>> Walt-discriminador
     
     @Bean
     CommandLineRunner seedDefaultUser(UsuariosRepository repo, PasswordEncoder encoder, Environment env) {

@@ -2,32 +2,924 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head th:replace="~{layout :: head}">
-
 </head>
 
 <body>
-    
-    <div class="drawer">
-        <input id="my-drawer-3" type="checkbox" class="drawer-toggle" />
-        <div class="drawer-content flex flex-col">
-            <!-- Navbar -->
-            <div th:replace="~{layout :: navbar}"></div>
-            
-            <!-- Page content here -->
-            <div class="w-full p-4 sm:p-6 lg:p-10 bg-base-100">
-                <h1 class="text-3xl font-bold mb-6">Gestionar Cuentas Contables</h1>
-                
-                <div class="alert alert-info">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <span>Funcionalidad en desarrollo - Próximamente podrás ver el dashboard</span>
-                </div>
 
+  <div class="drawer">
+    <input id="my-drawer-3" type="checkbox" class="drawer-toggle" />
+    <div class="drawer-content flex flex-col">
+      <!-- Navbar -->
+      <div th:replace="~{layout :: navbar}"></div>
 
-            </div>  
+      <!-- Page content here -->
+      <div class="w-full p-4 sm:p-6 lg:p-10 bg-base-100">
+
+        <h1 class="text-3xl font-bold mb-6">Gestionar Cuentas Contables</h1>
+
+        <div class="alert alert-info">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            class="stroke-current shrink-0 w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span>Funcionalidad en desarrollo - Próximamente podrás ver el dashboard</span>
         </div>
 
-        <div th:replace="~{layout :: sidebar('dashboard')}"></div>
+
+        <div class="p-6">
+
+          <!-- Header con saludo + reloj -->
+          <div class="mb-8 flex items-center justify-between gap-4">
+            <div>
+              <h1 class="text-3xl font-bold mb-2">
+                ¡Bienvenido, <span th:text="${usuario.username}">admin</span>!
+              </h1>
+            </div>
+            <div class="text-right">
+              <div id="reloj-hora" class="text-3xl font-bold tabular-nums">--:--:--</div>
+              <div id="reloj-fecha" class="text-sm opacity-70">—</div>
+            </div>
+          </div>
+
+          <!-- DASHBOARD PARA ADMINISTRADOR -->
+          <div th:if="${usuario.role == 'ADMIN'}">
+
+            <!-- ======================= KPIs (franja superior) ======================= -->
+            <div class="px-6 pt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+              <div class="stat bg-base-200 rounded-xl">
+                <div class="stat-title">Partidas del mes</div>
+                <div class="stat-value text-info">128</div>
+                <div class="stat-desc">Última actualización: 10:20</div>
+              </div>
+              <div class="stat bg-base-200 rounded-xl">
+                <div class="stat-title">Ingreso mensual</div>
+                <div class="stat-value text-success">$42,350.75</div>
+                <div class="stat-desc">Sep 2025</div>
+              </div>
+              <div class="stat bg-base-200 rounded-xl">
+                <div class="stat-title">Ingreso diario</div>
+                <div class="stat-value text-success">$3,125.40</div>
+                <div class="stat-desc">Hoy</div>
+              </div>
+              <div class="stat bg-base-200 rounded-xl">
+                <div class="stat-title">Mayor movimiento (hoy)</div>
+                <div class="stat-value text-success">$7,890.00</div>
+                <div class="stat-desc">1101 - Caja</div>
+              </div>
+              <div class="stat bg-base-200 rounded-xl">
+                <div class="stat-title">Usuarios activos</div>
+                <div class="stat-value text-success">12</div>
+              </div>
+            </div>
+            <!-- ===================== /KPIs ===================== -->
+
+            <!-- ====== FILA VISUAL (sin librerías) ====== -->
+            <div class="px-6 mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+              <!-- Partidas por día (semana actual) -->
+              <div class="card bg-base-100 shadow">
+                <div class="card-body">
+                  <div class="flex items-center justify-between">
+                    <h3 class="card-title">Partidas registradas esta semana</h3>
+                  </div>
+
+                  <div class="mt-2 space-y-3" data-group="semana">
+                    <div class="grid grid-cols-12 gap-3 items-center">
+                      <div class="col-span-2 text-sm">Lunes</div>
+                      <div class="col-span-9">
+                        <progress class="progress progress-success w-full" value="0" max="100" data-val="12"></progress>
+                      </div>
+                      <div class="col-span-1 text-right text-sm font-medium" data-out>12</div>
+                    </div>
+                    <div class="grid grid-cols-12 gap-3 items-center">
+                      <div class="col-span-2 text-sm">Martes</div>
+                      <div class="col-span-9">
+                        <progress class="progress progress-success w-full" value="0" max="100" data-val="18"></progress>
+                      </div>
+                      <div class="col-span-1 text-right text-sm font-medium" data-out>18</div>
+                    </div>
+                    <div class="grid grid-cols-12 gap-3 items-center">
+                      <div class="col-span-2 text-sm">Miércoles</div>
+                      <div class="col-span-9">
+                        <progress class="progress progress-success w-full" value="0" max="100" data-val="9"></progress>
+                      </div>
+                      <div class="col-span-1 text-right text-sm font-medium" data-out>9</div>
+                    </div>
+                    <div class="grid grid-cols-12 gap-3 items-center">
+                      <div class="col-span-2 text-sm">Jueves</div>
+                      <div class="col-span-9">
+                        <progress class="progress progress-success w-full" value="0" max="100" data-val="15"></progress>
+                      </div>
+                      <div class="col-span-1 text-right text-sm font-medium" data-out>15</div>
+                    </div>
+                    <div class="grid grid-cols-12 gap-3 items-center">
+                      <div class="col-span-2 text-sm">Viernes</div>
+                      <div class="col-span-9">
+                        <progress class="progress progress-success w-full" value="0" max="100" data-val="7"></progress>
+                      </div>
+                      <div class="col-span-1 text-right text-sm font-medium" data-out>7</div>
+                    </div>
+                    <div class="grid grid-cols-12 gap-3 items-center">
+                      <div class="col-span-2 text-sm">Sábado</div>
+                      <div class="col-span-9">
+                        <progress class="progress progress-success w-full" value="0" max="100" data-val="5"></progress>
+                      </div>
+                      <div class="col-span-1 text-right text-sm font-medium" data-out>5</div>
+                    </div>
+                    <div class="grid grid-cols-12 gap-3 items-center">
+                      <div class="col-span-2 text-sm">Domingo</div>
+                      <div class="col-span-9">
+                        <progress class="progress progress-success w-full" value="0" max="100" data-val="2"></progress>
+                      </div>
+                      <div class="col-span-1 text-right text-sm font-medium" data-out>2</div>
+                    </div>
+                  </div>
+
+                  <div class="mt-3 text-sm opacity-70">Total semanal: <b>68</b></div>
+                </div>
+              </div>
+
+              <!-- Cierre contable de hoy (ADMIN con botón) -->
+              <div class="card bg-base-100 shadow">
+                <div class="card-body">
+                  <div class="flex items-center justify-between">
+                    <h3 class="card-title">Cierre contable de hoy</h3>
+                    <span id="cierreEstado" class="badge">—</span>
+                  </div>
+
+                  <div class="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+                    <div>
+                      <div class="text-sm opacity-70">Tiempo restante</div>
+                      <div id="cierreCountdown" class="text-3xl font-bold tracking-tight">--:--:--</div>
+                    </div>
+                    <div>
+                      <div class="text-sm opacity-70">Hora límite</div>
+                      <div id="cierreHora" class="text-xl font-semibold">18:00</div>
+                      <div class="text-xs opacity-60" id="cierreFecha">—</div>
+                    </div>
+                    <div class="text-right">
+                      <a id="cierreBtn" class="btn btn-primary" href="/admin/cierre-diario">Cerrar día ahora</a>
+                    </div>
+                  </div>
+
+                  <div class="mt-4">
+                    <div class="flex justify-between text-xs opacity-70 mb-1">
+                      <span>Inicio del día</span>
+                      <span>Fin del día</span>
+                    </div>
+                    <progress id="cierreProgress" class="progress progress-success w-full" value="0"
+                      max="100"></progress>
+                  </div>
+
+                  <div id="cierreConfig" data-deadline="2025-10-10T18:00:00" data-open-since="2025-10-10T08:00:00"
+                    data-close-url="/admin/cierre-diario">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Movimientos recientes -->
+              <div class="card bg-base-100 shadow lg:col-span-2">
+                <div class="card-body">
+                  <h3 class="card-title">Movimientos recientes</h3>
+
+                  <div class="overflow-x-auto">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th>Fecha/Hora</th>
+                          <th>Partida</th>
+                          <th>Cuenta</th>
+                          <th class="text-right">Débito</th>
+                          <th class="text-right">Crédito</th>
+                          <th>Usuario</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr class="hover">
+                          <td>2025-10-10 10:42</td>
+                          <td><span class="badge badge-ghost">#1251</span></td>
+                          <td>1101 - Caja</td>
+                          <td class="text-right"><span class="badge badge-success badge-outline">$1,250.00</span></td>
+                          <td class="text-right">—</td>
+                          <td><span class="badge">maria</span></td>
+                        </tr>
+                        <tr class="hover">
+                          <td>2025-10-10 10:38</td>
+                          <td><span class="badge badge-ghost">#1250</span></td>
+                          <td>4101 - Ventas</td>
+                          <td class="text-right">—</td>
+                          <td class="text-right"><span class="badge badge-error badge-outline">$1,250.00</span></td>
+                          <td><span class="badge">maria</span></td>
+                        </tr>
+                        <tr class="hover">
+                          <td>2025-10-10 10:15</td>
+                          <td><span class="badge badge-ghost">#1249</span></td>
+                          <td>1205 - Clientes</td>
+                          <td class="text-right">—</td>
+                          <td class="text-right"><span class="badge badge-error badge-outline">$300.00</span></td>
+                          <td><span class="badge">carlos</span></td>
+                        </tr>
+                        <tr class="hover">
+                          <td>2025-10-10 09:58</td>
+                          <td><span class="badge badge-ghost">#1248</span></td>
+                          <td>5101 - Compras</td>
+                          <td class="text-right"><span class="badge badge-success badge-outline">$800.00</span></td>
+                          <td class="text-right">—</td>
+                          <td><span class="badge">andrea</span></td>
+                        </tr>
+                        <tr class="hover">
+                          <td>2025-10-10 09:41</td>
+                          <td><span class="badge badge-ghost">#1247</span></td>
+                          <td>2102 - Proveedores</td>
+                          <td class="text-right">—</td>
+                          <td class="text-right"><span class="badge badge-error badge-outline">$800.00</span></td>
+                          <td><span class="badge">jorge</span></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+            <!-- ====== /FILA VISUAL ====== -->
+
+            <!-- ====== SCRIPTS DE DASHBOARD (ADMIN) ====== -->
+            <!-- 1) Auto-% para barras (progress) -->
+            <script>
+              document.addEventListener('DOMContentLoaded', () => {
+                document.querySelectorAll('[data-group]').forEach(group => {
+                  const bars = group.querySelectorAll('progress[data-val]');
+                  const values = Array.from(bars).map(b => Number(b.dataset.val) || 0);
+                  const max = Math.max(1, ...values);
+                  bars.forEach(b => b.value = Math.round((Number(b.dataset.val) || 0) * 100 / max));
+                  const totalHolders = group.querySelectorAll('[data-total]');
+                  if (totalHolders.length && !totalHolders[0].dataset.bound) {
+                    const sum = values.reduce((a, b) => a + b, 0);
+                    totalHolders.forEach(el => { el.textContent = sum; el.dataset.bound = '1'; });
+                  }
+                });
+              });
+            </script>
+
+            <!-- 2) Contador de cierre (ADMIN con botón) -->
+            <script>
+              (function () {
+                const cfg = document.getElementById('cierreConfig');
+                if (!cfg) return;
+
+                const deadlineISO = cfg.dataset.deadline;
+                const openSinceISO = cfg.dataset.openSince;
+                const closeUrl = cfg.dataset.closeUrl || '/admin/cierre-diario';
+
+                const deadline = new Date(deadlineISO);
+                const openSince = openSinceISO ? new Date(openSinceISO) : null;
+
+                const elCountdown = document.getElementById('cierreCountdown');
+                const elEstado = document.getElementById('cierreEstado');
+                const elHora = document.getElementById('cierreHora');
+                const elFecha = document.getElementById('cierreFecha');
+                const elBtn = document.getElementById('cierreBtn');
+                const elProg = document.getElementById('cierreProgress');
+
+                elHora.textContent = deadline.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                elFecha.textContent = deadline.toLocaleDateString();
+
+                function fmt(ms) {
+                  if (ms < 0) ms = 0;
+                  const s = Math.floor(ms / 1000);
+                  const hh = String(Math.floor(s / 3600)).padStart(2, '0');
+                  const mm = String(Math.floor((s % 3600) / 60)).padStart(2, '0');
+                  const ss = String(s % 60).padStart(2, '0');
+                  return `${hh}:${mm}:${ss}`;
+                }
+
+                function tick() {
+                  const now = new Date();
+                  const msLeft = deadline - now;
+                  elCountdown.textContent = fmt(msLeft);
+
+                  const abierto = msLeft > 0;
+                  elEstado.textContent = abierto ? 'Abierto' : 'Cerrado';
+                  elEstado.className = 'badge ' + (abierto ? 'badge-success' : 'badge-ghost');
+
+                  elBtn.href = closeUrl;
+                  elBtn.classList.toggle('btn-disabled', !abierto);
+                  elBtn.toggleAttribute('disabled', !abierto);
+
+                  if (openSince && elProg) {
+                    const total = deadline - openSince;
+                    const trans = Math.min(Math.max(now - openSince, 0), total);
+                    const pct = total > 0 ? Math.round((trans / total) * 100) : 0;
+                    elProg.value = pct;
+                  }
+                }
+
+                tick();
+                setInterval(tick, 1000);
+              })();
+            </script>
+
+            <!-- 3) Reloj (zona horaria El Salvador) -->
+            <script>
+              (function () {
+                const elHora = document.getElementById('reloj-hora');
+                const elFecha = document.getElementById('reloj-fecha');
+                if (!elHora || !elFecha) return;
+
+                const tz = 'America/El_Salvador';
+                const fmtHora = new Intl.DateTimeFormat('es-SV', {
+                  hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: tz
+                });
+                const fmtFecha = new Intl.DateTimeFormat('es-SV', {
+                  weekday: 'long', day: '2-digit', month: 'short', year: 'numeric', timeZone: tz
+                });
+
+                function tick() {
+                  const now = new Date();
+                  elHora.textContent = fmtHora.format(now);
+                  elFecha.textContent = fmtFecha.format(now);
+                }
+                tick();
+                setInterval(tick, 1000);
+              })();
+            </script>
+            <!-- ====== /SCRIPTS DE DASHBOARD (ADMIN) ====== -->
+
+          </div> <!-- /ADMIN -->
+
+          <!-- DASHBOARD PARA AUDITOR (idéntico al de ADMIN, pero SIN botón de cerrar periodo) -->
+          <div th:if="${usuario.role == 'AUDITOR'}">
+            <!-- ======================= KPIs (franja superior) ======================= -->
+            <div class="px-6 pt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+              <div class="stat bg-base-200 rounded-xl">
+                <div class="stat-title">Partidas del mes</div>
+                <div class="stat-value text-info">128</div>
+                <div class="stat-desc">Última actualización: 10:20</div>
+              </div>
+              <div class="stat bg-base-200 rounded-xl">
+                <div class="stat-title">Ingreso mensual</div>
+                <div class="stat-value text-success">$42,350.75</div>
+                <div class="stat-desc">Sep 2025</div>
+              </div>
+              <div class="stat bg-base-200 rounded-xl">
+                <div class="stat-title">Ingreso diario</div>
+                <div class="stat-value text-success">$3,125.40</div>
+                <div class="stat-desc">Hoy</div>
+              </div>
+              <div class="stat bg-base-200 rounded-xl">
+                <div class="stat-title">Mayor movimiento (hoy)</div>
+                <div class="stat-value text-success">$7,890.00</div>
+                <div class="stat-desc">1101 - Caja</div>
+              </div>
+              <div class="stat bg-base-200 rounded-xl">
+                <div class="stat-title">Usuarios activos</div>
+                <div class="stat-value text-success">12</div>
+              </div>
+            </div>
+            <!-- ===================== /KPIs ===================== -->
+
+            <!-- ====== FILA VISUAL (sin librerías) ====== -->
+            <div class="px-6 mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+              <!-- Partidas por día (semana actual) -->
+              <div class="card bg-base-100 shadow">
+                <div class="card-body">
+                  <div class="flex items-center justify-between">
+                    <h3 class="card-title">Partidas registradas esta semana</h3>
+                  </div>
+
+                  <div class="mt-2 space-y-3" data-group="semana-aud">
+                    <div class="grid grid-cols-12 gap-3 items-center">
+                      <div class="col-span-2 text-sm">Lunes</div>
+                      <div class="col-span-9">
+                        <progress class="progress progress-success w-full" value="0" max="100" data-val="12"></progress>
+                      </div>
+                      <div class="col-span-1 text-right text-sm font-medium" data-out>12</div>
+                    </div>
+                    <div class="grid grid-cols-12 gap-3 items-center">
+                      <div class="col-span-2 text-sm">Martes</div>
+                      <div class="col-span-9">
+                        <progress class="progress progress-success w-full" value="0" max="100" data-val="18"></progress>
+                      </div>
+                      <div class="col-span-1 text-right text-sm font-medium" data-out>18</div>
+                    </div>
+                    <div class="grid grid-cols-12 gap-3 items-center">
+                      <div class="col-span-2 text-sm">Miércoles</div>
+                      <div class="col-span-9">
+                        <progress class="progress progress-success w-full" value="0" max="100" data-val="9"></progress>
+                      </div>
+                      <div class="col-span-1 text-right text-sm font-medium" data-out>9</div>
+                    </div>
+                    <div class="grid grid-cols-12 gap-3 items-center">
+                      <div class="col-span-2 text-sm">Jueves</div>
+                      <div class="col-span-9">
+                        <progress class="progress progress-success w-full" value="0" max="100" data-val="15"></progress>
+                      </div>
+                      <div class="col-span-1 text-right text-sm font-medium" data-out>15</div>
+                    </div>
+                    <div class="grid grid-cols-12 gap-3 items-center">
+                      <div class="col-span-2 text-sm">Viernes</div>
+                      <div class="col-span-9">
+                        <progress class="progress progress-success w-full" value="0" max="100" data-val="7"></progress>
+                      </div>
+                      <div class="col-span-1 text-right text-sm font-medium" data-out>7</div>
+                    </div>
+                    <div class="grid grid-cols-12 gap-3 items-center">
+                      <div class="col-span-2 text-sm">Sábado</div>
+                      <div class="col-span-9">
+                        <progress class="progress progress-success w-full" value="0" max="100" data-val="5"></progress>
+                      </div>
+                      <div class="col-span-1 text-right text-sm font-medium" data-out>5</div>
+                    </div>
+                    <div class="grid grid-cols-12 gap-3 items-center">
+                      <div class="col-span-2 text-sm">Domingo</div>
+                      <div class="col-span-9">
+                        <progress class="progress progress-success w-full" value="0" max="100" data-val="2"></progress>
+                      </div>
+                      <div class="col-span-1 text-right text-sm font-medium" data-out>2</div>
+                    </div>
+                  </div>
+
+                  <div class="mt-3 text-sm opacity-70">Total semanal: <b>68</b></div>
+                </div>
+              </div>
+
+              <!-- Cierre contable de hoy (AUDITOR SIN botón) -->
+              <div class="card bg-base-100 shadow">
+                <div class="card-body">
+                  <div class="flex items-center justify-between">
+                    <h3 class="card-title">Cierre contable de hoy</h3>
+                    <span id="cierreEstadoAud" class="badge">—</span>
+                  </div>
+
+                  <div class="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+                    <div>
+                      <div class="text-sm opacity-70">Tiempo restante</div>
+                      <div id="cierreCountdownAud" class="text-3xl font-bold tracking-tight">--:--:--</div>
+                    </div>
+                    <div>
+                      <div class="text-sm opacity-70">Hora límite</div>
+                      <div id="cierreHoraAud" class="text-xl font-semibold">18:00</div>
+                      <div class="text-xs opacity-60" id="cierreFechaAud">—</div>
+                    </div>
+                    <div class="text-right">
+                      <span class="badge badge-outline">Solo lectura</span>
+                    </div>
+                  </div>
+
+                  <div class="mt-4">
+                    <div class="flex justify-between text-xs opacity-70 mb-1">
+                      <span>Inicio del día</span>
+                      <span>Fin del día</span>
+                    </div>
+                    <progress id="cierreProgressAud" class="progress progress-success w-full" value="0"
+                      max="100"></progress>
+                  </div>
+
+                  <div id="cierreConfigAud" data-deadline="2025-10-10T18:00:00" data-open-since="2025-10-10T08:00:00">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Movimientos recientes -->
+              <div class="card bg-base-100 shadow lg:col-span-2">
+                <div class="card-body">
+                  <h3 class="card-title">Movimientos recientes</h3>
+
+                  <div class="overflow-x-auto">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th>Fecha/Hora</th>
+                          <th>Partida</th>
+                          <th>Cuenta</th>
+                          <th class="text-right">Débito</th>
+                          <th class="text-right">Crédito</th>
+                          <th>Usuario</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr class="hover">
+                          <td>2025-10-10 10:42</td>
+                          <td><span class="badge badge-ghost">#1251</span></td>
+                          <td>1101 - Caja</td>
+                          <td class="text-right"><span class="badge badge-success badge-outline">$1,250.00</span></td>
+                          <td class="text-right">—</td>
+                          <td><span class="badge">maria</span></td>
+                        </tr>
+                        <tr class="hover">
+                          <td>2025-10-10 10:38</td>
+                          <td><span class="badge badge-ghost">#1250</span></td>
+                          <td>4101 - Ventas</td>
+                          <td class="text-right">—</td>
+                          <td class="text-right"><span class="badge badge-error badge-outline">$1,250.00</span></td>
+                          <td><span class="badge">maria</span></td>
+                        </tr>
+                        <tr class="hover">
+                          <td>2025-10-10 10:15</td>
+                          <td><span class="badge badge-ghost">#1249</span></td>
+                          <td>1205 - Clientes</td>
+                          <td class="text-right">—</td>
+                          <td class="text-right"><span class="badge badge-error badge-outline">$300.00</span></td>
+                          <td><span class="badge">carlos</span></td>
+                        </tr>
+                        <tr class="hover">
+                          <td>2025-10-10 09:58</td>
+                          <td><span class="badge badge-ghost">#1248</span></td>
+                          <td>5101 - Compras</td>
+                          <td class="text-right"><span class="badge badge-success badge-outline">$800.00</span></td>
+                          <td class="text-right">—</td>
+                          <td><span class="badge">andrea</span></td>
+                        </tr>
+                        <tr class="hover">
+                          <td>2025-10-10 09:41</td>
+                          <td><span class="badge badge-ghost">#1247</span></td>
+                          <td>2102 - Proveedores</td>
+                          <td class="text-right">—</td>
+                          <td class="text-right"><span class="badge badge-error badge-outline">$800.00</span></td>
+                          <td><span class="badge">jorge</span></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+            <!-- ====== /FILA VISUAL ====== -->
+
+            <!-- ====== SCRIPTS DE DASHBOARD (AUDITOR) ====== -->
+            <!-- 1) Auto-% para barras (progress) -->
+            <script>
+              document.addEventListener('DOMContentLoaded', () => {
+                document.querySelectorAll('[data-group="semana-aud"]').forEach(group => {
+                  const bars = group.querySelectorAll('progress[data-val]');
+                  const values = Array.from(bars).map(b => Number(b.dataset.val) || 0);
+                  const max = Math.max(1, ...values);
+                  bars.forEach(b => b.value = Math.round((Number(b.dataset.val) || 0) * 100 / max));
+                });
+              });
+            </script>
+
+            <!-- 2) Contador de cierre (AUDITOR sin botón) -->
+            <script>
+              (function () {
+                const cfg = document.getElementById('cierreConfigAud');
+                if (!cfg) return;
+
+                const deadlineISO = cfg.dataset.deadline;
+                const openSinceISO = cfg.dataset.openSince;
+
+                const deadline = new Date(deadlineISO);
+                const openSince = openSinceISO ? new Date(openSinceISO) : null;
+
+                const elCountdown = document.getElementById('cierreCountdownAud');
+                const elEstado = document.getElementById('cierreEstadoAud');
+                const elHora = document.getElementById('cierreHoraAud');
+                const elFecha = document.getElementById('cierreFechaAud');
+                const elProg = document.getElementById('cierreProgressAud');
+
+                elHora.textContent = deadline.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                elFecha.textContent = deadline.toLocaleDateString();
+
+                function fmt(ms) {
+                  if (ms < 0) ms = 0;
+                  const s = Math.floor(ms / 1000);
+                  const hh = String(Math.floor(s / 3600)).padStart(2, '0');
+                  const mm = String(Math.floor((s % 3600) / 60)).padStart(2, '0');
+                  const ss = String(s % 60).padStart(2, '0');
+                  return `${hh}:${mm}:${ss}`;
+                }
+
+                function tick() {
+                  const now = new Date();
+                  const msLeft = deadline - now;
+                  elCountdown.textContent = fmt(msLeft);
+
+                  const abierto = msLeft > 0;
+                  elEstado.textContent = abierto ? 'Abierto' : 'Cerrado';
+                  elEstado.className = 'badge ' + (abierto ? 'badge-success' : 'badge-ghost');
+
+                  if (openSince && elProg) {
+                    const total = deadline - openSince;
+                    const trans = Math.min(Math.max(now - openSince, 0), total);
+                    const pct = total > 0 ? Math.round((trans / total) * 100) : 0;
+                    elProg.value = pct;
+                  }
+                }
+
+                tick();
+                setInterval(tick, 1000);
+              })();
+            </script>
+
+            <!-- 3) Reloj (zona horaria El Salvador) -->
+            <script>
+              (function () {
+                const elHora = document.getElementById('reloj-hora');
+                const elFecha = document.getElementById('reloj-fecha');
+                if (!elHora || !elFecha) return;
+
+                const tz = 'America/El_Salvador';
+                const fmtHora = new Intl.DateTimeFormat('es-SV', {
+                  hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: tz
+                });
+                const fmtFecha = new Intl.DateTimeFormat('es-SV', {
+                  weekday: 'long', day: '2-digit', month: 'short', year: 'numeric', timeZone: tz
+                });
+
+                function tick() {
+                  const now = new Date();
+                  elHora.textContent = fmtHora.format(now);
+                  elFecha.textContent = fmtFecha.format(now);
+                }
+                tick();
+                setInterval(tick, 1000);
+              })();
+            </script>
+            <!-- ====== /SCRIPTS DE DASHBOARD (AUDITOR) ====== -->
+          </div>
+          <!-- /AUDITOR -->
+
+          <!-- DASHBOARD PARA CONTADOR -->
+          <div th:if="${usuario.role == 'CONTADOR'}">
+            <!-- ======================= KPIs (contador) ======================= -->
+            <div class="px-6 pt-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div class="stat bg-base-200 rounded-xl">
+                <div class="stat-title">Ingresos de hoy</div>
+                <div class="stat-value text-success">$3,125.40</div>
+                <div class="stat-desc">Actualizado 10:45</div>
+              </div>
+              <div class="stat bg-base-200 rounded-xl">
+                <div class="stat-title">Partidas generadas hoy</div>
+                <div class="stat-value text-info">12</div>
+                <div class="stat-desc">Por <span th:text="${usuario.username}">usuario</span></div>
+              </div>
+              <div class="stat bg-base-200 rounded-xl">
+                <div class="stat-title">Balance del día</div>
+                <div class="stat-value text-primary">$1,705.40</div>
+                <div class="stat-desc">Ingresos - Gastos</div>
+              </div>
+              <div class="stat bg-base-200 rounded-xl">
+                <div class="stat-title">Gastos de hoy</div>
+                <div class="stat-value text-error">$1,420.00</div>
+                <div class="stat-desc">Total egresos</div>
+              </div>
+            </div>
+            <!-- ===================== /KPIs ===================== -->
+
+            <!-- ====== CONTENIDO PRINCIPAL ====== -->
+            <div class="px-6 mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+              <!-- Cierre contable de hoy (contador SIN botón) -->
+              <div class="card bg-base-100 shadow">
+                <div class="card-body">
+                  <div class="flex items-center justify-between">
+                    <h3 class="card-title">Cierre contable de hoy</h3>
+                    <span id="cierreEstadoContador" class="badge">—</span>
+                  </div>
+
+                  <div class="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+                    <div>
+                      <div class="text-sm opacity-70">Tiempo restante</div>
+                      <div id="cierreCountdownContador" class="text-3xl font-bold tracking-tight">--:--:--</div>
+                    </div>
+                    <div>
+                      <div class="text-sm opacity-70">Hora límite</div>
+                      <div id="cierreHoraContador" class="text-xl font-semibold">18:00</div>
+                      <div class="text-xs opacity-60" id="cierreFechaContador">—</div>
+                    </div>
+                    <div class="text-right">
+                      <span class="badge badge-outline">Solo lectura</span>
+                    </div>
+                  </div>
+
+                  <div class="mt-4">
+                    <div class="flex justify-between text-xs opacity-70 mb-1">
+                      <span>Inicio del día</span>
+                      <span>Fin del día</span>
+                    </div>
+                    <progress id="cierreProgressContador" class="progress progress-success w-full" value="0"
+                      max="100"></progress>
+                  </div>
+
+                  <div id="cierreConfigContador" data-deadline="2025-10-10T18:00:00"
+                    data-open-since="2025-10-10T08:00:00">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Acceso rápido -->
+              <div class="card bg-base-100 shadow">
+                <div class="card-body">
+                  <h3 class="card-title">Acceso rápido</h3>
+                  <div class="grid grid-cols-1 gap-3">
+                    <a th:href="@{/registrar-partida}" class="btn btn-primary btn-block">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                      </svg>
+                      Nueva Partida Contable
+                    </a>
+                    <a th:href="@{/contador/libro-diario}" class="btn btn-outline btn-block">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                        </path>
+                      </svg>
+                      Ver Libro Diario
+                    </a>
+                    <a th:href="@{/contador/subir-pdf}" class="btn btn-outline btn-block">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                        </path>
+                      </svg>
+                      Subir Documentos
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- ====== MIS MOVIMIENTOS RECIENTES ====== -->
+            <div class="px-6 mt-6">
+              <div class="card bg-base-100 shadow">
+                <div class="card-body">
+                  <div class="flex items-center justify-between">
+                    <h3 class="card-title">Mis movimientos recientes</h3>
+                    <div class="badge badge-info">Último registro: 10:42</div>
+                  </div>
+
+                  <div class="overflow-x-auto">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th>Fecha/Hora</th>
+                          <th>Partida</th>
+                          <th>Descripción</th>
+                          <th>Cuenta</th>
+                          <th class="text-right">Débito</th>
+                          <th class="text-right">Crédito</th>
+                          <th>Estado</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr class="hover">
+                          <td>2025-10-10 10:42</td>
+                          <td><span class="badge badge-ghost">#1251</span></td>
+                          <td>Venta contado Cliente A</td>
+                          <td>1101 - Caja</td>
+                          <td class="text-right"><span class="badge badge-success badge-outline">$1,250.00</span></td>
+                          <td class="text-right">—</td>
+                          <td><span class="badge badge-success">Aprobada</span></td>
+                        </tr>
+                        <tr class="hover">
+                          <td>2025-10-10 10:38</td>
+                          <td><span class="badge badge-ghost">#1250</span></td>
+                          <td>Venta contado Cliente A</td>
+                          <td>4101 - Ventas</td>
+                          <td class="text-right">—</td>
+                          <td class="text-right"><span class="badge badge-error badge-outline">$1,250.00</span></td>
+                          <td><span class="badge badge-success">Aprobada</span></td>
+                        </tr>
+                        <tr class="hover">
+                          <td>2025-10-10 10:15</td>
+                          <td><span class="badge badge-ghost">#1249</span></td>
+                          <td>Pago servicios básicos</td>
+                          <td>6101 - Gastos Operativos</td>
+                          <td class="text-right"><span class="badge badge-success badge-outline">$300.00</span></td>
+                          <td class="text-right">—</td>
+                          <td><span class="badge badge-success">Aprobada</span></td>
+                        </tr>
+                        <tr class="hover">
+                          <td>2025-10-10 09:58</td>
+                          <td><span class="badge badge-ghost">#1248</span></td>
+                          <td>Compra mercadería Prov. Y</td>
+                          <td>5101 - Compras</td>
+                          <td class="text-right"><span class="badge badge-success badge-outline">$800.00</span></td>
+                          <td class="text-right">—</td>
+                          <td><span class="badge badge-warning">Pendiente</span></td>
+                        </tr>
+                        <tr class="hover">
+                          <td>2025-10-10 09:41</td>
+                          <td><span class="badge badge-ghost">#1247</span></td>
+                          <td>Compra mercadería Prov. Y</td>
+                          <td>2102 - Proveedores</td>
+                          <td class="text-right">—</td>
+                          <td class="text-right"><span class="badge badge-error badge-outline">$800.00</span></td>
+                          <td><span class="badge badge-warning">Pendiente</span></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div class="text-sm opacity-70 mt-3">
+                    Total de partidas registradas hoy: <strong>12</strong> |
+                    Total ingresos registrados: <strong>$3,125.40</strong>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            <!-- ====== SCRIPTS DE DASHBOARD (CONTADOR) ====== -->
+            <!-- 1) Contador de cierre (CONTADOR sin botón) -->
+            <script>
+              (function () {
+                const cfg = document.getElementById('cierreConfigContador');
+                if (!cfg) return;
+
+                const deadlineISO = cfg.dataset.deadline;
+                const openSinceISO = cfg.dataset.openSince;
+
+                const deadline = new Date(deadlineISO);
+                const openSince = openSinceISO ? new Date(openSinceISO) : null;
+
+                const elCountdown = document.getElementById('cierreCountdownContador');
+                const elEstado = document.getElementById('cierreEstadoContador');
+                const elHora = document.getElementById('cierreHoraContador');
+                const elFecha = document.getElementById('cierreFechaContador');
+                const elProg = document.getElementById('cierreProgressContador');
+
+                elHora.textContent = deadline.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                elFecha.textContent = deadline.toLocaleDateString();
+
+                function fmt(ms) {
+                  if (ms < 0) ms = 0;
+                  const s = Math.floor(ms / 1000);
+                  const hh = String(Math.floor(s / 3600)).padStart(2, '0');
+                  const mm = String(Math.floor((s % 3600) / 60)).padStart(2, '0');
+                  const ss = String(s % 60).padStart(2, '0');
+                  return `${hh}:${mm}:${ss}`;
+                }
+
+                function tick() {
+                  const now = new Date();
+                  const msLeft = deadline - now;
+                  elCountdown.textContent = fmt(msLeft);
+
+                  const abierto = msLeft > 0;
+                  elEstado.textContent = abierto ? 'Abierto' : 'Cerrado';
+                  elEstado.className = 'badge ' + (abierto ? 'badge-success' : 'badge-ghost');
+
+                  if (openSince && elProg) {
+                    const total = deadline - openSince;
+                    const trans = Math.min(Math.max(now - openSince, 0), total);
+                    const pct = total > 0 ? Math.round((trans / total) * 100) : 0;
+                    elProg.value = pct;
+                  }
+                }
+
+                tick();
+                setInterval(tick, 1000);
+              })();
+            </script>
+
+            <!-- 2) Reloj (zona horaria El Salvador) -->
+            <script>
+              (function () {
+                const elHora = document.getElementById('reloj-hora');
+                const elFecha = document.getElementById('reloj-fecha');
+                if (!elHora || !elFecha) return;
+
+                const tz = 'America/El_Salvador';
+                const fmtHora = new Intl.DateTimeFormat('es-SV', {
+                  hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: tz
+                });
+                const fmtFecha = new Intl.DateTimeFormat('es-SV', {
+                  weekday: 'long', day: '2-digit', month: 'short', year: 'numeric', timeZone: tz
+                });
+
+                function tick() {
+                  const now = new Date();
+                  elHora.textContent = fmtHora.format(now);
+                  elFecha.textContent = fmtFecha.format(now);
+                }
+                tick();
+                setInterval(tick, 1000);
+              })();
+            </script>
+            <!-- ====== /SCRIPTS DE DASHBOARD (CONTADOR) ====== -->
+          </div>
+          <!-- /CONTADOR -->
+
+        </div>
+
+
+      </div>
     </div>
 
+    <div th:replace="~{layout :: sidebar('dashboard')}"></div>
+  </div>
+
 </body>
+
 </html>
+
+
