@@ -1,22 +1,115 @@
-Avla
+# Sistema Contable
 
-1.Clonar el repositorio
-2. en terminal: docker build -f dockerfile.node -t node-img-test .
-3.docker compose up --build
-4.Solo queda ejecutar el proyecto de java, desde la clase SicApplication.java
+Sistema de gestión contable desarrollado con Spring Boot y PostgreSQL, diseñado para el registro y administración de operaciones contables.
 
-si queres tener un apoyo visual de la base podes conectarte a esta desde un gestor, yo use DBeaver.
+## Requisitos Previos
 
-**Para acceder con el usuario por defecto**
-Si no tienen un usuario por defecto solo corran la aplicación de java y en la terminal les va a dar el usuario/gmail y el password, ahí solo lo ingresan y ya se tiene digamos la funciuonalidad que tendría un admin normal, esto es solo para esta fase del proyecto puesto que estamos probando en localhost, de igual manera en git no se publica nada referente a la seguridad y si una persona quisiera acceder digamos lo haría de manera local sin comprometer el proyecto
+- Java 17 o superior
+- Docker y Docker Compose
+- Maven 3.6 o superior
+- Git
 
-**en caso de que ustedes quieran acceder o configurar su propio usuario solo cambien lo que viene en la aplicattion propierities**
+## Instalación y Configuración
 
-el proceso para todo el proyecto dockerizado 
-es el siguiente 
+### 1. Clonar el Repositorio
 
-mvn clean package -DskipTests
-docker compose build
-docker compose up
+```bash
+git clone <url-del-repositorio>
+cd SistemaContable
+```
 
-pero esto hasta el final.
+### 2. Configurar la Base de Datos
+
+Desde la raíz del proyecto, construir la imagen de Node.js:
+
+```bash
+docker build -f dockerfile.node -t node-img-test .
+```
+
+Iniciar los contenedores de Docker (PostgreSQL y otros servicios):
+
+```bash
+docker compose up --build
+```
+
+Esto iniciará una instancia de PostgreSQL en el puerto 5433 con las siguientes credenciales:
+
+- **Host:** localhost
+- **Puerto:** 5433
+- **Base de datos:** sistema_contable
+- **Usuario:** postgres
+- **Contraseña:** postgres
+
+### 3. Ejecutar la Aplicación
+
+Ejecutar el proyecto Java desde la clase principal:
+
+```
+backend/sic/src/main/java/com/ues/sic/SicApplication.java
+```
+
+La aplicación estará disponible en: `http://localhost:8082`
+
+## Usuarios por Defecto
+
+El sistema crea automáticamente tres usuarios con diferentes roles al iniciar por primera vez:
+
+| Rol       | Usuario    | Contraseña    | Email               |
+|-----------|------------|---------------|---------------------|
+| Admin     | admin      | admin123      | admin@sic.com       |
+| Contador  | contador   | contador123   | contador@sic.com    |
+| Auditor   | auditor    | auditor123    | auditor@sic.com     |
+
+**Nota de Seguridad:** Se recomienda cambiar estas contraseñas en un entorno de producción.
+
+## Datos Iniciales
+
+Al iniciar la aplicación, el sistema carga automáticamente:
+
+- **Catálogo de Cuentas:** 30 cuentas predefinidas (Activos, Pasivos, Capital Contable)
+- **Periodos Contables:** 5 periodos de ejemplo para el año 2025
+
+Estos datos se cargan desde los archivos JSON ubicados en `backend/sic/src/main/resources/data/`
+
+## Estructura del Proyecto
+
+```
+SistemaContable/
+├── backend/
+│   └── sic/                    # Aplicación Spring Boot
+│       ├── src/
+│       │   ├── main/
+│       │   │   ├── java/       # Código fuente Java
+│       │   │   └── resources/  # Archivos de configuración y datos
+│       │   └── test/           # Pruebas unitarias
+│       └── pom.xml             # Dependencias Maven
+├── frontend/                   # Archivos del frontend
+├── docker-compose.yml          # Configuración de servicios Docker
+└── README.md
+```
+
+## Tecnologías Utilizadas
+
+- **Backend:** Spring Boot 3.x, Spring Security, Spring Data JPA
+- **Base de Datos:** PostgreSQL 15
+- **Autenticación:** JWT (JSON Web Tokens)
+- **Containerización:** Docker, Docker Compose
+- **Build Tool:** Maven
+
+## Configuración
+
+La configuración principal se encuentra en:
+
+```
+backend/sic/src/main/resources/application.properties
+```
+
+Puerto del servidor: **8082**
+
+## Contribuir
+
+Para contribuir al proyecto, crear una rama desde `main` y enviar un Pull Request con los cambios propuestos.
+
+## Licencia
+
+Este proyecto es de uso académico.
