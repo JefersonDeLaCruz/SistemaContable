@@ -38,7 +38,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(authz -> authz
                 .requestMatchers("/", "/login", "/css/**", "/js/**", "/images/**", "/api/usuarios/**", "/api/cuentas/**", "/api/periodos/**").permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
-                .requestMatchers("/auditor/**").hasRole("AUDITOR")
+                .requestMatchers("/auditor/**").hasAnyRole("AUDITOR", "ADMIN")
                 .requestMatchers("/contador/**").hasRole("CONTADOR")
                 .requestMatchers("/dashboard").authenticated()
                 // Requerir autenticación para todas las demás rutas
