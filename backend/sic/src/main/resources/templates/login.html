@@ -53,35 +53,49 @@
             </div>
           </div>
     
-          <form th:action="@{/login}" method="post" class="flex flex-col justify-center items-center gap-4 p-4">
-            <div> 
-              <!-- LABEL PARA NOMBRE DE USUARIO -->
-              <label class="input validator mb-6">
-                <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                  <g stroke-linejoin="round" stroke-linecap="round" stroke-width="2.5" fill="none" stroke="currentColor">
-                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="12" cy="7" r="4"></circle>
-                  </g>
-                </svg>
-                <input type="text" name="username" required placeholder="Nombre de usuario" minlength="3"
-                       maxlength="30" title="Solo letras, números o guión" pattern="[A-Za-z][A-Za-z0-9\-]*" />
-              </label>
+           <form th:action="@{/login}" method="post" class="flex flex-col justify-center items-center gap-4 p-4">
 
-              <!-- LABEL PARA CONTRASEÑA -->
-              <label class="input validator">
-                <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                  <g stroke-linejoin="round" stroke-linecap="round" stroke-width="2.5" fill="none" stroke="currentColor">
-                    <path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z">
-                    </path>
-                    <circle cx="16.5" cy="7.5" r=".5" fill="currentColor"></circle>
-                  </g>
-                </svg>
-                <input type="password" name="password" required placeholder="Clave" minlength="2"
-                       title="Debe tener más de 8 caracteres, incluyendo número, letra minúscula y mayúscula" />
-              </label>
-            </div>
-            
-            <input type="submit" class="btn btn-dash bg-gray-500 text-white px-4 py-2 rounded hover:bg-black" value="Acceder" />
+            <!-- LABEL PARA NOMBRE DE USUARIO -->
+            <label class="input validator">
+              <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <g stroke-linejoin="round" stroke-linecap="round" stroke-width="2.5" fill="none" stroke="currentColor">
+                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </g>
+              </svg>
+              <input type="text" name="username" required placeholder="Nombre de usuario" minlength="3"
+              maxlength="30" title="Solo letras, números o guión" />
+              <!-- pattern="[A-Za-z][A-Za-z0-9\-]*" esto iba dentro del input -->
+            </label>
+            <!-- <p class="validator-hint p-4 m-3 hidden">
+              Debe tener de 3 a 30 caracteres
+              <br />conteniendo solo letras, números o guión
+            </p> -->
+
+
+            <!-- LABEL PARA CONTRASEÑA -->
+            <label class="input validator">
+              <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <g stroke-linejoin="round" stroke-linecap="round" stroke-width="2.5" fill="none" stroke="currentColor">
+                  <path
+                    d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z">
+                  </path>
+                  <circle cx="16.5" cy="7.5" r=".5" fill="currentColor"></circle>
+                </g>
+              </svg>
+              <input type="password" name="password" required placeholder="Clave" minlength="2"
+                
+                title="Debe tener más de 8 caracteres, incluyendo número, letra minúscula y mayúscula" />
+                <!-- pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" esto iba dentro del input -->
+            </label>
+            <!-- <p class="validator-hint hidden">
+              Debe tener más de 8 caracteres, incluyendo
+              <br />Al menos un número <br />Al menos una letra minúscula <br />Al menos una letra mayúscula
+            </p> -->
+
+            <input type="submit" class="btn btn-dash" value="Acceder" />
+
+
           </form>
 
         </div>
