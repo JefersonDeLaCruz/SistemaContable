@@ -15,6 +15,9 @@ services:
   
   tailwind:
     image: node-img-test
+    build:
+      context: .
+      dockerfile: dockerfile.node
     container_name: tailwind-test
     volumes:
       - ./backend/sic/src/main/resources/static/css:/app/css
