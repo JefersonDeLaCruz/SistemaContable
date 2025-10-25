@@ -10,4 +10,5 @@ public interface UsuariosRepository extends JpaRepository<UsuariosModel, Long>{
     // Métodos para verificar existencia de manera segura
     boolean existsByUsernameIgnoreCase(String username);
     boolean existsByEmailIgnoreCase(String email);
+    long countByActive(Boolean active);
 }

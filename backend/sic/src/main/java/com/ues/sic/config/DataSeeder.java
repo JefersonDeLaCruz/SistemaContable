@@ -26,15 +26,15 @@ import java.util.List;
 public class DataSeeder {
 
     // Usuarios por defecto para cada rol
-    private static final String DEFAULT_ADMIN_USERNAME = "admin";
+    private static final String DEFAULT_ADMIN_USERNAME = "admin1";
     private static final String DEFAULT_ADMIN_PASSWORD = "admin123";
     private static final String DEFAULT_ADMIN_EMAIL = "admin@sic.com";
     
-    private static final String DEFAULT_CONTADOR_USERNAME = "contador";
+    private static final String DEFAULT_CONTADOR_USERNAME = "contador1";
     private static final String DEFAULT_CONTADOR_PASSWORD = "contador123";
     private static final String DEFAULT_CONTADOR_EMAIL = "contador@sic.com";
     
-    private static final String DEFAULT_AUDITOR_USERNAME = "auditor";
+    private static final String DEFAULT_AUDITOR_USERNAME = "auditor1";
     private static final String DEFAULT_AUDITOR_PASSWORD = "auditor123";
     private static final String DEFAULT_AUDITOR_EMAIL = "auditor@sic.com";
     

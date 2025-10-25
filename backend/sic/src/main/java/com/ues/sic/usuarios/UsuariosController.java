@@ -47,6 +47,9 @@ public class UsuariosController {
     }
 
     
-   
+   @GetMapping("/activos/count")
+   public long getActiveCount(){
+    return usuariosRepository.countByActive(true);
+   }
 
 }

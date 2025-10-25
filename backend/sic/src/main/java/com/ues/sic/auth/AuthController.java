@@ -15,6 +15,7 @@ import com.ues.sic.partidas.PartidasService;
 import com.ues.sic.detalle_partida.DetallePartidaModel;
 import com.ues.sic.detalle_partida.DetallePartidaService;
 import com.ues.sic.cuentas.CuentaModel;
+import com.ues.sic.dashboard.DashboardService;
 import com.ues.sic.cuentas.CuentaRepository;
 
 import java.util.List;
@@ -36,13 +37,19 @@ public class AuthController {
     @Autowired
     private CuentaRepository cuentaRepository;
 
+    @Autowired
+    private DashboardService dashboardService;
+
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
         // Obtener el usuario autenticado desde Spring Security
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
-        
+        long nUsuarios = dashboardService.contarUsuariosActivos();
+        long partidasMes = dashboardService.contarPartidasMesActual();
         UsuariosModel user = usuariosRepository.findByUsername(username);
+        Map<String, Integer> semana = dashboardService.contarPartidasSemanaActual();
+        int semanaMax = dashboardService.maxPartidasSemanaActual(semana);
         if (user != null) {
             model.addAttribute("usuario", user);
             model.addAttribute("titulo", "Dashboard");
@@ -62,7 +69,10 @@ public class AuthController {
             model.addAttribute("partidas", todasLasPartidas);
             model.addAttribute("detalles", todosLosDetalles);
             model.addAttribute("mapaCuentas", mapaCuentas);
-            
+            model.addAttribute("usuariosActivos", nUsuarios);
+            model.addAttribute("partidasMesActual", partidasMes);
+            model.addAttribute("semana", semana);
+            model.addAttribute("semanaMax", semanaMax);
             return "dashboard";
         }
         return "redirect:/login";
