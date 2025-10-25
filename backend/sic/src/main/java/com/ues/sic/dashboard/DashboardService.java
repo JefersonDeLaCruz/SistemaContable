@@ -106,6 +106,38 @@ public class DashboardService {
         return out;
     }
 
+    public List<MiMovimientoDTO> misMovimientosRecientes(String usuario, int limite) {
+        List<Object[]> filas = detallePartidaRepository.misMovimientosRecientes(usuario, limite);
+        List<MiMovimientoDTO> out = new ArrayList<>();
+        for (Object[] r : filas) {
+            String fecha = ((java.sql.Date) r[0]).toLocalDate().toString();
+            Long partidaId = ((Number) r[1]).longValue();
+            String descripcion = (String) r[2];
+            String cuenta = (String) r[3];
+            Double debito = r[4] != null ? ((Number) r[4]).doubleValue() : 0.0;
+            Double credito = r[5] != null ? ((Number) r[5]).doubleValue() : 0.0;
+            String estado = debito > 0 ? "Debito" : (credito > 0 ? "Credito" : "-");
+            out.add(new MiMovimientoDTO(fecha, partidaId, descripcion, cuenta, debito, credito, estado));
+        }
+        return out;
+    }
+
+    public List<MiMovimientoDTO> misMovimientosRecientesPara(String username, String userId, int limite) {
+        List<Object[]> filas = detallePartidaRepository.misMovimientosRecientesDe(username, userId, limite);
+        List<MiMovimientoDTO> out = new ArrayList<>();
+        for (Object[] r : filas) {
+            String fecha = ((java.sql.Date) r[0]).toLocalDate().toString();
+            Long partidaId = ((Number) r[1]).longValue();
+            String descripcion = (String) r[2];
+            String cuenta = (String) r[3];
+            Double debito = r[4] != null ? ((Number) r[4]).doubleValue() : 0.0;
+            Double credito = r[5] != null ? ((Number) r[5]).doubleValue() : 0.0;
+            String estado = debito > 0 ? "Debito" : (credito > 0 ? "Credito" : "-");
+            out.add(new MiMovimientoDTO(fecha, partidaId, descripcion, cuenta, debito, credito, estado));
+        }
+        return out;
+    }
+
     public double mayorMovimientoHoy(){
         String hoy = java.time.LocalDate.now().toString();
         Double max = detallePartidaRepository.maxMovimientoHoy(hoy);

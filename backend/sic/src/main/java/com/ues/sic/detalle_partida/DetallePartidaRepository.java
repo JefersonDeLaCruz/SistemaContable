@@ -50,6 +50,46 @@ public interface DetallePartidaRepository extends JpaRepository<DetallePartidaMo
             """,
            nativeQuery = true)
     Double gastoDiario(@Param("hoy") String hoy);
+
+    @Query(value = """
+            SELECT
+              CAST(p.fecha AS DATE)                AS fecha,
+              p.id                                 AS partida_id,
+              d.descripcion                        AS descripcion,
+              COALESCE(c.codigo || ' - ' || c.nombre, d.id_cuenta::text) AS cuenta,
+              d.debito                             AS debito,
+              d.credito                            AS credito
+            FROM detalle_partida d
+            JOIN partidas p ON p.id = d.id_partida
+            LEFT JOIN cuentas c ON c.id_cuenta = CAST(d.id_cuenta AS INTEGER)
+            WHERE p.id_usuario = :usuario
+            ORDER BY CAST(p.fecha AS DATE) DESC, p.id DESC, d.id DESC
+            LIMIT :limite
+            """,
+           nativeQuery = true)
+    List<Object[]> misMovimientosRecientes(@Param("usuario") String usuario, @Param("limite") int limite);
+
+    @Query(value = """
+            SELECT
+              CAST(p.fecha AS DATE)                AS fecha,
+              p.id                                 AS partida_id,
+              d.descripcion                        AS descripcion,
+              COALESCE(c.codigo || ' - ' || c.nombre, d.id_cuenta::text) AS cuenta,
+              d.debito                             AS debito,
+              d.credito                            AS credito
+            FROM detalle_partida d
+            JOIN partidas p ON p.id = d.id_partida
+            LEFT JOIN cuentas c ON c.id_cuenta = CAST(d.id_cuenta AS INTEGER)
+            WHERE p.id_usuario = :username OR p.id_usuario = :userId
+            ORDER BY CAST(p.fecha AS DATE) DESC, p.id DESC, d.id DESC
+            LIMIT :limite
+            """,
+           nativeQuery = true)
+    List<Object[]> misMovimientosRecientesDe(
+        @Param("username") String username,
+        @Param("userId") String userId,
+        @Param("limite") int limite
+    );
     
     
 }

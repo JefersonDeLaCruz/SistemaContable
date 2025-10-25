@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" data-theme="corporate">
 
 <head th:replace="~{layout :: head}">
@@ -16,15 +16,6 @@
       <div class="w-full p-4 sm:p-6 lg:p-10 bg-base-100">
 
         <h1 class="text-3xl font-bold mb-6">Gestionar Cuentas Contables</h1>
-
-        <div class="alert alert-info">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-            class="stroke-current shrink-0 w-6 h-6">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
-          <span>Funcionalidad en desarrollo - Próximamente podrás ver el dashboard</span>
-        </div>
 
 
         <div class="p-6">
@@ -64,8 +55,7 @@
               <div class="stat bg-base-200 rounded-xl">
                 <div class="stat-title">Mayor movimiento (hoy)</div>
                 <div class="stat-value text-success" th:text="${mayorMovimientoHoy}"></div>
-                <div class="stat-desc">1101 - Caja</div>
-              </div>
+               </div>
               <div class="stat bg-base-200 rounded-xl">
                 <div class="stat-title">Usuarios activos</div>
                 <div class="stat-value text-success" th:text="${usuariosActivos}"></div>
@@ -192,17 +182,17 @@
                           <th>Usuario</th>
                         </tr>
                       </thead>
-                      <tbody>
-                        <tr class="hover" th:each="mov : ${movimientosRecientes}">
-                          <td th:text="${mov.fecha}">2025-10-10</td>
-                          <td><span class="badge badge-ghost" th:text="${'#' + mov.partidaId}">#0</span></td>
-                          <td th:text="${mov.cuenta}">-</td>
-                          <td class="text-right" th:text="${mov.debito > 0} ? ${mov.debito} : ''">0.00</td>
-                          <td class="text-right" th:text="${mov.credito > 0} ? ${mov.credito} : ''">0.00</td>
-                          <td><span class="badge" th:text="${mov.usuario}">usuario</span></td>
+                                            <tbody>
+                        <tr class="hover" th:each="m : ${misMovimientos}">
+                          <td th:text="${m.fecha}">2025-10-10</td>
+                          <td><span class="badge badge-ghost" th:text="${'#' + m.partidaId}">#0</span></td>
+                          <td th:text="${m.descripcion}">-</td>
+                          <td th:text="${m.cuenta}">-</td>
+                          <td class="text-right" th:text="${m.debito > 0} ? ${m.debito} : ''">0.00</td>
+                          <td class="text-right" th:text="${m.credito > 0} ? ${m.credito} : ''">0.00</td>
+                          <td><span class="badge" th:text="${m.estado}">-</span></td>
                         </tr>
-                        <tr th:if="${#lists.isEmpty(movimientosRecientes)}">
-                          <td colspan="6" class="text-center opacity-70">Sin movimientos recientes</td>
+                        <tr th:if="${#lists.isEmpty(misMovimientos)}"><td colspan="7" class="text-center opacity-70">Sin movimientos</td></tr>
                       </tbody>
                     </table>
                   </div>
@@ -592,7 +582,7 @@
                 <div class="stat-desc">Por <span th:text="${usuario.username}">usuario</span></div>
               </div>
               <div class="stat bg-base-200 rounded-xl">
-                <div class="stat-title">Balance del d�a</div>
+                <div class="stat-title">Balance del d�a</div>
                 <div class="stat-value text-primary" th:text="${balanceDia}"><div class="stat-value text-primary">$1,705.40</div></div>
                 <div class="stat-desc">Ingresos - Gastos</div>
               </div>
@@ -685,7 +675,7 @@
                 <div class="card-body">
                   <div class="flex items-center justify-between">
                     <h3 class="card-title">Mis movimientos recientes</h3>
-                    <div class="badge badge-info">Último registro: 10:42</div>
+                    <div class="badge badge-info" th:text="'Ultimo registro: ' + ${ultimoRegistro}">Ultimo registro: -</div>
                   </div>
 
                   <div class="overflow-x-auto">
@@ -701,52 +691,17 @@
                           <th>Estado</th>
                         </tr>
                       </thead>
-                      <tbody>
-                        <tr class="hover">
-                          <td>2025-10-10 10:42</td>
-                          <td><span class="badge badge-ghost">#1251</span></td>
-                          <td>Venta contado Cliente A</td>
-                          <td>1101 - Caja</td>
-                          <td class="text-right"><span class="badge badge-success badge-outline">$1,250.00</span></td>
-                          <td class="text-right">—</td>
-                          <td><span class="badge badge-success">Aprobada</span></td>
+                                            <tbody>
+                        <tr class="hover" th:each="m : ">
+                          <td th:text="${m.fecha}">2025-10-10</td>
+                          <td><span class="badge badge-ghost" th:text="${'#' + m.partidaId}">#0</span></td>
+                          <td th:text="${m.descripcion}">-</td>
+                          <td th:text="${m.cuenta}">-</td>
+                          <td class="text-right" th:text="${m.debito > 0} ? ${m.debito} : ''">0.00</td>
+                          <td class="text-right" th:text="${m.credito > 0} ? ${m.credito} : ''">0.00</td>
+                          <td><span class="badge" th:text="${m.estado}">-</span></td>
                         </tr>
-                        <tr class="hover">
-                          <td>2025-10-10 10:38</td>
-                          <td><span class="badge badge-ghost">#1250</span></td>
-                          <td>Venta contado Cliente A</td>
-                          <td>4101 - Ventas</td>
-                          <td class="text-right">—</td>
-                          <td class="text-right"><span class="badge badge-error badge-outline">$1,250.00</span></td>
-                          <td><span class="badge badge-success">Aprobada</span></td>
-                        </tr>
-                        <tr class="hover">
-                          <td>2025-10-10 10:15</td>
-                          <td><span class="badge badge-ghost">#1249</span></td>
-                          <td>Pago servicios básicos</td>
-                          <td>6101 - Gastos Operativos</td>
-                          <td class="text-right"><span class="badge badge-success badge-outline">$300.00</span></td>
-                          <td class="text-right">—</td>
-                          <td><span class="badge badge-success">Aprobada</span></td>
-                        </tr>
-                        <tr class="hover">
-                          <td>2025-10-10 09:58</td>
-                          <td><span class="badge badge-ghost">#1248</span></td>
-                          <td>Compra mercadería Prov. Y</td>
-                          <td>5101 - Compras</td>
-                          <td class="text-right"><span class="badge badge-success badge-outline">$800.00</span></td>
-                          <td class="text-right">—</td>
-                          <td><span class="badge badge-warning">Pendiente</span></td>
-                        </tr>
-                        <tr class="hover">
-                          <td>2025-10-10 09:41</td>
-                          <td><span class="badge badge-ghost">#1247</span></td>
-                          <td>Compra mercadería Prov. Y</td>
-                          <td>2102 - Proveedores</td>
-                          <td class="text-right">—</td>
-                          <td class="text-right"><span class="badge badge-error badge-outline">$800.00</span></td>
-                          <td><span class="badge badge-warning">Pendiente</span></td>
-                        </tr>
+                        <tr th:if="${#lists.isEmpty(misMovimientos)}"><td colspan="7" class="text-center opacity-70">No hay ningun movimiento reciente</td></tr>
                       </tbody>
                     </table>
                   </div>
@@ -853,6 +808,8 @@
 </body>
 
 </html>
+
+
 
 
 

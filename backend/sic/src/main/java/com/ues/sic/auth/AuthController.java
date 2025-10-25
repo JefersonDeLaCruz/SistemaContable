@@ -86,6 +86,9 @@ public class AuthController {
             model.addAttribute("gastoDiario", gastoDiario);
             model.addAttribute("balanceDia", balanceDia);
             model.addAttribute("partidasHoyUsuario", partidasHoyUsuario);
+            var misMovs = dashboardService.misMovimientosRecientesPara(username, user.getId().toString(), 7);
+            model.addAttribute("misMovimientos", misMovs);
+            model.addAttribute("ultimoRegistro", misMovs.isEmpty() ? "-" : misMovs.get(0).fecha);
             
             model.addAttribute("movimientosRecientes", dashboardService.ultimosMovimientos(7));
                 return "dashboard";
@@ -109,3 +112,4 @@ public class AuthController {
         return "login";
     }
 }
+
