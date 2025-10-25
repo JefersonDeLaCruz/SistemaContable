@@ -13,7 +13,6 @@ public class PartidasService {
     public PartidasModel save(PartidasModel partida) {
         return partidasRepository.save(partida);
     }
-    
     public PartidasModel findById(Long id) {
         return partidasRepository.findById(id).orElse(null);
     }

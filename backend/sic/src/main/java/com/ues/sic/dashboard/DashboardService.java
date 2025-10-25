@@ -6,12 +6,14 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.ArrayList;
 
 import com.ues.sic.partidas.PartidasRepository;
 import com.ues.sic.usuarios.UsuariosRepository;
+import com.ues.sic.detalle_partida.DetallePartidaRepository;
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.time.DayOfWeek;
+
 
 @Service
 public class DashboardService {
@@ -72,8 +74,41 @@ public class DashboardService {
         return semana;
     }
 
-    // Si quieres porcentaje: calcula max y también devuélvelo
     public int maxPartidasSemanaActual(Map<String, Integer> semana) {
         return semana.values().stream().mapToInt(Integer::intValue).max().orElse(0);
+    }
+
+    //sacar el total
+    public long totalPartidasSemanaActual(){
+        Map<String,Integer> semana = contarPartidasSemanaActual();
+        long total = 0;
+        for(Integer conteo: semana.values()){
+            total +=conteo;
+        }    
+        return total;
+    }
+
+    @Autowired
+    private DetallePartidaRepository detallePartidaRepository;
+
+    public List<MovimientoRecienteDTO> ultimosMovimientos(int limite) {
+        List<Object[]> filas = detallePartidaRepository.ultimosMovimientos(limite);
+        List<MovimientoRecienteDTO> out = new ArrayList<>();
+        for (Object[] r : filas) {
+            String fecha = ((java.sql.Date) r[0]).toLocalDate().toString();
+            Long partidaId = ((Number) r[1]).longValue();
+            String cuenta = (String) r[2];
+            Double debito = r[3] != null ? ((Number) r[3]).doubleValue() : 0.0;
+            Double credito = r[4] != null ? ((Number) r[4]).doubleValue() : 0.0;
+            String usuario = (String) r[5];
+            out.add(new MovimientoRecienteDTO(fecha, partidaId, cuenta, debito, credito, usuario));
+        }
+        return out;
+    }
+
+    public double mayorMovimientoHoy(){
+        String hoy = java.time.LocalDateTime.now().toString();
+        Double max = detallePartidaRepository.maxMovimientoHoy(hoy);
+        return (max != null) ? max : 0.0;
     }
 }

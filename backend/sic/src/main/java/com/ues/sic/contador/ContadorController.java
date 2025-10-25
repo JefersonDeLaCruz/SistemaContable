@@ -80,8 +80,8 @@ public class ContadorController {
         return "contador/balances";
     }
 
-    @GetMapping("/subir-pdf")
-    public String subirPdf(Model model) {
+    @GetMapping("/subir-documento")
+    public String subirDocumento(Model model) {
         UsuariosModel user = getAuthenticatedUser();
         
         if (!hasRequiredRole(user, "CONTADOR")) {

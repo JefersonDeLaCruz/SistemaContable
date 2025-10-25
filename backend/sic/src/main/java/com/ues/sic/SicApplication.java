@@ -9,7 +9,7 @@ public class SicApplication {
 	public static void main(String[] args) {
 
 
-		System.out.println("Avla que jopa");
+		System.out.println("BURLAO JA JA JA");
 		SpringApplication.run(SicApplication.class, args);
 		
 	}

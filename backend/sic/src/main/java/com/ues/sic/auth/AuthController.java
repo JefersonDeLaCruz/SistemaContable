@@ -48,6 +48,9 @@ public class AuthController {
         long nUsuarios = dashboardService.contarUsuariosActivos();
         long partidasMes = dashboardService.contarPartidasMesActual();
         UsuariosModel user = usuariosRepository.findByUsername(username);
+        long totalSemana = dashboardService.totalPartidasSemanaActual();
+        Double mayorMovHoy = dashboardService.mayorMovimientoHoy();
+
         Map<String, Integer> semana = dashboardService.contarPartidasSemanaActual();
         int semanaMax = dashboardService.maxPartidasSemanaActual(semana);
         if (user != null) {
@@ -73,7 +76,11 @@ public class AuthController {
             model.addAttribute("partidasMesActual", partidasMes);
             model.addAttribute("semana", semana);
             model.addAttribute("semanaMax", semanaMax);
-            return "dashboard";
+            model.addAttribute("totalSemana", totalSemana);
+            model.addAttribute("mayorMovimientoHoy", mayorMovHoy);
+            
+            model.addAttribute("movimientosRecientes", dashboardService.ultimosMovimientos(7));
+                return "dashboard";
         }
         return "redirect:/login";
     }
