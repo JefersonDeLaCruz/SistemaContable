@@ -16,6 +16,11 @@ public interface PartidasRepository extends  JpaRepository<PartidasModel, Long>{
     @Query(value = "SELECT * FROM partidas p WHERE CAST(p.fecha AS DATE) >= CAST(:fechaInicio AS DATE) AND CAST(p.fecha AS DATE) <= CAST(:fechaFin AS DATE) ORDER BY CAST(p.fecha AS DATE) ASC, p.id ASC", nativeQuery = true)
     List<PartidasModel> findByFechaBetween(@Param("fechaInicio") String fechaInicio, @Param("fechaFin") String fechaFin);
 
+    @Query(value = "SELECT COUNT(*) FROM partidas p WHERE CAST(p.fecha AS DATE) = CAST(:hoy AS DATE)", nativeQuery = true)
+    long countHoy(@Param("hoy") String hoy);
+
+    @Query(value = "SELECT COUNT(*) FROM partidas p WHERE CAST(p.fecha AS DATE) = CAST(:hoy AS DATE) AND p.id_usuario = :usuario", nativeQuery = true)
+    long countHoyPorUsuario(@Param("hoy") String hoy, @Param("usuario") String usuario);
     //Obtener conteo de partidas por día dentro de un rango de fechas
     @Query(value = "SELECT CAST(p.fecha AS DATE) AS dia, COUNT(*) AS cantidad " +
                    "FROM partidas p " +

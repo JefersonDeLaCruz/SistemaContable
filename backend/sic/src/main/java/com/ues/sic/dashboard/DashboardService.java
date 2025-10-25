@@ -107,8 +107,32 @@ public class DashboardService {
     }
 
     public double mayorMovimientoHoy(){
-        String hoy = java.time.LocalDateTime.now().toString();
+        String hoy = java.time.LocalDate.now().toString();
         Double max = detallePartidaRepository.maxMovimientoHoy(hoy);
         return (max != null) ? max : 0.0;
     }
+
+    public double ingresoDiario(){
+        String hoy = java.time.LocalDate.now().toString();
+        Double total = detallePartidaRepository.ingresoDiario(hoy);
+        return (total != null) ? total : 0.0;
+    }
+
+    public double gastoDiario(){
+        String hoy = java.time.LocalDate.now().toString();
+        Double total = detallePartidaRepository.gastoDiario(hoy);
+        return (total != null) ? total : 0.0;
+    }
+
+    public long partidasHoyTotal(){
+        String hoy = java.time.LocalDate.now().toString();
+        return partidasRepository.countHoy(hoy);
+    }
+
+    public long partidasHoyDe(String usuario){
+        String hoy = java.time.LocalDate.now().toString();
+        return partidasRepository.countHoyPorUsuario(hoy, usuario);
+    }
+
+
 }

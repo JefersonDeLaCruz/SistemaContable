@@ -50,6 +50,10 @@ public class AuthController {
         UsuariosModel user = usuariosRepository.findByUsername(username);
         long totalSemana = dashboardService.totalPartidasSemanaActual();
         Double mayorMovHoy = dashboardService.mayorMovimientoHoy();
+        double ingresoDiario = dashboardService.ingresoDiario();
+        double gastoDiario = dashboardService.gastoDiario();
+        double balanceDia = ingresoDiario - gastoDiario;
+        long partidasHoyUsuario = dashboardService.partidasHoyDe(username);
 
         Map<String, Integer> semana = dashboardService.contarPartidasSemanaActual();
         int semanaMax = dashboardService.maxPartidasSemanaActual(semana);
@@ -78,6 +82,10 @@ public class AuthController {
             model.addAttribute("semanaMax", semanaMax);
             model.addAttribute("totalSemana", totalSemana);
             model.addAttribute("mayorMovimientoHoy", mayorMovHoy);
+            model.addAttribute("ingresoDiario", ingresoDiario);
+            model.addAttribute("gastoDiario", gastoDiario);
+            model.addAttribute("balanceDia", balanceDia);
+            model.addAttribute("partidasHoyUsuario", partidasHoyUsuario);
             
             model.addAttribute("movimientosRecientes", dashboardService.ultimosMovimientos(7));
                 return "dashboard";

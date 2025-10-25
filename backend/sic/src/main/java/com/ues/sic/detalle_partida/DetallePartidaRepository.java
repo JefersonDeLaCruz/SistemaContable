@@ -28,4 +28,28 @@ public interface DetallePartidaRepository extends JpaRepository<DetallePartidaMo
 
     @Query(value = "SELECT MAX(GREATEST(d.debito,d.credito)) FROM detalle_partida d JOIN partidas p ON p.id = d.id_partida WHERE CAST(p.fecha AS DATE) = CAST(:hoy AS DATE)", nativeQuery = true)
     Double maxMovimientoHoy(@Param("hoy")String hoy);
+
+    @Query(value = """
+            SELECT COALESCE(SUM(d.credito - d.debito), 0)
+            FROM detalle_partida d
+            JOIN partidas p ON p.id = d.id_partida
+            LEFT JOIN cuentas c ON c.id_cuenta = CAST(d.id_cuenta AS INTEGER)
+            WHERE CAST(p.fecha AS DATE) = CAST(:hoy AS DATE)
+              AND (c.tipo = 'INGRESOS' OR c.codigo LIKE '4%')
+            """,
+           nativeQuery = true)
+    Double ingresoDiario(@Param("hoy") String hoy);
+
+    @Query(value = """
+            SELECT COALESCE(SUM(d.debito - d.credito), 0)
+            FROM detalle_partida d
+            JOIN partidas p ON p.id = d.id_partida
+            LEFT JOIN cuentas c ON c.id_cuenta = CAST(d.id_cuenta AS INTEGER)
+            WHERE CAST(p.fecha AS DATE) = CAST(:hoy AS DATE)
+              AND (c.tipo = 'GASTOS' OR c.codigo LIKE '5%')
+            """,
+           nativeQuery = true)
+    Double gastoDiario(@Param("hoy") String hoy);
+    
+    
 }

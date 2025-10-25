@@ -58,8 +58,7 @@
                 <div class="stat-desc">Sep 2025</div>
               </div>
               <div class="stat bg-base-200 rounded-xl">
-                <div class="stat-title">Ingreso diario</div>
-                <div class="stat-value text-success">$3,125.40</div>
+                <div class="stat-title">Ingreso diario</div>                <div class="stat-value text-success" th:text="${ingresoDiario}">0</div>
                 <div class="stat-desc">Hoy</div>
               </div>
               <div class="stat bg-base-200 rounded-xl">
@@ -332,8 +331,7 @@
                 <div class="stat-desc">Sep 2025</div>
               </div>
               <div class="stat bg-base-200 rounded-xl">
-                <div class="stat-title">Ingreso diario</div>
-                <div class="stat-value text-success">$3,125.40</div>
+                <div class="stat-title">Ingreso diario</div>                <div class="stat-value text-success" th:text="${ingresoDiario}">0</div>
                 <div class="stat-desc">Hoy</div>
               </div>
               <div class="stat bg-base-200 rounded-xl">
@@ -586,22 +584,21 @@
             <div class="px-6 pt-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div class="stat bg-base-200 rounded-xl">
                 <div class="stat-title">Ingresos de hoy</div>
-                <div class="stat-value text-success">$3,125.40</div>
-                <div class="stat-desc">Actualizado 10:45</div>
+                <div class="stat-value text-success" th:text="${ingresoDiario}"><div class="stat-value text-success">$3,125.40</div></div>
+                <div class="stat-desc">Actualizado hoy</div>
               </div>
               <div class="stat bg-base-200 rounded-xl">
-                <div class="stat-title">Partidas generadas hoy</div>
-                <div class="stat-value text-info">12</div>
+                <div class="stat-title">Partidas generadas hoy</div>                <div class="stat-value text-info" th:text="${partidasHoyUsuario}">0</div>
                 <div class="stat-desc">Por <span th:text="${usuario.username}">usuario</span></div>
               </div>
               <div class="stat bg-base-200 rounded-xl">
-                <div class="stat-title">Balance del dÃ­a</div>
-                <div class="stat-value text-primary">$1,705.40</div>
+                <div class="stat-title">Balance del día</div>
+                <div class="stat-value text-primary" th:text="${balanceDia}"><div class="stat-value text-primary">$1,705.40</div></div>
                 <div class="stat-desc">Ingresos - Gastos</div>
               </div>
               <div class="stat bg-base-200 rounded-xl">
-                <div class="stat-title">Gastos de hoy</div>
-                <div class="stat-value text-error">$1,420.00</div>
+                <div class="stat-title">Gastos de hoy</div>                <div class="stat-value text-error" th:text="${gastoDiario}"><div class="stat-title">Gastos de hoy</div>
+                <div class="stat-value text-error">$1,420.00</div></div>
                 <div class="stat-desc">Total egresos</div>
               </div>
             </div>
@@ -856,6 +853,13 @@
 </body>
 
 </html>
+
+
+
+
+
+
+
 
 
 
