@@ -58,13 +58,66 @@ function renderSeccion(titulo, data) {
 
 function renderBalance(data) {
   const cont = document.getElementById('balanceContainer');
+  const totalActivo = Number(data?.activo?.total || 0);
+  const totalPasivo = Number(data?.pasivo?.total || 0);
+  const totalCapital = Number(data?.capital?.total || 0);
+  const totalPC = totalPasivo + totalCapital;
+  const dif = Number(data?.diferencia || 0);
+  const cuadra = !!data?.cuadra;
+  const progressMax = Math.max(totalActivo, totalPC, 1);
+  const pAct = Math.round((totalActivo / progressMax) * 100);
+  const pPC = Math.round((totalPC / progressMax) * 100);
+
   const header = `
-    <div class="alert">
-      <span>Fecha de corte: <b>${data.fechaCorte}</b> — Cuadrado: <b>${data.cuadra ? 'Sí' : 'No'}</b> ${!data.cuadra ? `(Dif: ${fmtMoneda(data.diferencia)})` : ''}</span>
+    <div class="alert ${cuadra ? 'alert-success' : 'alert-warning'}">
+      <div>
+        <span>Fecha de corte: <b>${data.fechaCorte}</b></span>
+        <span class="ml-4">Estado: <span class="badge ${cuadra ? 'badge-success' : 'badge-error'}">${cuadra ? 'Cuadrado' : 'No cuadrado'}</span></span>
+        ${!cuadra ? `<span class="ml-2">Diferencia: <b>${fmtMoneda(dif)}</b></span>` : ''}
+      </div>
     </div>
   `;
+
+  const stats = `
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+      <div class="stat bg-base-200 rounded-xl">
+        <div class="stat-title">Total Activo</div>
+        <div class="stat-value text-info">${fmtMoneda(totalActivo)}</div>
+      </div>
+      <div class="stat bg-base-200 rounded-xl">
+        <div class="stat-title">Total Pasivo</div>
+        <div class="stat-value text-secondary">${fmtMoneda(totalPasivo)}</div>
+      </div>
+      <div class="stat bg-base-200 rounded-xl">
+        <div class="stat-title">Total Capital</div>
+        <div class="stat-value text-primary">${fmtMoneda(totalCapital)}</div>
+      </div>
+      <div class="stat bg-base-200 rounded-xl">
+        <div class="stat-title">Pasivo + Capital</div>
+        <div class="stat-value ${cuadra ? 'text-success' : 'text-error'}">${fmtMoneda(totalPC)}</div>
+        <div class="stat-desc">Diferencia: ${fmtMoneda(dif)}</div>
+      </div>
+    </div>
+  `;
+
+  const compare = `
+    <div class="card bg-base-100 shadow mb-6">
+      <div class="card-body">
+        <h3 class="card-title">Comparativo</h3>
+        <div class="space-y-2">
+          <div class="flex items-center justify-between text-sm"><span>Activo</span><span class="font-mono">${fmtMoneda(totalActivo)}</span></div>
+          <progress class="progress progress-info w-full" value="${pAct}" max="100"></progress>
+          <div class="flex items-center justify-between text-sm mt-3"><span>Pasivo + Capital</span><span class="font-mono">${fmtMoneda(totalPC)}</span></div>
+          <progress class="progress ${cuadra ? 'progress-success' : 'progress-warning'} w-full" value="${pPC}" max="100"></progress>
+        </div>
+      </div>
+    </div>
+  `;
+
   cont.innerHTML = `
     ${header}
+    ${stats}
+    ${compare}
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       ${renderSeccion('Activo', data.activo)}
       <div class="space-y-6">
@@ -73,9 +126,7 @@ function renderBalance(data) {
       </div>
     </div>
   `;
-}
-
-function renderEstadoResultados(data) {
+}function renderEstadoResultados(data) {
   const cont = document.getElementById('balanceContainer');
   const header = `
     <div class="alert">
@@ -216,3 +267,4 @@ function renderBalanceComprobacion(data) {
     </div>
   `;
 }
+

@@ -1,9 +1,4 @@
 
-
-
-
-
-
 package com.ues.sic.detalle_partida;
 
 import com.ues.sic.partidas.PartidasModel;
