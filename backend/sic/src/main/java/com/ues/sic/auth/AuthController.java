@@ -99,6 +99,7 @@ public class AuthController {
     @GetMapping("/login")
     public String login(@RequestParam(value = "error", required = false) String error,
                        @RequestParam(value = "logout", required = false) String logout,
+                       @RequestParam(value = "username_changed", required = false) String usernameChanged,
                        Model model) {
         
         if (error != null) {
@@ -107,6 +108,10 @@ public class AuthController {
         
         if (logout != null) {
             model.addAttribute("message", "Ha cerrado sesión exitosamente");
+        }
+        
+        if (usernameChanged != null) {
+            model.addAttribute("message", "Usuario actualizado exitosamente. Por favor, inicia sesión con tu nuevo nombre de usuario.");
         }
         
         return "login";

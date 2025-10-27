@@ -4,11 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.ues.sic.usuarios.UsuariosModel;
 import com.ues.sic.usuarios.UsuariosRepository;
@@ -19,6 +22,7 @@ import com.ues.sic.detalle_partida.DetallePartidaModel;
 import com.ues.sic.detalle_partida.DetallePartidaService;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 
@@ -33,6 +37,9 @@ public class ViewController {
     
     @Autowired
     private DetallePartidaService detallePartidaService;
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
 
     @GetMapping("/")
@@ -83,6 +90,121 @@ public class ViewController {
         model.addAttribute("usuario", user);
         model.addAttribute("titulo", "Configuración");
         return "configuracion";
+    }
+
+    @PostMapping("/configuracion/actualizar")
+    public String actualizarConfiguracion(
+            @RequestParam("username") String newUsername,
+            @RequestParam("email") String newEmail,
+            @RequestParam(value = "role", required = false) String newRole,
+            RedirectAttributes redirectAttributes) {
+        
+        try {
+            // Obtener usuario actual
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            String currentUsername = auth.getName();
+            UsuariosModel user = usuariosRepository.findByUsername(currentUsername);
+            
+            if (user == null) {
+                redirectAttributes.addFlashAttribute("error", "Usuario no encontrado");
+                return "redirect:/configuracion";
+            }
+            
+            boolean usernameChanged = false;
+            
+            // Validar username único (excluyendo el usuario actual)
+            if (!user.getUsername().equalsIgnoreCase(newUsername)) {
+                if (usuariosRepository.existsByUsernameIgnoreCaseAndIdNot(newUsername, user.getId())) {
+                    redirectAttributes.addFlashAttribute("error", "El nombre de usuario ya está en uso");
+                    return "redirect:/configuracion";
+                }
+                usernameChanged = true;
+            }
+            
+            // Validar email único (excluyendo el usuario actual)
+            if (!user.getEmail().equalsIgnoreCase(newEmail)) {
+                if (usuariosRepository.existsByEmailIgnoreCaseAndIdNot(newEmail, user.getId())) {
+                    redirectAttributes.addFlashAttribute("error", "El correo electrónico ya está en uso");
+                    return "redirect:/configuracion";
+                }
+            }
+            
+            // Actualizar campos
+            user.setUsername(newUsername);
+            user.setEmail(newEmail);
+            
+            // Solo permitir cambio de rol si el usuario es ADMIN
+            if (user.getRole().equals("ADMIN") && newRole != null && !newRole.isEmpty()) {
+                user.setRole(newRole);
+            }
+            
+            // Actualizar timestamp
+            user.setUpdatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+            
+            // Guardar cambios
+            usuariosRepository.save(user);
+            
+            // Si cambió el username, forzar logout y re-login
+            if (usernameChanged) {
+                redirectAttributes.addFlashAttribute("info", "Usuario actualizado. Por favor, inicia sesión nuevamente con tu nuevo nombre de usuario.");
+                SecurityContextHolder.clearContext();
+                return "redirect:/login?username_changed=true";
+            }
+            
+            redirectAttributes.addFlashAttribute("success", "Configuración actualizada exitosamente");
+            return "redirect:/configuracion";
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("error", "Error al actualizar la configuración: " + e.getMessage());
+            return "redirect:/configuracion";
+        }
+    }
+
+    @PostMapping("/configuracion/cambiar-password")
+    public String cambiarPassword(
+            @RequestParam("currentPassword") String currentPassword,
+            @RequestParam("newPassword") String newPassword,
+            RedirectAttributes redirectAttributes) {
+        
+        try {
+            // Obtener usuario actual
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            String username = auth.getName();
+            UsuariosModel user = usuariosRepository.findByUsername(username);
+            
+            if (user == null) {
+                redirectAttributes.addFlashAttribute("error", "Usuario no encontrado");
+                return "redirect:/configuracion";
+            }
+            
+            // Verificar contraseña actual
+            if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+                redirectAttributes.addFlashAttribute("error", "La contraseña actual es incorrecta");
+                return "redirect:/configuracion";
+            }
+            
+            // Validar longitud mínima de nueva contraseña
+            if (newPassword.length() < 6) {
+                redirectAttributes.addFlashAttribute("error", "La nueva contraseña debe tener al menos 6 caracteres");
+                return "redirect:/configuracion";
+            }
+            
+            // Actualizar contraseña
+            user.setPassword(passwordEncoder.encode(newPassword));
+            user.setUpdatedAt(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+            
+            // Guardar cambios
+            usuariosRepository.save(user);
+            
+            redirectAttributes.addFlashAttribute("success", "Contraseña actualizada exitosamente");
+            return "redirect:/configuracion";
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("error", "Error al cambiar la contraseña: " + e.getMessage());
+            return "redirect:/configuracion";
+        }
     }
 
 

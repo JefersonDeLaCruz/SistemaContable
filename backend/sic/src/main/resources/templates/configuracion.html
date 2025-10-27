@@ -1,33 +1,240 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" data-theme="corporate">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" data-theme="corporate">
 
 <head th:replace="~{layout :: head}">
 
 </head>
 
 <body>
-    
+
     <div class="drawer">
         <input id="my-drawer-3" type="checkbox" class="drawer-toggle" />
         <div class="drawer-content flex flex-col">
             <!-- Navbar -->
             <div th:replace="~{layout :: navbar}"></div>
-            
+
             <!-- Page content here -->
             <div class="w-full p-4 sm:p-6 lg:p-10 bg-base-100">
-                <h1 class="text-3xl font-bold mb-6">Configuracion</h1>
                 
-                <div class="alert alert-info">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <span>Funcionalidad en desarrollo - Próximamente podrás configurar tu cuenta</span>
+                <!-- Header Section -->
+                <div class="mb-6">
+                    <h1 class="text-3xl font-bold text-center mb-2">Configuración de Cuenta</h1>
+                    <p class="text-center text-base-content/70">Gestiona tu información personal y configuración de seguridad</p>
                 </div>
 
+                <div class="divider"></div>
 
-            </div>  
+                <!-- Mensajes de éxito/error -->
+                <div th:if="${success}" class="alert alert-success shadow-lg mb-6 max-w-2xl mx-auto">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span th:text="${success}">Operación exitosa</span>
+                </div>
+
+                <div th:if="${error}" class="alert alert-error shadow-lg mb-6 max-w-2xl mx-auto">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span th:text="${error}">Error en la operación</span>
+                </div>
+
+                <!-- Formulario de configuración -->
+                <div class="max-w-2xl mx-auto">
+                    
+                    <form action="/configuracion/actualizar" method="post" class="bg-base-200 p-6 sm:p-8 rounded-lg shadow-lg">
+                        
+                        <!-- Token CSRF -->
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+                        <!-- Información Personal -->
+                        <div class="mb-6">
+                            <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                                Información Personal
+                            </h2>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                
+                                <!-- Nombre de usuario -->
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text font-semibold">Nombre de Usuario</span>
+                                        <span class="label-text-alt text-error">*</span>
+                                    </label>
+                                    <input type="text" name="username" id="usernameInput"
+                                           class="input input-bordered w-full" 
+                                           placeholder="Ingrese su nombre de usuario"
+                                           th:value="${usuario?.username}"
+                                           th:data-original="${usuario?.username}"
+                                           required />
+                                    <label class="label">
+                                        <span class="label-text-alt text-warning hidden" id="usernameWarning">
+                                            Al cambiar tu nombre de usuario, deberás iniciar sesión nuevamente
+                                        </span>
+                                    </label>
+                                </div>
+
+                                <!-- Correo electrónico -->
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text font-semibold">Correo Electrónico</span>
+                                        <span class="label-text-alt text-error">*</span>
+                                    </label>
+                                    <input type="email" name="email" 
+                                           class="input input-bordered w-full" 
+                                           placeholder="usuario@ejemplo.com"
+                                           th:value="${usuario?.email}"
+                                           required />
+                                </div>
+
+                                <!-- Rol (solo lectura para no-admins) -->
+                                <div class="form-control md:col-span-2">
+                                    <label class="label">
+                                        <span class="label-text font-semibold">Rol en el Sistema</span>
+                                        <span class="label-text-alt text-error" th:if="${usuario?.role == 'ADMIN'}">*</span>
+                                    </label>
+                                    <select id="role" name="role" 
+                                            class="select select-bordered w-full"
+                                            th:classappend="${usuario?.role != 'ADMIN'} ? 'bg-base-300' : ''"
+                                            th:attr="disabled=${usuario?.role != 'ADMIN'}"
+                                            required>
+                                        <option value="">Seleccionar rol...</option>
+                                        <option value="ADMIN" th:selected="${usuario?.role == 'ADMIN'}">Administrador</option>
+                                        <option value="CONTADOR" th:selected="${usuario?.role == 'CONTADOR'}">Contador</option>
+                                        <option value="AUDITOR" th:selected="${usuario?.role == 'AUDITOR'}">Auditor</option>
+                                    </select>
+                                    <label class="label">
+                                        <span class="label-text-alt" th:if="${usuario?.role == 'ADMIN'}">Como administrador, puedes modificar tu propio rol</span>
+                                        <span class="label-text-alt" th:if="${usuario?.role != 'ADMIN'}">El rol es asignado por el administrador y no puede ser modificado</span>
+                                    </label>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <!-- Botones de acción -->
+                        <div class="flex flex-col sm:flex-row gap-3 justify-between items-center">
+                            
+                            <button type="button" id="btnCambiarPassword" class="btn btn-outline btn-warning gap-2 w-full sm:w-auto order-2 sm:order-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                                </svg>
+                                Cambiar Contraseña
+                            </button>
+
+                            <div class="flex gap-3 w-full sm:w-auto order-1 sm:order-2">
+                                <a href="/dashboard" class="btn btn-outline btn-secondary gap-2 flex-1 sm:flex-none">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                                    </svg>
+                                    Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-primary gap-2 flex-1 sm:flex-none">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    Guardar Cambios
+                                </button>
+                            </div>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
         </div>
 
         <div th:replace="~{layout :: sidebar('configuracion')}"></div>
     </div>
 
+    <!-- Modal para cambiar contraseña -->
+    <dialog id="modalCambiarPassword" class="modal">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                </svg>
+                Cambiar Contraseña
+            </h3>
+            
+            <form id="formCambiarPassword" action="/configuracion/cambiar-password" method="post">
+                
+                <!-- Token CSRF -->
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+                <div class="space-y-4">
+                    
+                    <!-- Contraseña actual -->
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-semibold">Contraseña Actual</span>
+                            <span class="label-text-alt text-error">*</span>
+                        </label>
+                        <input type="password" name="currentPassword" 
+                               class="input input-bordered w-full" 
+                               placeholder="Ingrese su contraseña actual"
+                               required 
+                               minlength="6" />
+                    </div>
+
+                    <!-- Nueva contraseña -->
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-semibold">Nueva Contraseña</span>
+                            <span class="label-text-alt text-error">*</span>
+                        </label>
+                        <input type="password" name="newPassword" id="newPassword"
+                               class="input input-bordered w-full" 
+                               placeholder="Mínimo 6 caracteres"
+                               required 
+                               minlength="6" />
+                        <label class="label">
+                            <span class="label-text-alt">Mínimo 6 caracteres</span>
+                        </label>
+                    </div>
+
+                    <!-- Confirmar nueva contraseña -->
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-semibold">Confirmar Nueva Contraseña</span>
+                            <span class="label-text-alt text-error">*</span>
+                        </label>
+                        <input type="password" name="confirmPassword" id="confirmPassword"
+                               class="input input-bordered w-full" 
+                               placeholder="Repita la nueva contraseña"
+                               required 
+                               minlength="6" />
+                    </div>
+
+                    <!-- Mensaje de error -->
+                    <div id="passwordError" class="alert alert-error hidden">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span id="passwordErrorMessage">Las contraseñas no coinciden</span>
+                    </div>
+
+                </div>
+
+                <div class="modal-action">
+                    <button type="button" class="btn btn-ghost" onclick="modalCambiarPassword.close()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Cambiar Contraseña</button>
+                </div>
+            </form>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
+
+    <script th:src="@{/js/configuracion.js}"></script>
 </body>
+
 </html>
