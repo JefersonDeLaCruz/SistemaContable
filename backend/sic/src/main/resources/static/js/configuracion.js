@@ -11,15 +11,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const usernameInput = document.getElementById('usernameInput');
     const usernameWarning = document.getElementById('usernameWarning');
 
-    // Auto-cerrar alertas después de 5 segundos
-    const alerts = document.querySelectorAll('.alert-success, .alert-error');
-    alerts.forEach(alert => {
-        setTimeout(() => {
-            alert.style.transition = 'opacity 0.5s';
-            alert.style.opacity = '0';
-            setTimeout(() => alert.remove(), 500);
-        }, 5000);
-    });
+    // Mostrar mensajes flash con sistema Toast
+    const mensajesFlash = document.getElementById('mensajesFlash');
+    if (mensajesFlash) {
+        const success = mensajesFlash.dataset.success;
+        const error = mensajesFlash.dataset.error;
+        
+        if (success && success.trim() !== '') {
+            mostrarToast(success, 'success', 5000);
+        }
+        
+        if (error && error.trim() !== '') {
+            mostrarToast(error, 'error', 5000);
+        }
+    }
 
     // Mostrar advertencia cuando se cambia el username
     if (usernameInput && usernameWarning) {
