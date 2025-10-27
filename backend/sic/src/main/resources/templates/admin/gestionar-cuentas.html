@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" data-theme="corporate">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" data-theme="corporate">
 
 <head th:replace="~{layout :: head}">
 
@@ -15,13 +15,120 @@
             
             <!-- Page content here -->
             <div class="w-full p-4 sm:p-6 lg:p-10 bg-base-100">
-                <h1 class="text-3xl font-bold mb-6">Gestionar Cuentas Contables</h1>
                 
-                <div class="alert alert-info">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <span>Funcionalidad en desarrollo - Próximamente podrás gestionar el catálogo de cuentas contables</span>
+                <!-- Header Section -->
+                <div class="mb-6">
+                    <h1 class="text-3xl font-bold text-center mb-2">Gestionar Catálogo de Cuentas</h1>
+                    <p class="text-center text-base-content/70">Administra el catálogo de cuentas contables del sistema</p>
                 </div>
 
+                <div class="divider"></div>
+
+                <!-- Controles superiores -->
+                <div class="flex flex-col sm:flex-row gap-4 items-center justify-between mb-6">
+                    
+                    <!-- Buscador -->
+                    <div class="form-control w-full sm:w-auto">
+                        <div class="input-group">
+                            <input type="text" id="buscarCuenta" placeholder="Buscar cuenta..." 
+                                   class="input input-bordered w-full sm:w-80" />
+                            <button class="btn btn-square">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Botón Nueva Cuenta -->
+                    <button id="btnNuevaCuenta" class="btn btn-primary gap-2 w-full sm:w-auto">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Nueva Cuenta
+                    </button>
+                </div>
+
+                <!-- Filtros -->
+                <div class="bg-base-200 p-4 rounded-lg shadow-md mb-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text font-semibold">Tipo de Cuenta</span>
+                            </label>
+                            <select id="filtroTipo" class="select select-bordered w-full">
+                                <option value="">Todos los tipos</option>
+                                <option value="ACTIVO">Activo</option>
+                                <option value="PASIVO">Pasivo</option>
+                                <option value="CAPITAL CONTABLE">Capital Contable</option>
+                            </select>
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text font-semibold">Saldo Normal</span>
+                            </label>
+                            <select id="filtroSaldo" class="select select-bordered w-full">
+                                <option value="">Todos</option>
+                                <option value="DEUDOR">Deudor</option>
+                                <option value="ACREEDOR">Acreedor</option>
+                            </select>
+                        </div>
+
+                        <div class="form-control self-end">
+                            <button id="btnLimpiarFiltros" class="btn btn-outline btn-secondary w-full">
+                                Limpiar Filtros
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Tabla de Cuentas -->
+                <div class="overflow-x-auto rounded-lg shadow-lg bg-base-200 p-4">
+                    <table class="table w-full table-zebra">
+                        <thead class="bg-primary text-primary-content sticky top-0">
+                            <tr>
+                                <th class="w-24">Código</th>
+                                <th class="w-1/3">Nombre</th>
+                                <th class="w-32">Tipo</th>
+                                <th class="w-32">Saldo Normal</th>
+                                <th class="w-32">Cuenta Padre</th>
+                                <th class="w-32 text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaCuentas">
+                            <!-- Las filas se llenarán dinámicamente con JavaScript -->
+                            <tr>
+                                <td colspan="6" class="text-center py-8">
+                                    <span class="loading loading-spinner loading-lg"></span>
+                                    <p class="mt-2">Cargando cuentas...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Estadísticas -->
+                <div class="stats shadow mt-6 w-full">
+                    <div class="stat">
+                        <div class="stat-title">Total de Cuentas</div>
+                        <div class="stat-value text-primary" id="totalCuentas">0</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-title">Activos</div>
+                        <div class="stat-value text-success" id="totalActivos">0</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-title">Pasivos</div>
+                        <div class="stat-value text-warning" id="totalPasivos">0</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-title">Capital</div>
+                        <div class="stat-value text-info" id="totalCapital">0</div>
+                    </div>
+                </div>
 
             </div>  
         </div>
@@ -29,5 +136,129 @@
         <div th:replace="~{layout :: sidebar('gestionar-cuentas')}"></div>
     </div>
 
+    <!-- Modal para Crear/Editar Cuenta -->
+    <dialog id="modalCuenta" class="modal">
+        <div class="modal-box max-w-2xl">
+            <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span id="tituloModal">Nueva Cuenta</span>
+            </h3>
+            
+            <form id="formCuenta">
+                
+                <input type="hidden" id="cuentaId" />
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    
+                    <!-- Código -->
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-semibold">Código de Cuenta</span>
+                            <span class="label-text-alt text-error">*</span>
+                        </label>
+                        <input type="text" id="codigo" name="codigo" 
+                               class="input input-bordered w-full" 
+                               placeholder="Ej: 1.1.01"
+                               required />
+                        <label class="label">
+                            <span class="label-text-alt">Formato: 1, 1.1, 1.1.01, etc.</span>
+                        </label>
+                    </div>
+
+                    <!-- Nombre -->
+                    <div class="form-control md:col-span-2">
+                        <label class="label">
+                            <span class="label-text font-semibold">Nombre de la Cuenta</span>
+                            <span class="label-text-alt text-error">*</span>
+                        </label>
+                        <input type="text" id="nombre" name="nombre" 
+                               class="input input-bordered w-full" 
+                               placeholder="Ej: CAJA GENERAL"
+                               required />
+                    </div>
+
+                    <!-- Tipo -->
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-semibold">Tipo de Cuenta</span>
+                            <span class="label-text-alt text-error">*</span>
+                        </label>
+                        <select id="tipo" name="tipo" class="select select-bordered w-full" required>
+                            <option value="">Seleccionar tipo...</option>
+                            <option value="ACTIVO">Activo</option>
+                            <option value="PASIVO">Pasivo</option>
+                            <option value="CAPITAL CONTABLE">Capital Contable</option>
+                        </select>
+                    </div>
+
+                    <!-- Saldo Normal -->
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-semibold">Saldo Normal</span>
+                            <span class="label-text-alt text-error">*</span>
+                        </label>
+                        <select id="saldoNormal" name="saldoNormal" class="select select-bordered w-full" required>
+                            <option value="">Seleccionar saldo...</option>
+                            <option value="DEUDOR">Deudor</option>
+                            <option value="ACREEDOR">Acreedor</option>
+                        </select>
+                    </div>
+
+                    <!-- ID Padre -->
+                    <div class="form-control md:col-span-2">
+                        <label class="label">
+                            <span class="label-text font-semibold">Cuenta Padre (opcional)</span>
+                        </label>
+                        <select id="idPadre" name="idPadre" class="select select-bordered w-full">
+                            <option value="">Sin cuenta padre</option>
+                            <!-- Se llenará dinámicamente -->
+                        </select>
+                        <label class="label">
+                            <span class="label-text-alt">Selecciona una cuenta padre si esta es una subcuenta</span>
+                        </label>
+                    </div>
+
+                </div>
+
+                <div class="modal-action">
+                    <button type="button" class="btn btn-ghost" onclick="modalCuenta.close()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Cuenta</button>
+                </div>
+            </form>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
+
+    <!-- Modal de Confirmación para Eliminar -->
+    <dialog id="modalEliminar" class="modal">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg mb-4 flex items-center gap-2 text-error">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                Confirmar Eliminación
+            </h3>
+            
+            <p class="py-4">¿Estás seguro de que deseas eliminar la cuenta <strong id="cuentaEliminarNombre"></strong>?</p>
+            <p class="text-sm text-warning">Esta acción no se puede deshacer.</p>
+
+            <input type="hidden" id="cuentaEliminarId" />
+
+            <div class="modal-action">
+                <button type="button" class="btn btn-ghost" onclick="modalEliminar.close()">Cancelar</button>
+                <button type="button" id="btnConfirmarEliminar" class="btn btn-error">Eliminar</button>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
+
+    <script th:src="@{/js/scripts.js}"></script>
+    <script th:src="@{/js/gestionar-cuentas.js}"></script>
 </body>
 </html>

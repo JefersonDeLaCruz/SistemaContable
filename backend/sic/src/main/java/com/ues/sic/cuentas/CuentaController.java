@@ -3,6 +3,7 @@ package com.ues.sic.cuentas;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,10 +19,17 @@ public class CuentaController {
         return cuentaRepository.findAll();
     }
 
+    // Obtener una cuenta por ID
+    @GetMapping("/{id}")
+    public ResponseEntity<CuentaModel> getCuentaById(@PathVariable Integer id) {
+        return cuentaRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     // Inserta solo una cuenta 
     @PostMapping("/insertar")
     public CuentaModel insertarCuenta(@RequestBody CuentaModel cuenta) {
-        // Puedes usar el método estático o directamente el repositorio
         return CuentaModel.insertarCuenta(cuentaRepository, cuenta.getCodigo(), cuenta.getNombre(),
                 cuenta.getTipo(), cuenta.getSaldoNormal(), cuenta.getIdPadre());
     }
@@ -34,5 +42,36 @@ public class CuentaController {
                         c.getCodigo(), c.getNombre(), c.getTipo(),
                         c.getSaldoNormal(), c.getIdPadre()))
                 .toList();
+    }
+
+    // Actualizar una cuenta existente
+    @PutMapping("/{id}")
+    public ResponseEntity<CuentaModel> actualizarCuenta(
+            @PathVariable Integer id, 
+            @RequestBody CuentaModel cuentaActualizada) {
+        
+        return cuentaRepository.findById(id)
+                .map(cuenta -> {
+                    cuenta.setCodigo(cuentaActualizada.getCodigo());
+                    cuenta.setNombre(cuentaActualizada.getNombre());
+                    cuenta.setTipo(cuentaActualizada.getTipo());
+                    cuenta.setSaldoNormal(cuentaActualizada.getSaldoNormal());
+                    cuenta.setIdPadre(cuentaActualizada.getIdPadre());
+                    
+                    CuentaModel cuentaGuardada = cuentaRepository.save(cuenta);
+                    return ResponseEntity.ok(cuentaGuardada);
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    // Eliminar una cuenta
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> eliminarCuenta(@PathVariable Integer id) {
+        return cuentaRepository.findById(id)
+                .map(cuenta -> {
+                    cuentaRepository.delete(cuenta);
+                    return ResponseEntity.ok().build();
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 }
