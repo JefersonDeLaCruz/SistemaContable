@@ -8,7 +8,7 @@
       select.forEach(selectItem => {
         cuentas.forEach(cuenta => {
         const option = document.createElement('option');
-        option.value = cuenta.id; // o cuenta.codigo si preferís
+        option.value = cuenta.idCuenta; // o cuenta.codigo si preferís
         option.textContent = `${cuenta.codigo} - ${cuenta.nombre}`;
         selectItem.appendChild(option);
       });

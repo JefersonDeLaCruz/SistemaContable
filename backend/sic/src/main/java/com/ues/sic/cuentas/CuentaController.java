@@ -13,6 +13,12 @@ public class CuentaController {
     @Autowired
     private CuentaRepository cuentaRepository;
 
+   private final CuentaService cuentaService;
+
+    public CuentaController(CuentaService cuentaService) {
+        this.cuentaService = cuentaService;
+    }
+
     // Obtener todas las cuentas
     @GetMapping
     public List<CuentaModel> getAllCuentas() {
@@ -35,5 +41,11 @@ public class CuentaController {
                         c.getCodigo(), c.getNombre(), c.getTipo(),
                         c.getSaldoNormal(), c.getIdPadre()))
                 .toList();
+    }
+
+     // Ejemplo: GET /api/cuentas/5
+    @GetMapping("/{idCuenta}")
+    public String obtenerCodigo(@PathVariable Integer idCuenta) {
+        return cuentaService.obtenerCodigoPorId(idCuenta);
     }
 }

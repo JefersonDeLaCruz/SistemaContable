@@ -61,6 +61,9 @@ public class ViewController {
         return "registrar-partida";
     }
 
+    /*
+     * GET: Vista de Libro Mayor 
+     */
     @GetMapping("/libro-mayor")
     public String verLibroMayor(Model model){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -72,6 +75,15 @@ public class ViewController {
         model.addAttribute("titulo", "Libro Mayor");
         return "libro-mayor";
     }
+     /*
+     * POST: Filtrado de partidas para mayorizacion en cuentas T
+     * Parametros de filtracion:
+     * @param idPeriodo
+     * @parar idCuenta  - Si value es igual a 'ALL' devolvemos todos las cuentas T de todas las cuentas
+     */
+
+
+     
     
     @PostMapping("/partida")
     public ResponseEntity<?> crearPartida(@ModelAttribute PartidaConDetallesDTO dto) {

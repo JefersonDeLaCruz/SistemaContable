@@ -22,13 +22,13 @@
                         </svg>
                     </label>
                 </div>
-                <div class="mx-2 flex-1 px-2 text-lg font-semibold">LIBRO MAYOR</div>
+                <div class="mx-2 flex-1 px-2 text-lg font-semibold">Libro Mayor</div>
             </div>
 
             <!-- Filtros -->
             <div class="p-7 md:p-6 px-6 py-6 ms-10 border-gray-100">
                 <h2 class="text-2xl font-bold">
-                    Filtrar en el Libro Mayor
+                    Filtrar por Periodo y Cuenta
                 </h2>
                 <form class="p-4 flex flex-col gap-3 md:flex-row md:items-center md:gap-4" th:action="@{/libro-mayor}"
                     method="get">
@@ -40,72 +40,20 @@
                         </select>
                     </label>
 
-                    <label class="form-control max-w-xs">
+                    <!-- <label class="form-control max-w-xs">
                         <span class="fieldset-legend">Cuenta:</span>
                         <select id="selectCuenta" class="select" required>
-                            <option value="">Seleccionar cuenta...</option>
+                            <option value="">Seleccionar cuenta...</option> -->
                             <!-- traer cuentas de db -->
-                        </select>
-                    </label>
-                    <button class="btn btn-sm btn-primary mt-2 md:mt-7">Filtrar</button>
+                        <!-- </select>
+                    </label> --> 
+                    <button id="filtrar" class="btn btn-sm btn-primary mt-2 md:mt-7">Filtrar</button>
                 </form>
             </div>
 
 
-            <div class="w-full p-4 md:p-6">
-                <!-- Encabezado de la cuenta -->
-                <header class="px-6 py-6 bg-base-200 mb-1">
-                    <h2 class="text-2xl font-bold text-center">
-                        1101 - Banco
-                    </h2>
-                </header>
+           <div class="p-4 m-4" id="libroMayor"></div>
 
-                <!-- Tabla de movimientos -->
-                <table class="table-auto w-full">
-                    <thead class="bg-base-200 text-sm uppercase">
-                        <tr>
-                            <th class="px-6 py-3 text-left">Fecha</th>
-                            <th class="px-6 py-3 text-left">Referencia</th>
-                            <th class="px-6 py-3 text-left">Descripción</th>
-                            <th class="px-6 py-3 text-left">Débito</th>
-                            <th class="px-6 py-3 text-left">Crédito</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-sm">
-                        <tr class="border-t border-gray-100">
-                            <td class="px-6 py-3">2025-09-01</td>
-                            <td class="px-6 py-3">Saldo inicial</td>
-                            <td class="px-6 py-3">-</td>
-                            <td class="px-6 py-3 text-green-600 font-medium">10,000.00</td>
-                            <td class="px-6 py-3 text-red-600 font-medium">0.00</td>
-                        </tr>
-                        <tr class="border-t border-gray-100">
-                            <td class="px-6 py-3">2025-09-10</td>
-                            <td class="px-6 py-3">PD-2025-09-10-001</td>
-                            <td class="px-6 py-3">Pago a proveedores</td>
-                            <td class="px-6 py-3 text-green-600 font-medium">0.00</td>
-                            <td class="px-6 py-3 text-red-600 font-medium">1,250.00</td>
-                        </tr>
-                        <tr class="border-t border-gray-100">
-                            <td class="px-6 py-3"></td>
-                            <td class="px-6 py-3"></td>
-                            <td class="px-6 py-3 font-bold">SUMA</td>
-                            <td class="px-6 py-3 text-green-600 font-medium">10,000.00</td>
-                            <td class="px-6 py-3 text-red-600 font-medium">1,250.00</td>
-                        </tr>
-                        <tr class="border-t border-gray-100">
-                            <td class="px-6 py-3"></td>
-                            <td class="px-6 py-3"></td>
-                            <td class="px-6 py-3 font-bold">SALDO</td>
-                            <td class="px-6 py-3 text-green-600 font-medium">8,750.00</td>
-                            <td class="px-6 py-3 text-red-600 font-medium"></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-
-        </div>
 
 
         <div class="drawer-side">
