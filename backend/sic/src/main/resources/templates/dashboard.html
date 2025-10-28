@@ -692,7 +692,7 @@
                         </tr>
                       </thead>
                                             <tbody>
-                        <tr class="hover" th:each="m : ">
+                        <tr class="hover" th:each="m : ${misMovimientos}">
                           <td th:text="${m.fecha}">2025-10-10</td>
                           <td><span class="badge badge-ghost" th:text="${'#' + m.partidaId}">#0</span></td>
                           <td th:text="${m.descripcion}">-</td>
@@ -704,11 +704,6 @@
                         <tr th:if="${#lists.isEmpty(misMovimientos)}"><td colspan="7" class="text-center opacity-70">No hay ningun movimiento reciente</td></tr>
                       </tbody>
                     </table>
-                  </div>
-
-                  <div class="text-sm opacity-70 mt-3">
-                    Total de partidas registradas hoy: <strong>12</strong> |
-                    Total ingresos registrados: <strong>$3,125.40</strong>
                   </div>
 
                 </div>
@@ -808,6 +803,7 @@
 </body>
 
 </html>
+
 
 
 

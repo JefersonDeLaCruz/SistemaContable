@@ -1,33 +1,53 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{layout :: head}"> </head>
 
-<head th:replace="~{layout :: head}">
-
-</head>
-
-<body>
-    
+  <body>
     <div class="drawer">
-        <input id="my-drawer-3" type="checkbox" class="drawer-toggle" />
-        <div class="drawer-content flex flex-col">
-            <!-- Navbar -->
-            <div th:replace="~{layout :: navbar}"></div>
-            
-            <!-- Page content here -->
-            <div class="w-full p-4 sm:p-6 lg:p-10 bg-base-100">
-                <h1 class="text-3xl font-bold mb-6">Gestionar Balances</h1>
-                
-                <div class="alert alert-info">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <span>Funcionalidad en desarrollo - Próximamente podrás gestionar el catálogo de balances</span>
-                </div>
+      <input id="my-drawer-3" type="checkbox" class="drawer-toggle" />
+      <div class="drawer-content flex flex-col">
+        <!-- Navbar -->
+        <div th:replace="~{layout :: navbar}"></div>
 
+        <!-- Page content here -->
+        <div class="w-full p-4 sm:p-6 lg:p-10 bg-base-100">
+          <h1 class="text-3xl font-bold mb-6">Balance General</h1>
 
-            </div>  
+          <!-- Filtros -->
+          <div class="p-4 bg-base-200 rounded-lg mb-6">
+            <form class="flex flex-col gap-3 md:flex-row md:items-end md:gap-4">
+              
+              <label class="form-control max-w-xs"
+                > <span class="fieldset-legend">Tipo:</span>
+                <select id="selectTipo" class="select">
+                  
+
+                  <option value="general">Balance General</option>
+                  
+                  <option value="estado">Estado de Resultados</option>
+                                <option value='comprobacion'>Balance de Comprobación</option>
+                  </select
+                > </label
+              >
+              <label class="form-control max-w-xs"><span class="fieldset-legend">Periodo:</span>
+                <select id="selectPeriodo" class="select" required>
+                  
+                  <option value="">Seleccione un periodo</option>
+                  </select> </label>
+              <button id="btnCalcular" type="button" class="btn btn-primary"> Calcular</button>
+            </form>
+          </div>
+
+          <!-- Contenido del balance -->
+          <div id="balanceContainer" class="space-y-6"></div>
         </div>
+      </div>
 
-        <div th:replace="~{layout :: sidebar('balances')}"></div>
+      <div th:replace="~{layout :: sidebar('balances')}"></div>
     </div>
 
-</body>
+    <script th:src="@{/js/balances.js}"></script>
+  </body>
 </html>
+
+
