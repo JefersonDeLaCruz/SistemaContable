@@ -181,7 +181,28 @@ public interface DetallePartidaRepository extends JpaRepository<DetallePartidaMo
            nativeQuery = true)
     Double gastoEntre(@Param("inicio") String inicio, @Param("fin") String fin);
 
-    // Saldos acumulados hasta fecha (todas las cuentas)
+    // Saldos acumulados hasta un período (todas las cuentas)
+    // Incluye todos los períodos anteriores al especificado
+    @Query(value = """
+            SELECT
+              c.id_cuenta AS id_cuenta,
+              c.codigo AS codigo,
+              c.nombre AS nombre,
+              c.saldo_normal AS saldo_normal,
+              COALESCE(SUM(d.debito), 0) AS total_debito,
+              COALESCE(SUM(d.credito), 0) AS total_credito
+            FROM cuentas c
+            LEFT JOIN detalle_partida d ON CAST(d.id_cuenta AS INTEGER) = c.id_cuenta
+            LEFT JOIN partidas p ON p.id = d.id_partida
+            LEFT JOIN periodos_contables pc ON CAST(p.id_periodo AS INTEGER) = pc.id_periodo
+            WHERE (p.id_periodo IS NULL OR pc.fecha_inicio < (SELECT fecha_inicio FROM periodos_contables WHERE id_periodo = CAST(:periodoId AS INTEGER)))
+            GROUP BY c.id_cuenta, c.codigo, c.nombre, c.saldo_normal
+            ORDER BY c.codigo
+            """,
+           nativeQuery = true)
+    List<Object[]> saldosHastaPeriodo(@Param("periodoId") Integer periodoId);
+
+    // Saldos acumulados hasta fecha (para balance de comprobación)
     @Query(value = """
             SELECT
               c.id_cuenta AS id_cuenta,
@@ -201,6 +222,7 @@ public interface DetallePartidaRepository extends JpaRepository<DetallePartidaMo
     List<Object[]> saldosHastaTodos(@Param("fecha") String fecha);
 
     // Movimientos del periodo (todas las cuentas)
+    // Filtra por idPeriodo en lugar de fecha
     @Query(value = """
             SELECT
               c.id_cuenta AS id_cuenta,
@@ -208,12 +230,31 @@ public interface DetallePartidaRepository extends JpaRepository<DetallePartidaMo
               c.nombre AS nombre,
               COALESCE(SUM(d.debito), 0) AS debito,
               COALESCE(SUM(d.credito), 0) AS credito
-            FROM cuentas c
-            LEFT JOIN detalle_partida d ON CAST(d.id_cuenta AS INTEGER) = c.id_cuenta
-            LEFT JOIN partidas p ON p.id = d.id_partida
-            WHERE p.fecha IS NOT NULL
-              AND CAST(p.fecha AS DATE) BETWEEN CAST(:inicio AS DATE) AND CAST(:fin AS DATE)
+            FROM detalle_partida d
+            JOIN partidas p ON p.id = d.id_partida
+            JOIN cuentas c ON c.id_cuenta = CAST(d.id_cuenta AS INTEGER)
+            WHERE CAST(p.id_periodo AS INTEGER) = :periodoId
             GROUP BY c.id_cuenta, c.codigo, c.nombre
+            HAVING COALESCE(SUM(d.debito), 0) + COALESCE(SUM(d.credito), 0) > 0
+            ORDER BY c.codigo
+            """,
+           nativeQuery = true)
+    List<Object[]> movimientosPorPeriodo(@Param("periodoId") Integer periodoId);
+
+    // Movimientos del periodo por rango de fechas (para balance de comprobación)
+    @Query(value = """
+            SELECT
+              c.id_cuenta AS id_cuenta,
+              c.codigo AS codigo,
+              c.nombre AS nombre,
+              COALESCE(SUM(d.debito), 0) AS debito,
+              COALESCE(SUM(d.credito), 0) AS credito
+            FROM detalle_partida d
+            JOIN partidas p ON p.id = d.id_partida
+            JOIN cuentas c ON c.id_cuenta = CAST(d.id_cuenta AS INTEGER)
+            WHERE CAST(p.fecha AS DATE) BETWEEN CAST(:inicio AS DATE) AND CAST(:fin AS DATE)
+            GROUP BY c.id_cuenta, c.codigo, c.nombre
+            HAVING COALESCE(SUM(d.debito), 0) + COALESCE(SUM(d.credito), 0) > 0
             ORDER BY c.codigo
             """,
            nativeQuery = true)

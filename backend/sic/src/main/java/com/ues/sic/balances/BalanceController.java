@@ -3,6 +3,8 @@
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import com.ues.sic.balances.flujos.EstadoFlujosEfectivoDTO;
+import com.ues.sic.balances.flujos.EstadoFlujosEfectivoService;
 import com.ues.sic.detalle_partida.DetallePartidaRepository;
 import com.ues.sic.periodos.PeriodoContableModel;
 import com.ues.sic.periodos.PeriodoContableRepository;
@@ -19,6 +21,9 @@ public class BalanceController {
 
     @Autowired
     private PeriodoContableRepository periodoRepo;
+
+    @Autowired
+    private EstadoFlujosEfectivoService efeService;
 
     @GetMapping("/general")
     public Map<String, Object> balanceGeneral(
@@ -312,5 +317,16 @@ public class BalanceController {
                 "saldoFinal", round2(Math.abs(totFin))
         ));
         return resp;
+    }
+
+    /**
+     * Endpoint para calcular el Estado de Flujos de Efectivo
+     * 
+     * @param periodoId ID del período contable
+     * @return DTO con el estado de flujos de efectivo
+     */
+    @GetMapping("/flujos-efectivo")
+    public EstadoFlujosEfectivoDTO flujosEfectivo(@RequestParam("periodo") Integer periodoId) {
+        return efeService.calcularEFE(periodoId);
     }
 }

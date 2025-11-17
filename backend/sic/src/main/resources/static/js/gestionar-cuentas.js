@@ -124,6 +124,8 @@ document.addEventListener('DOMContentLoaded', function() {
             case 'ACTIVO': return 'badge-success';
             case 'PASIVO': return 'badge-warning';
             case 'CAPITAL CONTABLE': return 'badge-info';
+            case 'INGRESO': return 'badge-primary';
+            case 'GASTO': return 'badge-error';
             default: return 'badge-ghost';
         }
     }
@@ -132,7 +134,8 @@ document.addEventListener('DOMContentLoaded', function() {
      * Obtener nombre de cuenta padre
      */
     function obtenerNombrePadre(idPadre) {
-        const padre = cuentas.find(c => c.idCuenta === idPadre);
+        if (!idPadre) return '-';
+        const padre = cuentas.find(c => c.codigo === idPadre);
         return padre ? `${padre.codigo} - ${padre.nombre}` : 'Desconocida';
     }
 
@@ -153,15 +156,15 @@ document.addEventListener('DOMContentLoaded', function() {
     /**
      * Cargar opciones de cuenta padre en el select
      */
-    function cargarOpcionesPadre(excluirId = null) {
+    function cargarOpcionesPadre(excluirCodigo = null) {
         const selectPadre = document.getElementById('idPadre');
         selectPadre.innerHTML = '<option value="">Sin cuenta padre</option>';
         
         cuentas
-            .filter(c => c.idCuenta !== excluirId)
+            .filter(c => c.codigo !== excluirCodigo)
             .forEach(cuenta => {
                 const option = document.createElement('option');
-                option.value = cuenta.idCuenta;
+                option.value = cuenta.codigo;
                 option.textContent = `${cuenta.codigo} - ${cuenta.nombre}`;
                 selectPadre.appendChild(option);
             });
@@ -198,7 +201,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('tipo').value = cuenta.tipo;
         document.getElementById('saldoNormal').value = cuenta.saldoNormal;
         
-        cargarOpcionesPadre(cuenta.idCuenta);
+        cargarOpcionesPadre(cuenta.codigo);
         document.getElementById('idPadre').value = cuenta.idPadre || '';
         
         modalCuenta.showModal();

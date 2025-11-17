@@ -24,13 +24,13 @@ public class CuentaModel {
     private String saldoNormal;
 
     @Column(name = "id_padre")
-    private Integer idPadre; // Id de la cuenta padre
+    private String idPadre; // Id de la cuenta padre
 
     // Constructor vacío
     public CuentaModel() {}
 
     // Constructor con parámetros
-    public CuentaModel(String codigo, String nombre, String tipo, String saldoNormal, Integer idPadre) {
+    public CuentaModel(String codigo, String nombre, String tipo, String saldoNormal, String idPadre) {
         this.codigo = codigo;
         this.nombre = nombre;
         this.tipo = tipo;
@@ -79,16 +79,16 @@ public class CuentaModel {
         this.saldoNormal = saldoNormal;
     }
 
-    public Integer getIdPadre() {
+    public String getIdPadre() {
         return idPadre;
     }
 
-    public void setIdPadre(Integer idPadre) {
+    public void setIdPadre(String idPadre) {
         this.idPadre = idPadre;
     }
 
     // Método para insertar una nueva cuenta
-    public static CuentaModel insertarCuenta(CuentaRepository repository, String codigo, String nombre, String tipo, String saldoNormal, Integer idPadre) {
+    public static CuentaModel insertarCuenta(CuentaRepository repository, String codigo, String nombre, String tipo, String saldoNormal, String idPadre) {
         CuentaModel cuenta = new CuentaModel(codigo, nombre, tipo, saldoNormal, idPadre);
         return repository.save(cuenta);
     }

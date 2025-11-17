@@ -1,39 +1,73 @@
 [
-  { "codigo": "1",       "nombre": "ACTIVO",                   "tipo": "ACTIVO",   "saldoNormal": "DEUDOR" },
+  { "codigo": "1",        "nombre": "ACTIVO",                             "tipo": "ACTIVO",   "saldoNormal": "DEUDOR" },
 
-  { "codigo": "1.1",     "nombre": "ACTIVO CORRIENTE",         "tipo": "ACTIVO",   "saldoNormal": "DEUDOR",  "idPadre": "0" },
-  { "codigo": "1.1.01",  "nombre": "CAJA GENERAL",             "tipo": "ACTIVO", "saldoNormal": "DEUDOR",  "idPadre": "1" },
-  { "codigo": "1.1.02",  "nombre": "CAJA CHICA",               "tipo": "ACTIVO", "saldoNormal": "DEUDOR",  "idPadre": "1" },
-  { "codigo": "1.1.03",  "nombre": "BANCOS NACIONALES",        "tipo": "ACTIVO", "saldoNormal": "DEUDOR",  "idPadre": "1" },
-  { "codigo": "1.1.04",  "nombre": "BANCOS EXTRANJEROS",       "tipo": "ACTIVO", "saldoNormal": "DEUDOR",  "idPadre": "1" },
-  { "codigo": "1.1.05",  "nombre": "CHEQUES EN TRÁNSITO",      "tipo": "ACTIVO", "saldoNormal": "DEUDOR",  "idPadre": "1" },
-  { "codigo": "1.1.06",  "nombre": "CLIENTES (CUENTAS POR COBRAR)", "tipo": "ACTIVO", "saldoNormal": "DEUDOR", "idPadre": "1" },
-  { "codigo": "1.1.07",  "nombre": "DOCUMENTOS POR COBRAR",    "tipo": "ACTIVO", "saldoNormal": "DEUDOR",  "idPadre": "1" },
-  { "codigo": "1.1.08",  "nombre": "IVA CRÉDITO FISCAL",       "tipo": "ACTIVO", "saldoNormal": "DEUDOR",  "idPadre": "1" },
-  { "codigo": "1.1.09",  "nombre": "INVENTARIOS DE MERCADERÍAS", "tipo": "ACTIVO", "saldoNormal": "DEUDOR", "idPadre": "1" },
+  { "codigo": "1.1",      "nombre": "ACTIVO CORRIENTE",                   "tipo": "ACTIVO",   "saldoNormal": "DEUDOR",  "idPadre": "1" },
+  { "codigo": "1.1.01",   "nombre": "CAJA GENERAL",                        "tipo": "ACTIVO",   "saldoNormal": "DEUDOR",  "idPadre": "1.1" },
+  { "codigo": "1.1.02",   "nombre": "CAJA CHICA",                          "tipo": "ACTIVO",   "saldoNormal": "DEUDOR",  "idPadre": "1.1" },
+  { "codigo": "1.1.03",   "nombre": "BANCOS NACIONALES",                   "tipo": "ACTIVO",   "saldoNormal": "DEUDOR",  "idPadre": "1.1" },
+  { "codigo": "1.1.04",   "nombre": "BANCOS EXTRANJEROS",                  "tipo": "ACTIVO",   "saldoNormal": "DEUDOR",  "idPadre": "1.1" },
+  { "codigo": "1.1.05",   "nombre": "CHEQUES EN TRÁNSITO",                 "tipo": "ACTIVO",   "saldoNormal": "DEUDOR",  "idPadre": "1.1" },
+  { "codigo": "1.1.06",   "nombre": "CLIENTES (CUENTAS POR COBRAR)",       "tipo": "ACTIVO",   "saldoNormal": "DEUDOR",  "idPadre": "1.1" },
+  { "codigo": "1.1.07",   "nombre": "DOCUMENTOS POR COBRAR",               "tipo": "ACTIVO",   "saldoNormal": "DEUDOR",  "idPadre": "1.1" },
+  { "codigo": "1.1.08",   "nombre": "IVA CRÉDITO FISCAL",                  "tipo": "ACTIVO",   "saldoNormal": "DEUDOR",  "idPadre": "1.1" },
+  { "codigo": "1.1.09",   "nombre": "INVENTARIOS DE MERCADERÍAS",          "tipo": "ACTIVO",   "saldoNormal": "DEUDOR",  "idPadre": "1.1" },
 
-  { "codigo": "1.2",     "nombre": "ACTIVO NO CORRIENTE",      "tipo": "ACTIVO",   "saldoNormal": "DEUDOR",  "idPadre": "0" },
-  { "codigo": "1.2.01",  "nombre": "TERRENOS",                 "tipo": "ACTIVO", "saldoNormal": "DEUDOR",  "idPadre": "1" },
-  { "codigo": "1.2.02",  "nombre": "EDIFICIOS",                "tipo": "ACTIVO", "saldoNormal": "DEUDOR",  "idPadre": "1" },
-  { "codigo": "1.2.03",  "nombre": "MOBILIARIO Y EQUIPO",      "tipo": "ACTIVO", "saldoNormal": "DEUDOR",  "idPadre": "1" },
-  { "codigo": "1.2.04",  "nombre": "VEHÍCULOS",                "tipo": "ACTIVO", "saldoNormal": "DEUDOR",  "idPadre": "1" },
-  { "codigo": "1.2.05",  "nombre": "DEPRECIACIÓN ACUMULADA (SE RESTA DEL ACTIVO)", "tipo": "ACTIVO", "saldoNormal": "ACREEDOR", "idPadre": "1" },
+  { "codigo": "1.2",      "nombre": "ACTIVO NO CORRIENTE",                 "tipo": "ACTIVO",   "saldoNormal": "DEUDOR",  "idPadre": "1" },
+  { "codigo": "1.2.01",   "nombre": "TERRENOS",                            "tipo": "ACTIVO",   "saldoNormal": "DEUDOR",  "idPadre": "1.2" },
+  { "codigo": "1.2.02",   "nombre": "EDIFICIOS",                           "tipo": "ACTIVO",   "saldoNormal": "DEUDOR",  "idPadre": "1.2" },
+  { "codigo": "1.2.03",   "nombre": "MOBILIARIO Y EQUIPO",                 "tipo": "ACTIVO",   "saldoNormal": "DEUDOR",  "idPadre": "1.2" },
+  { "codigo": "1.2.04",   "nombre": "VEHÍCULOS",                           "tipo": "ACTIVO",   "saldoNormal": "DEUDOR",  "idPadre": "1.2" },
+  { "codigo": "1.2.05",   "nombre": "DEPRECIACIÓN ACUMULADA",              "tipo": "ACTIVO",   "saldoNormal": "ACREEDOR","idPadre": "1.2" },
 
-  { "codigo": "2",       "nombre": "PASIVO",                   "tipo": "PASIVO",   "saldoNormal": "ACREEDOR" },
+  { "codigo": "2",        "nombre": "PASIVO",                              "tipo": "PASIVO",   "saldoNormal": "ACREEDOR" },
 
-  { "codigo": "2.1",     "nombre": "PASIVO CORRIENTE",         "tipo": "PASIVO",   "saldoNormal": "ACREEDOR", "idPadre": "17" },
-  { "codigo": "2.1.01",  "nombre": "PROVEEDORES",              "tipo": "PASIVO", "saldoNormal": "ACREEDOR", "idPadre": "18" },
-  { "codigo": "2.1.02",  "nombre": "DOCUMENTOS POR PAGAR",     "tipo": "PASIVO", "saldoNormal": "ACREEDOR", "idPadre": "18" },
-  { "codigo": "2.1.03",  "nombre": "IVA DÉBITO FISCAL",        "tipo": "PASIVO", "saldoNormal": "ACREEDOR", "idPadre": "18" },
-  { "codigo": "2.1.04",  "nombre": "RETENCIONES POR PAGAR",    "tipo": "PASIVO", "saldoNormal": "ACREEDOR", "idPadre": "18" },
-  { "codigo": "2.1.05",  "nombre": "SUELDOS POR PAGAR",        "tipo": "PASIVO", "saldoNormal": "ACREEDOR", "idPadre": "18" },
+  { "codigo": "2.1",      "nombre": "PASIVO CORRIENTE",                    "tipo": "PASIVO",   "saldoNormal": "ACREEDOR", "idPadre": "2" },
+  { "codigo": "2.1.01",   "nombre": "PROVEEDORES",                         "tipo": "PASIVO",   "saldoNormal": "ACREEDOR", "idPadre": "2.1" },
+  { "codigo": "2.1.02",   "nombre": "DOCUMENTOS POR PAGAR",                "tipo": "PASIVO",   "saldoNormal": "ACREEDOR", "idPadre": "2.1" },
+  { "codigo": "2.1.03",   "nombre": "IVA DÉBITO FISCAL",                   "tipo": "PASIVO",   "saldoNormal": "ACREEDOR", "idPadre": "2.1" },
+  { "codigo": "2.1.04",   "nombre": "RETENCIONES POR PAGAR",               "tipo": "PASIVO",   "saldoNormal": "ACREEDOR", "idPadre": "2.1" },
+  { "codigo": "2.1.05",   "nombre": "SUELDOS POR PAGAR",                   "tipo": "PASIVO",   "saldoNormal": "ACREEDOR", "idPadre": "2.1" },
 
-  { "codigo": "2.2",     "nombre": "PASIVO NO CORRIENTE",      "tipo": "PASIVO",   "saldoNormal": "ACREEDOR", "idPadre": "17" },
-  { "codigo": "2.2.01",  "nombre": "PRÉSTAMOS BANCARIOS A LARGO PLAZO", "tipo": "PASIVO", "saldoNormal": "ACREEDOR", "idPadre": "24" },
+  { "codigo": "2.2",      "nombre": "PASIVO NO CORRIENTE",                 "tipo": "PASIVO",   "saldoNormal": "ACREEDOR", "idPadre": "2" },
+  { "codigo": "2.2.01",   "nombre": "PRÉSTAMOS BANCARIOS A LARGO PLAZO",   "tipo": "PASIVO",   "saldoNormal": "ACREEDOR", "idPadre": "2.2" },
 
-  { "codigo": "3",       "nombre": "CAPITAL CONTABLE",         "tipo": "CAPITAL CONTABLE",   "saldoNormal": "ACREEDOR" },
-  { "codigo": "3.1",     "nombre": "CAPITAL SOCIAL",           "tipo": "CAPITAL CONTABLE", "saldoNormal": "ACREEDOR", "idPadre": "26" },
-  { "codigo": "3.2",     "nombre": "APORTACIONES DE SOCIOS",   "tipo": "CAPITAL CONTABLE", "saldoNormal": "ACREEDOR", "idPadre": "26" },
-  { "codigo": "3.3",     "nombre": "UTILIDADES RETENIDAS",     "tipo": "CAPITAL CONTABLE", "saldoNormal": "ACREEDOR", "idPadre": "26" },
-  { "codigo": "3.4",     "nombre": "RESULTADO DEL EJERCICIO",  "tipo": "CAPITAL CONTABLE", "saldoNormal": "ACREEDOR", "idPadre": "26" }
+  { "codigo": "3",        "nombre": "CAPITAL CONTABLE",                    "tipo": "CAPITAL CONTABLE", "saldoNormal": "ACREEDOR" },
+  { "codigo": "3.1",      "nombre": "CAPITAL SOCIAL",                      "tipo": "CAPITAL CONTABLE", "saldoNormal": "ACREEDOR", "idPadre": "3" },
+  { "codigo": "3.2",      "nombre": "APORTACIONES DE SOCIOS",              "tipo": "CAPITAL CONTABLE", "saldoNormal": "ACREEDOR", "idPadre": "3" },
+  { "codigo": "3.3",      "nombre": "UTILIDADES RETENIDAS",                "tipo": "CAPITAL CONTABLE", "saldoNormal": "ACREEDOR", "idPadre": "3" },
+  { "codigo": "3.4",      "nombre": "RESULTADO DEL EJERCICIO",             "tipo": "CAPITAL CONTABLE", "saldoNormal": "ACREEDOR", "idPadre": "3" },
+
+
+  
+
+  { "codigo": "4",        "nombre": "INGRESOS",                            "tipo": "INGRESO",  "saldoNormal": "ACREEDOR" },
+  { "codigo": "4.1",      "nombre": "VENTAS",                              "tipo": "INGRESO",  "saldoNormal": "ACREEDOR", "idPadre": "4" },
+  { "codigo": "4.2",      "nombre": "DESCUENTOS SOBRE VENTAS",             "tipo": "INGRESO",  "saldoNormal": "DEUDOR",   "idPadre": "4" },
+  { "codigo": "4.3",      "nombre": "OTROS INGRESOS",                      "tipo": "INGRESO",  "saldoNormal": "ACREEDOR", "idPadre": "4" },
+
+  
+
+  { "codigo": "5",        "nombre": "COSTO DE VENTAS",                     "tipo": "GASTO",    "saldoNormal": "DEUDOR" },
+  { "codigo": "5.1",      "nombre": "COSTO DE MERCADERÍAS VENDIDAS",       "tipo": "GASTO",    "saldoNormal": "DEUDOR", "idPadre": "5" },
+
+  
+
+  { "codigo": "6",        "nombre": "GASTOS DE OPERACIÓN",                 "tipo": "GASTO",    "saldoNormal": "DEUDOR" },
+
+  { "codigo": "6.1",      "nombre": "GASTOS DE ADMINISTRACIÓN",            "tipo": "GASTO",    "saldoNormal": "DEUDOR", "idPadre": "6" },
+  { "codigo": "6.1.01",   "nombre": "SUELDOS Y SALARIOS",                  "tipo": "GASTO",    "saldoNormal": "DEUDOR", "idPadre": "6.1" },
+  { "codigo": "6.1.02",   "nombre": "SERVICIOS BÁSICOS",                   "tipo": "GASTO",    "saldoNormal": "DEUDOR", "idPadre": "6.1" },
+  { "codigo": "6.1.03",   "nombre": "PAPELERÍA Y ÚTILES",                  "tipo": "GASTO",    "saldoNormal": "DEUDOR", "idPadre": "6.1" },
+
+  { "codigo": "6.2",      "nombre": "GASTOS DE VENTAS",                    "tipo": "GASTO",    "saldoNormal": "DEUDOR", "idPadre": "6" },
+  { "codigo": "6.2.01",   "nombre": "PUBLICIDAD Y PROPAGANDA",             "tipo": "GASTO",    "saldoNormal": "DEUDOR", "idPadre": "6.2" },
+
+  
+
+  { "codigo": "7",        "nombre": "GASTOS NO OPERATIVOS",                "tipo": "GASTO",    "saldoNormal": "DEUDOR" },
+  { "codigo": "7.1",      "nombre": "GASTOS FINANCIEROS",                  "tipo": "GASTO",    "saldoNormal": "DEUDOR", "idPadre": "7" },
+
+  
+
+  { "codigo": "6.3",      "nombre": "DEPRECIACIÓN DEL PERIODO",           "tipo": "GASTO",    "saldoNormal": "DEUDOR", "idPadre": "6" }
 ]

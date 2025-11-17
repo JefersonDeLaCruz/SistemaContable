@@ -5,5 +5,5 @@ public record CuentaRequest(
         String nombre,
         String tipo,
         String saldoNormal,
-        Integer codigoPadre // opcional: referenciamos al padre por su código
+        String codigoPadre // opcional: referenciamos al padre por su código
 ) {}
