@@ -178,11 +178,13 @@ public class EstadoFlujosEfectivoService {
                 double credito = r[4] != null ? ((Number) r[4]).doubleValue() : 0.0;
                 
                 // Ingresos (normalmente acreedor): crédito - débito
-                if ("INGRESOS".equalsIgnoreCase(tipo) || codigo.startsWith("4")) {
+                if ("INGRESOS".equalsIgnoreCase(tipo) || "INGRESO".equalsIgnoreCase(tipo) || codigo.startsWith("4")) {
                     ingresos += (credito - debito);
                 }
                 // Gastos (normalmente deudor): débito - crédito
-                else if ("GASTOS".equalsIgnoreCase(tipo) || codigo.startsWith("5")) {
+                // Incluye códigos 5.X, 6.X, 7.X (costo de ventas, gastos operativos, otros gastos)
+                else if ("GASTOS".equalsIgnoreCase(tipo) || "GASTO".equalsIgnoreCase(tipo) || 
+                         codigo.startsWith("5") || codigo.startsWith("6") || codigo.startsWith("7")) {
                     gastos += (debito - credito);
                 }
             }

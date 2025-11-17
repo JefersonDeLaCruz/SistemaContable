@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.*;
 
 import com.ues.sic.balances.flujos.EstadoFlujosEfectivoDTO;
 import com.ues.sic.balances.flujos.EstadoFlujosEfectivoService;
+import com.ues.sic.balances.patrimonio.EstadoCambiosPatrimonioDTO;
+import com.ues.sic.balances.patrimonio.EstadoCambiosPatrimonioService;
 import com.ues.sic.detalle_partida.DetallePartidaRepository;
 import com.ues.sic.periodos.PeriodoContableModel;
 import com.ues.sic.periodos.PeriodoContableRepository;
@@ -24,6 +26,9 @@ public class BalanceController {
 
     @Autowired
     private EstadoFlujosEfectivoService efeService;
+
+    @Autowired
+    private EstadoCambiosPatrimonioService patrimonioService;
 
     @GetMapping("/general")
     public Map<String, Object> balanceGeneral(
@@ -328,5 +333,16 @@ public class BalanceController {
     @GetMapping("/flujos-efectivo")
     public EstadoFlujosEfectivoDTO flujosEfectivo(@RequestParam("periodo") Integer periodoId) {
         return efeService.calcularEFE(periodoId);
+    }
+
+    /**
+     * Endpoint para calcular el Estado de Cambios en el Patrimonio Neto
+     * 
+     * @param periodoId ID del período contable
+     * @return DTO con el estado de cambios en el patrimonio
+     */
+    @GetMapping("/cambios-patrimonio")
+    public EstadoCambiosPatrimonioDTO cambiosPatrimonio(@RequestParam("periodo") Integer periodoId) {
+        return patrimonioService.calcularCambiosPatrimonio(periodoId);
     }
 }

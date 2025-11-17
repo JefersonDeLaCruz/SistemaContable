@@ -204,6 +204,8 @@ window.addEventListener('DOMContentLoaded', () => {
     try {
       const url = tipo === 'estado' ? `/api/balances/estado?periodo=${encodeURIComponent(periodo)}` : 
                   tipo === 'flujos' ? `/api/balances/flujos-efectivo?periodo=${encodeURIComponent(periodo)}` :
+                  tipo === 'patrimonio' ? `/api/balances/cambios-patrimonio?periodo=${encodeURIComponent(periodo)}` :
+                  tipo === 'comprobacion' ? `/api/balances/comprobacion?periodo=${encodeURIComponent(periodo)}` :
                   `/api/balances/general?periodo=${encodeURIComponent(periodo)}`;
       const res = await fetch(url);
       if (!res.ok) throw new Error('Error al calcular');
@@ -211,6 +213,7 @@ window.addEventListener('DOMContentLoaded', () => {
       if (tipo === 'estado') renderEstadoResultados(data); 
       else if (tipo === 'comprobacion') renderBalanceComprobacion(data); 
       else if (tipo === 'flujos') renderFlujosEfectivo(data);
+      else if (tipo === 'patrimonio') renderCambiosPatrimonio(data);
       else renderBalance(data);
       mostrarToast('Reporte actualizado', 'success', 2500);
     } catch (e) {
@@ -283,6 +286,86 @@ function renderFlujosEfectivo(data) {
   const secFin = `<div class="card bg-base-100 shadow mb-6"><div class="card-body"><h3 class="card-title">Actividades de Financiamiento</h3><div class="overflow-x-auto"><table class="table w-full"><tbody>${data.financiamiento.entradas && data.financiamiento.entradas.length > 0 ? `<tr class="bg-base-200"><td colspan="3" class="px-4 py-2 font-semibold">Entradas:</td></tr>${renderDet(data.financiamiento.entradas, 'text-success')}<tr class="font-semibold"><td colspan="2" class="px-4 py-2 text-right">Total Entradas:</td><td class="px-4 py-2 text-right font-mono text-success">${fmtMoneda(data.financiamiento.totalEntradas)}</td></tr>` : '<tr><td colspan="3" class="px-4 py-2 opacity-70">Sin entradas</td></tr>'}${data.financiamiento.salidas && data.financiamiento.salidas.length > 0 ? `<tr class="bg-base-200"><td colspan="3" class="px-4 py-2 font-semibold">Salidas:</td></tr>${renderDet(data.financiamiento.salidas, 'text-error')}<tr class="font-semibold"><td colspan="2" class="px-4 py-2 text-right">Total Salidas:</td><td class="px-4 py-2 text-right font-mono text-error">${fmtMoneda(data.financiamiento.totalSalidas)}</td></tr>` : '<tr><td colspan="3" class="px-4 py-2 opacity-70">Sin salidas</td></tr>'}<tr class="font-bold bg-accent text-accent-content border-t-2"><td colspan="2" class="px-4 py-3 text-right">FLUJO NETO FINANCIAMIENTO:</td><td class="px-4 py-3 text-right font-mono text-lg">${fmtMoneda(data.financiamiento.flujoNetoFinanciamiento)}</td></tr></tbody></table></div></div></div>`;
   const totales = `<div class="card bg-base-100 shadow"><div class="card-body"><h3 class="card-title">Resumen</h3><div class="overflow-x-auto"><table class="table w-full"><tbody><tr class="border-t border-base-200"><td class="px-4 py-2">Flujo Operación</td><td class="px-4 py-2 text-right font-mono">${fmtMoneda(data.operacion.flujoNetoOperacion)}</td></tr><tr class="border-t border-base-200"><td class="px-4 py-2">Flujo Inversión</td><td class="px-4 py-2 text-right font-mono">${fmtMoneda(data.inversion.flujoNetoInversion)}</td></tr><tr class="border-t border-base-200"><td class="px-4 py-2">Flujo Financiamiento</td><td class="px-4 py-2 text-right font-mono">${fmtMoneda(data.financiamiento.flujoNetoFinanciamiento)}</td></tr><tr class="font-bold bg-info text-info-content border-t-2"><td class="px-4 py-3">Aumento Neto</td><td class="px-4 py-3 text-right font-mono text-lg">${fmtMoneda(data.aumentoNetoEfectivo)}</td></tr><tr class="border-t border-base-200"><td class="px-4 py-2">Efectivo Inicial</td><td class="px-4 py-2 text-right font-mono">${fmtMoneda(data.saldoInicial)}</td></tr><tr class="font-bold bg-success text-success-content border-t-2"><td class="px-4 py-3">Efectivo Final</td><td class="px-4 py-3 text-right font-mono text-lg">${fmtMoneda(data.saldoFinal)}</td></tr></tbody></table></div></div></div>`;
   cont.innerHTML = `${header}${resumen}${secOp}${secInv}${secFin}${totales}`;
+}
+
+function renderCambiosPatrimonio(data) {
+  const cont = document.getElementById('balanceContainer');
+  
+  const filas = (data.cuentas || []).map(c => {
+    const mostrarUtilidad = Math.abs(c.utilidadPeriodo) >= 0.01;
+    return `
+      <tr class="border-t border-base-200">
+        <td class="px-4 py-2 text-sm tabular-nums">${c.codigo}</td>
+        <td class="px-4 py-2">${c.nombre}</td>
+        <td class="px-4 py-2 text-right font-mono">${fmtMoneda(c.saldoInicial)}</td>
+        <td class="px-4 py-2 text-right font-mono text-success">${c.aumentos > 0 ? fmtMoneda(c.aumentos) : '-'}</td>
+        <td class="px-4 py-2 text-right font-mono text-error">${c.disminuciones > 0 ? fmtMoneda(c.disminuciones) : '-'}</td>
+        <td class="px-4 py-2 text-right font-mono ${c.utilidadPeriodo >= 0 ? 'text-success' : 'text-error'}">${mostrarUtilidad ? fmtMoneda(c.utilidadPeriodo) : '-'}</td>
+        <td class="px-4 py-2 text-right font-mono font-semibold">${fmtMoneda(c.saldoFinal)}</td>
+      </tr>
+    `;
+  }).join('');
+
+  cont.innerHTML = `
+    <div class="alert alert-info">
+      <span>Período: <b>${data.periodo.nombre}</b> (${data.periodo.inicio} - ${data.periodo.fin})</span>
+    </div>
+    
+    <div class="card bg-base-100 shadow">
+      <div class="card-body">
+        <h3 class="card-title text-2xl mb-4">Estado de Cambios en el Patrimonio Neto</h3>
+        
+        <div class="overflow-x-auto">
+          <table class="table w-full">
+            <thead>
+              <tr class="bg-base-200">
+                <th class="w-28">Código</th>
+                <th>Cuenta</th>
+                <th class="w-32 text-right">Saldo Inicial</th>
+                <th class="w-32 text-right">Aumentos</th>
+                <th class="w-32 text-right">Disminuciones</th>
+                <th class="w-32 text-right">Utilidad/Pérdida</th>
+                <th class="w-32 text-right">Saldo Final</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${filas || '<tr><td colspan="7" class="px-4 py-2 opacity-70 text-center">Sin movimientos de patrimonio</td></tr>'}
+            </tbody>
+            <tfoot>
+              <tr class="font-bold border-t-2 border-primary bg-base-200">
+                <td colspan="2" class="text-right">TOTALES:</td>
+                <td class="text-right font-mono text-info">${fmtMoneda(data.totales.saldoInicial)}</td>
+                <td class="text-right font-mono text-success">${fmtMoneda(data.totales.aumentos)}</td>
+                <td class="text-right font-mono text-error">${fmtMoneda(data.totales.disminuciones)}</td>
+                <td class="text-right font-mono ${data.totales.utilidadPeriodo >= 0 ? 'text-success' : 'text-error'}">${fmtMoneda(data.totales.utilidadPeriodo)}</td>
+                <td class="text-right font-mono text-primary text-lg">${fmtMoneda(data.totales.saldoFinal)}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div class="stats stats-vertical lg:stats-horizontal shadow">
+          <div class="stat">
+            <div class="stat-title">Patrimonio Inicial</div>
+            <div class="stat-value text-sm text-info">${fmtMoneda(data.totales.saldoInicial)}</div>
+          </div>
+          <div class="stat">
+            <div class="stat-title">Variación Neta</div>
+            <div class="stat-value text-sm ${(data.totales.saldoFinal - data.totales.saldoInicial) >= 0 ? 'text-success' : 'text-error'}">
+              ${fmtMoneda(data.totales.saldoFinal - data.totales.saldoInicial)}
+            </div>
+            <div class="stat-desc">Aumentos - Disminuciones + Resultado</div>
+          </div>
+          <div class="stat">
+            <div class="stat-title">Patrimonio Final</div>
+            <div class="stat-value text-sm text-primary">${fmtMoneda(data.totales.saldoFinal)}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 
