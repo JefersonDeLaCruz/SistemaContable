@@ -1,6 +1,8 @@
 package com.ues.sic.auth;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import java.text.NumberFormat;
+import java.util.Locale;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -51,6 +53,9 @@ public class AuthController {
         long totalSemana = dashboardService.totalPartidasSemanaActual();
         Double mayorMovHoy = dashboardService.mayorMovimientoHoy();
         double ingresoDiario = dashboardService.ingresoDiario();
+        double ingresoMensual = dashboardService.ingresoMensual();
+        String mesActualLabel = dashboardService.mesActualLabelCorto();
+        String ingresoMensualFmt = NumberFormat.getCurrencyInstance(Locale.US).format(ingresoMensual);
         double gastoDiario = dashboardService.gastoDiario();
         double balanceDia = ingresoDiario - gastoDiario;
         long partidasHoyUsuario = dashboardService.partidasHoyDe(username);
@@ -83,6 +88,8 @@ public class AuthController {
             model.addAttribute("totalSemana", totalSemana);
             model.addAttribute("mayorMovimientoHoy", mayorMovHoy);
             model.addAttribute("ingresoDiario", ingresoDiario);
+            model.addAttribute("ingresoMensualFmt", ingresoMensualFmt);
+            model.addAttribute("mesActualLabel", mesActualLabel);
             model.addAttribute("gastoDiario", gastoDiario);
             model.addAttribute("balanceDia", balanceDia);
             model.addAttribute("partidasHoyUsuario", partidasHoyUsuario);

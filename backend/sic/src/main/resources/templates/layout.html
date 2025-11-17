@@ -169,8 +169,8 @@
                             </a>
                         </li>
                         <li th:if="${usuario.role == 'ADMIN'}">
-                            <a th:href="@{/admin/crear-usuario}"
-                                th:classappend="${paginaActual == 'crear-usuario'} ? 'menu-active' : ''"
+                            <a th:href="@{/admin/usuarios}"
+                                th:classappend="${paginaActual == 'usuarios' or paginaActual == 'crear-usuario'} ? 'menu-active' : ''"
                                 class="transition-transform duration-200 hover:scale-[1.05]">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="1.5" stroke="currentColor" class="size-6">

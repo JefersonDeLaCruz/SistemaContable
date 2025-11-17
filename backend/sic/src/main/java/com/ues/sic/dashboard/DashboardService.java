@@ -13,6 +13,7 @@ import com.ues.sic.usuarios.UsuariosRepository;
 import com.ues.sic.detalle_partida.DetallePartidaRepository;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.Locale;
 
 
 @Service
@@ -32,6 +33,21 @@ public class DashboardService {
         LocalDate inicio = ym.atDay(1);
         LocalDate fin = ym.atEndOfMonth();
         return partidasRepository.findByFechaBetween(inicio.toString(), fin.toString()).size();
+    }
+
+    public double ingresoMensual() {
+        YearMonth ym = YearMonth.now();
+        LocalDate inicio = ym.atDay(1);
+        LocalDate fin = ym.atEndOfMonth();
+        Double total = detallePartidaRepository.ingresoEntre(inicio.toString(), fin.toString());
+        return (total != null) ? total : 0.0;
+    }
+
+    public String mesActualLabelCorto() {
+        String[] meses = {"Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"};
+        YearMonth ym = YearMonth.now();
+        String mes = meses[ym.getMonthValue() - 1];
+        return mes + " " + ym.getYear();
     }
 
     public Map<String, Integer> contarPartidasSemanaActual() {

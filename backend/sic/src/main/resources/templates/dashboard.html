@@ -45,8 +45,8 @@
               </div>
               <div class="stat bg-base-200 rounded-xl">
                 <div class="stat-title">Ingreso mensual</div>
-                <div class="stat-value text-success">$42,350.75</div>
-                <div class="stat-desc">Sep 2025</div>
+                <div class="stat-value text-success" th:text="${ingresoMensualFmt}">$0.00</div>
+                <div class="stat-desc" th:text="${mesActualLabel}">-</div>
               </div>
               <div class="stat bg-base-200 rounded-xl">
                 <div class="stat-title">Ingreso diario</div>                <div class="stat-value text-success" th:text="${ingresoDiario}">0</div>

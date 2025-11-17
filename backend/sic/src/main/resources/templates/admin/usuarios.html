@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" data-theme="corporate">
+
+<head th:replace="~{layout :: head}"></head>
+
+<body>
+    <div class="drawer">
+        <input id="my-drawer-3" type="checkbox" class="drawer-toggle" />
+        <div class="drawer-content flex flex-col">
+            <div th:replace="~{layout :: navbar}"></div>
+
+            <div class="w-full p-4 sm:p-6 lg:p-10 bg-base-100">
+                <div class="mb-6">
+                    <h1 class="text-3xl font-bold text-center mb-2">Gestionar Usuarios</h1>
+                    <p class="text-center text-base-content/70">Administra los usuarios del sistema</p>
+                </div>
+
+                <div class="divider"></div>
+
+                <!-- Controles superiores -->
+                <div class="flex flex-col sm:flex-row gap-4 items-center justify-between mb-6">
+                    <!-- Buscador -->
+                    <div class="form-control w-full sm:w-auto">
+                        <div class="input-group">
+                            <input type="text" id="buscarUsuario" placeholder="Buscar por usuario o email..." class="input input-bordered w-full sm:w-96" />
+                            <button class="btn btn-square" type="button">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 w-full sm:w-auto">
+                        <select id="filtroRol" class="select select-bordered w-full sm:w-56">
+                            <option value="">Todos los roles</option>
+                            <option value="ADMIN">Administrador</option>
+                            <option value="CONTADOR">Contador</option>
+                            <option value="AUDITOR">Auditor</option>
+                        </select>
+                        <select id="filtroEstado" class="select select-bordered w-full sm:w-56">
+                            <option value="">Todos los estados</option>
+                            <option value="activo">Activos</option>
+                            <option value="inactivo">Inactivos</option>
+                        </select>
+                        <button id="btnNuevoUsuario" class="btn btn-primary gap-2 w-full sm:w-auto">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            </svg>
+                            Nuevo Usuario
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tabla de Usuarios -->
+                <div class="overflow-x-auto rounded-lg shadow-lg bg-base-200 p-4">
+                    <table class="table w-full table-zebra">
+                        <thead class="bg-primary text-primary-content sticky top-0">
+                            <tr>
+                                <th class="w-56">Usuario</th>
+                                <th class="w-72">Email</th>
+                                <th class="w-40">Rol</th>
+                                <th class="w-32 text-center">Estado</th>
+                                <th class="w-40">Creado</th>
+                                <th class="w-32 text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaUsuarios">
+                            <tr>
+                                <td colspan="6" class="text-center py-8">
+                                    <span class="loading loading-spinner loading-lg"></span>
+                                    <p class="mt-2">Cargando usuarios...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Estadísticas -->
+                <div class="stats shadow mt-6 w-full">
+                    <div class="stat">
+                        <div class="stat-title">Total de Usuarios</div>
+                        <div class="stat-value text-primary" id="totalUsuarios">0</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-title">Activos</div>
+                        <div class="stat-value text-success" id="totalActivos">0</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-title">Administradores</div>
+                        <div class="stat-value text-info" id="totalAdmins">0</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div th:replace="~{layout :: sidebar('usuarios')}"></div>
+    </div>
+
+    <!-- Modal Crear/Editar Usuario -->
+    <dialog id="modalUsuario" class="modal">
+        <div class="modal-box max-w-2xl">
+            <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span id="tituloModalUsuario">Nuevo Usuario</span>
+            </h3>
+
+            <form id="formUsuario">
+                <input type="hidden" id="usuarioId" />
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-semibold">Usuario</span>
+                            <span class="label-text-alt text-error">*</span>
+                        </label>
+                        <input type="text" id="username" class="input input-bordered w-full" required maxlength="50" />
+                    </div>
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-semibold">Email</span>
+                            <span class="label-text-alt text-error">*</span>
+                        </label>
+                        <input type="email" id="email" class="input input-bordered w-full" required maxlength="100" />
+                    </div>
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-semibold">Rol</span>
+                            <span class="label-text-alt text-error">*</span>
+                        </label>
+                        <select id="role" class="select select-bordered w-full" required>
+                            <option value="">Seleccionar rol...</option>
+                            <option value="ADMIN">Administrador</option>
+                            <option value="CONTADOR">Contador</option>
+                            <option value="AUDITOR">Auditor</option>
+                        </select>
+                    </div>
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-semibold">Contraseña</span>
+                        </label>
+                        <input type="password" id="password" class="input input-bordered w-full" minlength="6" />
+                        <label class="label">
+                            <span class="label-text-alt">Déjala en blanco para no cambiar</span>
+                        </label>
+                    </div>
+                    <div class="form-control">
+                        <label class="cursor-pointer label">
+                            <span class="label-text font-semibold">Activo</span>
+                            <input type="checkbox" id="active" class="toggle toggle-primary" checked />
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-action">
+                    <button type="button" class="btn btn-ghost" onclick="modalUsuario.close()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+        <form method="dialog" class="modal-backdrop"><button>close</button></form>
+    </dialog>
+
+    <!-- Modal Confirmar Eliminación -->
+    <dialog id="modalEliminarUsuario" class="modal">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg mb-4 flex items-center gap-2 text-error">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                Confirmar Eliminación
+            </h3>
+            <p class="py-4">¿Estás seguro de que deseas eliminar a <strong id="usuarioEliminarNombre"></strong>?</p>
+            <input type="hidden" id="usuarioEliminarId" />
+            <div class="modal-action">
+                <button type="button" class="btn btn-ghost" onclick="modalEliminarUsuario.close()">Cancelar</button>
+                <button type="button" id="btnConfirmarEliminarUsuario" class="btn btn-error">Eliminar</button>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop"><button>close</button></form>
+    </dialog>
+
+    <script th:inline="javascript">
+        window.currentUserId = [[${usuario.id}]];
+        window.currentUserRole = '[[${usuario.role}]]';
+    </script>
+    <script th:src="@{/js/scripts.js}"></script>
+    <script th:src="@{/js/usuarios.js}"></script>
+</body>
+
+</html>
