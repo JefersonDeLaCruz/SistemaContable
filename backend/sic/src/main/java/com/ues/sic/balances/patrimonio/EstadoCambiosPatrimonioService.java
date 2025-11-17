@@ -13,6 +13,13 @@ import java.util.*;
 /**
  * Servicio para calcular el Estado de Cambios en el Patrimonio Neto
  * Muestra los movimientos en las cuentas de capital durante un período
+ * 
+ * Componentes:
+ * - Saldo inicial del patrimonio (períodos anteriores)
+ * - Aumentos del patrimonio (aportes, reservas)
+ * - Disminuciones del patrimonio (retiros, dividendos)
+ * - Resultado del período (utilidad/pérdida del Estado de Resultados)
+ * - Saldo final del patrimonio
  */
 @Service
 public class EstadoCambiosPatrimonioService {
@@ -41,7 +48,6 @@ public class EstadoCambiosPatrimonioService {
         
         String sInicio = periodo.getFechaInicio().toString();
         String sFin = periodo.getFechaFin().toString();
-        String sDiaAntes = periodo.getFechaInicio().minusDays(1).toString();
 
         System.out.println("=== DEBUG PATRIMONIO ===");
         System.out.println("Período: " + periodo.getNombre() + " (" + sInicio + " a " + sFin + ")");
@@ -50,96 +56,30 @@ public class EstadoCambiosPatrimonioService {
         PeriodoDTO periodoDTO = new PeriodoDTO(periodo.getNombre(), sInicio, sFin);
         resultado.setPeriodo(periodoDTO);
 
-        // 1. Obtener saldos iniciales de capital contable
-        List<Object[]> saldosIniciales = detalleRepo.saldosHastaTodos(sDiaAntes);
-        Map<String, CuentaPatrimonioDTO> cuentasMap = new HashMap<>();
+        // PASO 1: Calcular utilidad neta del período (Estado de Resultados)
+        double utilidadNeta = calcularUtilidadNetaPeriodo(periodoId);
+        System.out.println("Utilidad del período calculada: " + utilidadNeta);
 
-        for (Object[] r : saldosIniciales) {
-            String codigo = (String) r[1];
-            String nombre = (String) r[2];
-            String saldoNormal = (String) r[3];
-            double tDeb = r[4] != null ? ((Number) r[4]).doubleValue() : 0.0;
-            double tCre = r[5] != null ? ((Number) r[5]).doubleValue() : 0.0;
-            
-            // Solo cuentas de capital contable (código 3.X)
-            if (!codigo.startsWith("3")) {
-                continue;
-            }
-            
-            double saldoInicial = "DEUDOR".equalsIgnoreCase(saldoNormal) 
-                ? (tDeb - tCre) 
-                : (tCre - tDeb);
-            
-            if (Math.abs(saldoInicial) >= 0.01) {
-                CuentaPatrimonioDTO cuenta = new CuentaPatrimonioDTO(codigo, nombre);
-                cuenta.setSaldoInicial(round2(saldoInicial));
-                cuentasMap.put(codigo, cuenta);
-            }
-        }
+        // PASO 2: Obtener saldos iniciales de patrimonio (períodos anteriores)
+        Map<String, CuentaPatrimonioDTO> cuentasMap = obtenerSaldosInicialesPatrimonio(periodoId);
+        System.out.println("Cuentas de patrimonio encontradas: " + cuentasMap.size());
 
-        // 2. Obtener movimientos del período en capital contable
-        List<Object[]> movimientos = detalleRepo.movimientosPorPeriodo(periodoId);
-        
-        for (Object[] r : movimientos) {
-            String codigo = (String) r[1];
-            String nombre = (String) r[2];
-            double debito = r[3] != null ? ((Number) r[3]).doubleValue() : 0.0;
-            double credito = r[4] != null ? ((Number) r[4]).doubleValue() : 0.0;
-            
-            // Solo cuentas de capital contable
-            if (!codigo.startsWith("3")) {
-                continue;
-            }
-            
-            CuentaPatrimonioDTO cuenta = cuentasMap.computeIfAbsent(codigo, 
-                k -> new CuentaPatrimonioDTO(codigo, nombre));
-            
-            // Aumentos = créditos (aumentan patrimonio)
-            // Disminuciones = débitos (reducen patrimonio)
-            cuenta.setAumentos(round2(credito));
-            cuenta.setDisminuciones(round2(debito));
-        }
+        // PASO 3: Obtener movimientos del período en cuentas de patrimonio (solo 3.X)
+        procesarMovimientosPatrimonio(periodoId, cuentasMap);
 
-        // 3. Calcular utilidad del período
-        Double ingresos = detalleRepo.ingresoEntre(sInicio, sFin);
-        Double gastos = detalleRepo.gastoEntre(sInicio, sFin);
-        double utilidadNeta = (ingresos != null ? ingresos : 0.0) - (gastos != null ? gastos : 0.0);
-        
-        System.out.println("Utilidad del período: " + utilidadNeta);
-
-        // 4. Agregar resultado del ejercicio como movimiento del patrimonio
+        // PASO 4: Agregar resultado del ejercicio
         if (Math.abs(utilidadNeta) >= 0.01) {
-            CuentaPatrimonioDTO resultadoEjercicio = cuentasMap.computeIfAbsent("3.99", 
-                k -> new CuentaPatrimonioDTO("3.99", utilidadNeta >= 0 ? "UTILIDAD DEL EJERCICIO" : "PÉRDIDA DEL EJERCICIO"));
+            CuentaPatrimonioDTO resultadoEjercicio = cuentasMap.computeIfAbsent("3.999", 
+                k -> new CuentaPatrimonioDTO("3.999", utilidadNeta >= 0 ? "UTILIDAD DEL EJERCICIO" : "PÉRDIDA DEL EJERCICIO"));
             resultadoEjercicio.setUtilidadPeriodo(round2(utilidadNeta));
         }
 
-        // 5. Calcular saldos finales
-        TotalesPatrimonioDTO totales = new TotalesPatrimonioDTO();
-        double totalInicial = 0.0;
-        double totalAumentos = 0.0;
-        double totalDisminuciones = 0.0;
+        // PASO 5: Calcular saldos finales y totales
+        TotalesPatrimonioDTO totales = calcularTotales(cuentasMap);
         
+        // PASO 6: Ordenar y asignar al resultado
         List<CuentaPatrimonioDTO> listaCuentas = new ArrayList<>(cuentasMap.values());
         listaCuentas.sort(Comparator.comparing(CuentaPatrimonioDTO::getCodigo));
-        
-        for (CuentaPatrimonioDTO cuenta : listaCuentas) {
-            double saldoFinal = cuenta.getSaldoInicial() 
-                              + cuenta.getAumentos() 
-                              - cuenta.getDisminuciones()
-                              + cuenta.getUtilidadPeriodo();
-            cuenta.setSaldoFinal(round2(saldoFinal));
-            
-            totalInicial += cuenta.getSaldoInicial();
-            totalAumentos += cuenta.getAumentos();
-            totalDisminuciones += cuenta.getDisminuciones();
-        }
-        
-        totales.setSaldoInicial(round2(totalInicial));
-        totales.setAumentos(round2(totalAumentos));
-        totales.setDisminuciones(round2(totalDisminuciones));
-        totales.setUtilidadPeriodo(round2(utilidadNeta));
-        totales.setSaldoFinal(round2(totalInicial + totalAumentos - totalDisminuciones + utilidadNeta));
         
         resultado.setCuentas(listaCuentas);
         resultado.setTotales(totales);
@@ -150,6 +90,146 @@ public class EstadoCambiosPatrimonioService {
         System.out.println("=== FIN DEBUG PATRIMONIO ===");
 
         return resultado;
+    }
+
+    /**
+     * Calcula la utilidad neta del período basándose en Estado de Resultados
+     * Ingresos (4.x) - Costos (5.x) - Gastos (6.x, 7.x)
+     */
+    private double calcularUtilidadNetaPeriodo(Integer periodoId) {
+        List<Object[]> movimientos = detalleRepo.movimientosPorPeriodo(periodoId);
+        
+        double ingresos = 0.0;
+        double costosYGastos = 0.0;
+        
+        for (Object[] r : movimientos) {
+            String codigo = (String) r[1];
+            double debito = r[3] != null ? ((Number) r[3]).doubleValue() : 0.0;
+            double credito = r[4] != null ? ((Number) r[4]).doubleValue() : 0.0;
+            
+            // Ingresos (4.x): saldo acreedor, por lo tanto crédito - débito
+            if (codigo.startsWith("4")) {
+                ingresos += (credito - debito);
+            }
+            // Costos y Gastos (5.x, 6.x, 7.x): saldo deudor, por lo tanto débito - crédito
+            else if (codigo.startsWith("5") || codigo.startsWith("6") || codigo.startsWith("7")) {
+                costosYGastos += (debito - credito);
+            }
+        }
+        
+        double utilidadNeta = ingresos - costosYGastos;
+        
+        System.out.println("  Ingresos totales: " + ingresos);
+        System.out.println("  Costos y gastos totales: " + costosYGastos);
+        System.out.println("  Utilidad neta: " + utilidadNeta);
+        
+        return utilidadNeta;
+    }
+
+    /**
+     * Obtiene saldos iniciales de cuentas de patrimonio (períodos anteriores)
+     * Solo procesa cuentas con código 3.X
+     */
+    private Map<String, CuentaPatrimonioDTO> obtenerSaldosInicialesPatrimonio(Integer periodoId) {
+        List<Object[]> saldosIniciales = detalleRepo.saldosHastaPeriodo(periodoId);
+        Map<String, CuentaPatrimonioDTO> cuentasMap = new HashMap<>();
+
+        for (Object[] r : saldosIniciales) {
+            String codigo = (String) r[1];
+            String nombre = (String) r[2];
+            String saldoNormal = (String) r[3];
+            double tDeb = r[4] != null ? ((Number) r[4]).doubleValue() : 0.0;
+            double tCre = r[5] != null ? ((Number) r[5]).doubleValue() : 0.0;
+            
+            // SOLO cuentas de patrimonio (código 3.X)
+            if (!codigo.startsWith("3")) {
+                continue;
+            }
+            
+            // Patrimonio normalmente es acreedor: crédito - débito
+            double saldoInicial = "DEUDOR".equalsIgnoreCase(saldoNormal) 
+                ? (tDeb - tCre) 
+                : (tCre - tDeb);
+            
+            // Solo agregar si tiene saldo inicial
+            if (Math.abs(saldoInicial) >= 0.01) {
+                CuentaPatrimonioDTO cuenta = new CuentaPatrimonioDTO(codigo, nombre);
+                cuenta.setSaldoInicial(round2(saldoInicial));
+                cuentasMap.put(codigo, cuenta);
+                System.out.println("  Saldo inicial: " + codigo + " - " + nombre + " = " + saldoInicial);
+            }
+        }
+
+        return cuentasMap;
+    }
+
+    /**
+     * Procesa movimientos del período en cuentas de patrimonio
+     * Crédito = Aumento del patrimonio
+     * Débito = Disminución del patrimonio
+     */
+    private void procesarMovimientosPatrimonio(Integer periodoId, Map<String, CuentaPatrimonioDTO> cuentasMap) {
+        List<Object[]> movimientos = detalleRepo.movimientosPorPeriodo(periodoId);
+        
+        for (Object[] r : movimientos) {
+            String codigo = (String) r[1];
+            String nombre = (String) r[2];
+            double debito = r[3] != null ? ((Number) r[3]).doubleValue() : 0.0;
+            double credito = r[4] != null ? ((Number) r[4]).doubleValue() : 0.0;
+            
+            // SOLO cuentas de patrimonio (código 3.X)
+            if (!codigo.startsWith("3")) {
+                continue;
+            }
+            
+            // Obtener o crear cuenta
+            CuentaPatrimonioDTO cuenta = cuentasMap.computeIfAbsent(codigo, 
+                k -> new CuentaPatrimonioDTO(codigo, nombre));
+            
+            // Regla contable para patrimonio:
+            // CRÉDITO = AUMENTO del patrimonio (ej: aportes de capital)
+            // DÉBITO = DISMINUCIÓN del patrimonio (ej: retiros, dividendos)
+            cuenta.setAumentos(round2(cuenta.getAumentos() + credito));
+            cuenta.setDisminuciones(round2(cuenta.getDisminuciones() + debito));
+            
+            System.out.println("  Movimiento: " + codigo + " - Aumentos: +" + credito + ", Disminuciones: -" + debito);
+        }
+    }
+
+    /**
+     * Calcula los totales del estado de cambios en el patrimonio
+     */
+    private TotalesPatrimonioDTO calcularTotales(Map<String, CuentaPatrimonioDTO> cuentasMap) {
+        TotalesPatrimonioDTO totales = new TotalesPatrimonioDTO();
+        
+        double totalInicial = 0.0;
+        double totalAumentos = 0.0;
+        double totalDisminuciones = 0.0;
+        double totalUtilidad = 0.0;
+        
+        for (CuentaPatrimonioDTO cuenta : cuentasMap.values()) {
+            // Calcular saldo final de cada cuenta
+            // Saldo final = Inicial + Aumentos - Disminuciones + Utilidad
+            double saldoFinal = cuenta.getSaldoInicial() 
+                              + cuenta.getAumentos() 
+                              - cuenta.getDisminuciones()
+                              + cuenta.getUtilidadPeriodo();
+            cuenta.setSaldoFinal(round2(saldoFinal));
+            
+            // Acumular totales
+            totalInicial += cuenta.getSaldoInicial();
+            totalAumentos += cuenta.getAumentos();
+            totalDisminuciones += cuenta.getDisminuciones();
+            totalUtilidad += cuenta.getUtilidadPeriodo();
+        }
+        
+        totales.setSaldoInicial(round2(totalInicial));
+        totales.setAumentos(round2(totalAumentos));
+        totales.setDisminuciones(round2(totalDisminuciones));
+        totales.setUtilidadPeriodo(round2(totalUtilidad));
+        totales.setSaldoFinal(round2(totalInicial + totalAumentos - totalDisminuciones + totalUtilidad));
+        
+        return totales;
     }
 
     /**
