@@ -14,6 +14,10 @@ public class CuentaService {
         this.repo = repo;
     }
 
+     public String obtenerCodigoPorId(Integer idCuenta) {
+        return repo.findCodigoByIdCuenta(idCuenta);
+    }
+
     @Transactional
     public List<CuentaModel> crearCatalogo(List<CuentaRequest> requests) {
         Map<String, CuentaModel> porCodigo = new HashMap<>();
