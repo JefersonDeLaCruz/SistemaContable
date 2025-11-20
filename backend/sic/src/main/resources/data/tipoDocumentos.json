@@ -1,0 +1,42 @@
+[
+  {
+    "nombre": "Factura",
+    "creadoPor": 1
+  },
+  {
+    "nombre": "Constancia de Ingresos",
+    "creadoPor": 1
+  },
+  {
+    "nombre": "Comprobante de Pago",
+    "creadoPor": 1
+  },
+  {
+    "nombre": "Declaración Jurada",
+    "creadoPor": 1
+  },
+  {
+    "nombre": "Permiso de Trabajo",
+    "creadoPor": 1
+  },
+  {
+    "nombre": "Carta de Autorización",
+    "creadoPor": 1
+  },
+  {
+    "nombre": "Recibo",
+    "creadoPor": 1
+  },
+  {
+    "nombre": "Comprobante de Retención",
+    "creadoPor": 1
+  },
+  {
+    "nombre": "Acta de Entrega",
+    "creadoPor": 1
+  },
+  {
+    "nombre": "Informe Técnico",
+    "creadoPor": 1
+  }
+]

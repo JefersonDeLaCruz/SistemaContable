@@ -1,5 +1,5 @@
 version: '3.9'
-#este es el compose que se va usar durante el desarrollo, solo tiene la base de datos
+
 services:
   java_db:
     container_name: java_db
@@ -12,7 +12,7 @@ services:
       POSTGRES_DB: sistema_contable
     volumes:
       - pgdata:/var/lib/postgresql/data
-  
+      
   tailwind:
     image: node-img-test
     build:

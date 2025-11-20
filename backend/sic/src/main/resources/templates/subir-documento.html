@@ -6,28 +6,114 @@
 </head>
 
 <body>
-    
+
     <div class="drawer">
         <input id="my-drawer-3" type="checkbox" class="drawer-toggle" />
         <div class="drawer-content flex flex-col">
             <!-- Navbar -->
             <div th:replace="~{layout :: navbar}"></div>
-            
-            <!-- Page content here -->
+
             <div class="w-full p-4 sm:p-6 lg:p-10 bg-base-100">
+
                 <h1 class="text-3xl font-bold mb-6">Subir Documento</h1>
-                
+
                 <div class="alert alert-info">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <span>Funcionalidad en desarrollo - Próximamente podrás subir documentos</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        class="stroke-current shrink-0 w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span>NOTA: Aquí puede vincular una partida con un documento en formato PDF (solo un documento a la
+                        vez) para
+                        proporcionar información adicional sobre una transacción.</span>
                 </div>
 
+                <!-- Contenedor base -->
+                <div class="mt-4  mb-4 p-4 rounded-lg border-2 border-gray-300">
+                    <div class="mt-4  mb-4 p-4 rounded-lg border-2 border-gray-300">
+                        <!-- BOTÓN PARA AGREGAR ARCHIVO -->
+                        <div class="flex justify-start mt-5">
+                            <button id="btnAgregar" class="btn btn-primary gap-2 w-full sm:w-auto">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 4v16m8-8H4" />
+                                </svg>
+                                Agregar PDF
+                            </button>
+                        </div>
 
-            </div>  
+                        <!-- INPUT OCULTO -->
+                        <input id="fileInput" type="file" accept="application/pdf" class="hidden" />
+
+                        <!-- LISTA DE PDF SUBIDOS -->
+                        <div id="listaPDF" class="mt-8 space-y-4"></div>
+                    </div>
+
+                    <!-- Controles - Tipo Documento (factura, cheque, etc) - Partida a la que le pertenece el documento  -->
+                    <div class="flex flex-col sm:flex-row gap-4 items-center justify-between mt-6 mb-6">
+                        <div class="flex gap-3 w-full sm:w-auto">
+                            <select id="tipoDocumento" class="select select-bordered w-full sm:w-56">
+                                <option value="" disabled selected>TIPO DE DOCUMENTO</option>
+                            </select>
+                            <select id="idPartida" class="select select-bordered w-full sm:w-56">
+                                <option value="" disabled selected>ID PARTIDA</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button id="btnGuardar" class="btn btn-primary gap-2 w-full sm:w-auto">
+                        GUARDAR
+                    </button>
+
+                    <!-- MODAL PARA VER PDF -->
+                    <div id="modal" class="fixed inset-0 backdrop-blur-md hidden items-center justify-center z-50">
+
+                        <div class="rounded-2xl shadow-2xl w-[90%] max-w-4xl relative border border-gray-200">
+
+                            <!-- BOTÓN CERRAR (X) -->
+                            <button id="cerrarModal" class="absolute -top-4 -right-4 bg-sky-400 shadow-lg border border-gray-300 
+                   w-10 h-10 flex items-center justify-center rounded-full 
+                   text-gray-700 hover:text-red-600 text-2xl font-bold transition">
+                                ✕
+                            </button>
+
+                            <iframe id="visorModal" class="w-full h-[500px] rounded-lg border" frameborder="0"></iframe>
+                        </div>
+                    </div>
+
+                </div>
+
+                <h1 class="text-3xl font-bold mt-6 mb-6">Gestionar Documentos Subidos</h1>
+                <!-- Tabla de Usuarios -->
+                <div class="overflow-x-auto rounded-lg shadow-lg bg-base-200 p-4">
+                    <table class="table w-full table-zebra">
+                        <thead class="bg-primary text-primary-content sticky top-0">
+                            <tr>
+                                <th class="w-56">Fecha de Subida</th>
+                                <th class="w-72">Tipo Documento</th>
+                                <th class="w-40">Id Partida</th>
+                                <th class="w-32 text-center">Subido por</th>
+                                <th class="w-32 text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaDocumentos">
+                            <tr>
+                                <td colspan="6" class="text-center py-8">
+                                    <span class="loading loading-spinner loading-lg"></span>
+                                    <p class="mt-2">Cargando documentos...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
         <div th:replace="~{layout :: sidebar('subir-documento')}"></div>
     </div>
 
+    <script th:src="@{/js/subir-documento.js}"></script>
 </body>
+
 </html>

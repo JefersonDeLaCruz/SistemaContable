@@ -49,13 +49,14 @@
                 <div class="stat-desc" th:text="${mesActualLabel}">-</div>
               </div>
               <div class="stat bg-base-200 rounded-xl">
-                <div class="stat-title">Ingreso diario</div>                <div class="stat-value text-success" th:text="${ingresoDiario}">0</div>
+                <div class="stat-title">Ingreso diario</div>
+                <div class="stat-value text-success" th:text="${ingresoDiario}">0</div>
                 <div class="stat-desc">Hoy</div>
               </div>
               <div class="stat bg-base-200 rounded-xl">
                 <div class="stat-title">Mayor movimiento (hoy)</div>
                 <div class="stat-value text-success" th:text="${mayorMovimientoHoy}"></div>
-               </div>
+              </div>
               <div class="stat bg-base-200 rounded-xl">
                 <div class="stat-title">Usuarios activos</div>
                 <div class="stat-value text-success" th:text="${usuariosActivos}"></div>
@@ -75,55 +76,69 @@
                     <div class="grid grid-cols-12 gap-3 items-center">
                       <div class="col-span-2 text-sm">Lunes</div>
                       <div class="col-span-9">
-                        <progress class="progress progress-success w-full" value="0" max="100" th:attr="data-val=${semana['Lunes']}"></progress>
+                        <progress class="progress progress-success w-full" value="0" max="100"
+                          th:attr="data-val=${semana['Lunes']}"></progress>
                       </div>
-                      <div class="col-span-1 text-right text-sm font-medium" data-out th:text="${semana['Lunes']}">0</div>
+                      <div class="col-span-1 text-right text-sm font-medium" data-out th:text="${semana['Lunes']}">0
+                      </div>
                     </div>
                     <div class="grid grid-cols-12 gap-3 items-center">
                       <div class="col-span-2 text-sm">Martes</div>
                       <div class="col-span-9">
-                        <progress class="progress progress-success w-full" value="0" max="100" th:attr="data-val=${semana['Martes']}"></progress>
+                        <progress class="progress progress-success w-full" value="0" max="100"
+                          th:attr="data-val=${semana['Martes']}"></progress>
                       </div>
-                      <div class="col-span-1 text-right text-sm font-medium" data-out th:text="${semana['Martes']}">0</div>
+                      <div class="col-span-1 text-right text-sm font-medium" data-out th:text="${semana['Martes']}">0
+                      </div>
                     </div>
                     <div class="grid grid-cols-12 gap-3 items-center">
                       <div class="col-span-2 text-sm">Miércoles</div>
                       <div class="col-span-9">
-                        <progress class="progress progress-success w-full" value="0" max="100" th:attr="data-val=${semana['Miercoles']}"></progress>
+                        <progress class="progress progress-success w-full" value="0" max="100"
+                          th:attr="data-val=${semana['Miercoles']}"></progress>
                       </div>
-                      <div class="col-span-1 text-right text-sm font-medium" data-out th:text="${semana['Miércoles']}">0</div>
+                      <div class="col-span-1 text-right text-sm font-medium" data-out th:text="${semana['Miércoles']}">0
+                      </div>
                     </div>
                     <div class="grid grid-cols-12 gap-3 items-center">
                       <div class="col-span-2 text-sm">Jueves</div>
                       <div class="col-span-9">
-                        <progress class="progress progress-success w-full" value="0" max="100" th:attr="data-val=${semana['Jueves']}"></progress>
+                        <progress class="progress progress-success w-full" value="0" max="100"
+                          th:attr="data-val=${semana['Jueves']}"></progress>
                       </div>
-                      <div class="col-span-1 text-right text-sm font-medium" data-out th:text="${semana['Jueves']}">0</div>
+                      <div class="col-span-1 text-right text-sm font-medium" data-out th:text="${semana['Jueves']}">0
+                      </div>
                     </div>
                     <div class="grid grid-cols-12 gap-3 items-center">
                       <div class="col-span-2 text-sm">Viernes</div>
                       <div class="col-span-9">
-                        <progress class="progress progress-success w-full" value="0" max="100" th:attr="data-val=${semana['Viernes']}"></progress>
+                        <progress class="progress progress-success w-full" value="0" max="100"
+                          th:attr="data-val=${semana['Viernes']}"></progress>
                       </div>
-                      <div class="col-span-1 text-right text-sm font-medium" data-out th:text="${semana['Viernes']}">0</div>
+                      <div class="col-span-1 text-right text-sm font-medium" data-out th:text="${semana['Viernes']}">0
+                      </div>
                     </div>
                     <div class="grid grid-cols-12 gap-3 items-center">
                       <div class="col-span-2 text-sm">Sábado</div>
                       <div class="col-span-9">
-                        <progress class="progress progress-success w-full" value="0" max="100" th:attr="data-val=${semana['Sabado']}"></progress>
+                        <progress class="progress progress-success w-full" value="0" max="100"
+                          th:attr="data-val=${semana['Sabado']}"></progress>
                       </div>
-                      <div class="col-span-1 text-right text-sm font-medium" data-out th:text="${semana['Sábado']}">0</div>
+                      <div class="col-span-1 text-right text-sm font-medium" data-out th:text="${semana['Sábado']}">0
+                      </div>
                     </div>
                     <div class="grid grid-cols-12 gap-3 items-center">
                       <div class="col-span-2 text-sm">Domingo</div>
                       <div class="col-span-9">
-                        <progress class="progress progress-success w-full" value="0" max="100" th:attr="data-val=${semana['Domingo']}"></progress>
+                        <progress class="progress progress-success w-full" value="0" max="100"
+                          th:attr="data-val=${semana['Domingo']}"></progress>
                       </div>
-                      <div class="col-span-1 text-right text-sm font-medium" data-out th:text="${semana['Domingo']}">0</div>
+                      <div class="col-span-1 text-right text-sm font-medium" data-out th:text="${semana['Domingo']}">0
+                      </div>
                     </div>
                   </div>
 
-                  <div class="mt-3 text-sm opacity-70" >Total semanal: <b th:text="${totalSemana}">0</b></div>
+                  <div class="mt-3 text-sm opacity-70">Total semanal: <b th:text="${totalSemana}">0</b></div>
                 </div>
               </div>
 
@@ -182,7 +197,7 @@
                           <th>Usuario</th>
                         </tr>
                       </thead>
-                                            <tbody>
+                      <tbody>
                         <tr class="hover" th:each="m : ${misMovimientos}">
                           <td th:text="${m.fecha}">2025-10-10</td>
                           <td><span class="badge badge-ghost" th:text="${'#' + m.partidaId}">#0</span></td>
@@ -192,7 +207,9 @@
                           <td class="text-right" th:text="${m.credito > 0} ? ${m.credito} : ''">0.00</td>
                           <td><span class="badge" th:text="${m.estado}">-</span></td>
                         </tr>
-                        <tr th:if="${#lists.isEmpty(misMovimientos)}"><td colspan="7" class="text-center opacity-70">Sin movimientos</td></tr>
+                        <tr th:if="${#lists.isEmpty(misMovimientos)}">
+                          <td colspan="7" class="text-center opacity-70">Sin movimientos</td>
+                        </tr>
                       </tbody>
                     </table>
                   </div>
@@ -321,7 +338,8 @@
                 <div class="stat-desc">Sep 2025</div>
               </div>
               <div class="stat bg-base-200 rounded-xl">
-                <div class="stat-title">Ingreso diario</div>                <div class="stat-value text-success" th:text="${ingresoDiario}">0</div>
+                <div class="stat-title">Ingreso diario</div>
+                <div class="stat-value text-success" th:text="${ingresoDiario}">0</div>
                 <div class="stat-desc">Hoy</div>
               </div>
               <div class="stat bg-base-200 rounded-xl">
@@ -335,7 +353,7 @@
               </div>
             </div>
 
-            
+
             <div class="px-6 mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
 
               <!-- Partidas por día (semana actual) -->
@@ -349,55 +367,69 @@
                     <div class="grid grid-cols-12 gap-3 items-center">
                       <div class="col-span-2 text-sm">Lunes</div>
                       <div class="col-span-9">
-                        <progress class="progress progress-success w-full" value="0" max="100" th:attr="data-val=${semana['Lunes']}"></progress>
+                        <progress class="progress progress-success w-full" value="0" max="100"
+                          th:attr="data-val=${semana['Lunes']}"></progress>
                       </div>
-                      <div class="col-span-1 text-right text-sm font-medium" data-out th:text="${semana['Lunes']}">0</div>
+                      <div class="col-span-1 text-right text-sm font-medium" data-out th:text="${semana['Lunes']}">0
+                      </div>
                     </div>
                     <div class="grid grid-cols-12 gap-3 items-center">
                       <div class="col-span-2 text-sm">Martes</div>
                       <div class="col-span-9">
-                        <progress class="progress progress-success w-full" value="0" max="100" th:attr="data-val=${semana['Martes']}"></progress>
+                        <progress class="progress progress-success w-full" value="0" max="100"
+                          th:attr="data-val=${semana['Martes']}"></progress>
                       </div>
-                      <div class="col-span-1 text-right text-sm font-medium" data-out th:text="${semana['Martes']}">0</div>
+                      <div class="col-span-1 text-right text-sm font-medium" data-out th:text="${semana['Martes']}">0
+                      </div>
                     </div>
                     <div class="grid grid-cols-12 gap-3 items-center">
                       <div class="col-span-2 text-sm">Miércoles</div>
                       <div class="col-span-9">
-                        <progress class="progress progress-success w-full" value="0" max="100" th:attr="data-val=${semana['Miercoles']}"></progress>
+                        <progress class="progress progress-success w-full" value="0" max="100"
+                          th:attr="data-val=${semana['Miercoles']}"></progress>
                       </div>
-                      <div class="col-span-1 text-right text-sm font-medium" data-out th:text="${semana['Miércoles']}">0</div>
+                      <div class="col-span-1 text-right text-sm font-medium" data-out th:text="${semana['Miércoles']}">0
+                      </div>
                     </div>
                     <div class="grid grid-cols-12 gap-3 items-center">
                       <div class="col-span-2 text-sm">Jueves</div>
                       <div class="col-span-9">
-                        <progress class="progress progress-success w-full" value="0" max="100" th:attr="data-val=${semana['Jueves']}"></progress>
+                        <progress class="progress progress-success w-full" value="0" max="100"
+                          th:attr="data-val=${semana['Jueves']}"></progress>
                       </div>
-                      <div class="col-span-1 text-right text-sm font-medium" data-out th:text="${semana['Jueves']}">0</div>
+                      <div class="col-span-1 text-right text-sm font-medium" data-out th:text="${semana['Jueves']}">0
+                      </div>
                     </div>
                     <div class="grid grid-cols-12 gap-3 items-center">
                       <div class="col-span-2 text-sm">Viernes</div>
                       <div class="col-span-9">
-                        <progress class="progress progress-success w-full" value="0" max="100" th:attr="data-val=${semana['Viernes']}"></progress>
+                        <progress class="progress progress-success w-full" value="0" max="100"
+                          th:attr="data-val=${semana['Viernes']}"></progress>
                       </div>
-                      <div class="col-span-1 text-right text-sm font-medium" data-out th:text="${semana['Viernes']}">0</div>
+                      <div class="col-span-1 text-right text-sm font-medium" data-out th:text="${semana['Viernes']}">0
+                      </div>
                     </div>
                     <div class="grid grid-cols-12 gap-3 items-center">
                       <div class="col-span-2 text-sm">Sábado</div>
                       <div class="col-span-9">
-                        <progress class="progress progress-success w-full" value="0" max="100" th:attr="data-val=${semana['Sabado']}"></progress>
+                        <progress class="progress progress-success w-full" value="0" max="100"
+                          th:attr="data-val=${semana['Sabado']}"></progress>
                       </div>
-                      <div class="col-span-1 text-right text-sm font-medium" data-out th:text="${semana['Sábado']}">0</div>
+                      <div class="col-span-1 text-right text-sm font-medium" data-out th:text="${semana['Sábado']}">0
+                      </div>
                     </div>
                     <div class="grid grid-cols-12 gap-3 items-center">
                       <div class="col-span-2 text-sm">Domingo</div>
                       <div class="col-span-9">
-                        <progress class="progress progress-success w-full" value="0" max="100" th:attr="data-val=${semana['Domingo']}"></progress>
+                        <progress class="progress progress-success w-full" value="0" max="100"
+                          th:attr="data-val=${semana['Domingo']}"></progress>
                       </div>
-                      <div class="col-span-1 text-right text-sm font-medium" data-out th:text="${semana['Domingo']}">0</div>
+                      <div class="col-span-1 text-right text-sm font-medium" data-out th:text="${semana['Domingo']}">0
+                      </div>
                     </div>
                   </div>
 
-                  <div class="mt-3 text-sm opacity-70" >Total semanal: <b th:text="${totalSemana}">0</b></div>
+                  <div class="mt-3 text-sm opacity-70">Total semanal: <b th:text="${totalSemana}">0</b></div>
                 </div>
               </div>
               <!-- Cierre contable de hoy (AUDITOR SIN botón) -->
@@ -454,7 +486,7 @@
                           <th>Usuario</th>
                         </tr>
                       </thead>
-                   <tbody>
+                      <tbody>
                         <tr class="hover" th:each="mov : ${movimientosRecientes}">
                           <td th:text="${mov.fecha}">2025-10-10</td>
                           <td><span class="badge badge-ghost" th:text="${'#' + mov.partidaId}">#0</span></td>
@@ -574,21 +606,29 @@
             <div class="px-6 pt-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div class="stat bg-base-200 rounded-xl">
                 <div class="stat-title">Ingresos de hoy</div>
-                <div class="stat-value text-success" th:text="${ingresoDiario}"><div class="stat-value text-success">$3,125.40</div></div>
+                <div class="stat-value text-success" th:text="${ingresoDiario}">
+                  <div class="stat-value text-success">$3,125.40</div>
+                </div>
                 <div class="stat-desc">Actualizado hoy</div>
               </div>
               <div class="stat bg-base-200 rounded-xl">
-                <div class="stat-title">Partidas generadas hoy</div>                <div class="stat-value text-info" th:text="${partidasHoyUsuario}">0</div>
+                <div class="stat-title">Partidas generadas hoy</div>
+                <div class="stat-value text-info" th:text="${partidasHoyUsuario}">0</div>
                 <div class="stat-desc">Por <span th:text="${usuario.username}">usuario</span></div>
               </div>
               <div class="stat bg-base-200 rounded-xl">
                 <div class="stat-title">Balance del d�a</div>
-                <div class="stat-value text-primary" th:text="${balanceDia}"><div class="stat-value text-primary">$1,705.40</div></div>
+                <div class="stat-value text-primary" th:text="${balanceDia}">
+                  <div class="stat-value text-primary">$1,705.40</div>
+                </div>
                 <div class="stat-desc">Ingresos - Gastos</div>
               </div>
               <div class="stat bg-base-200 rounded-xl">
-                <div class="stat-title">Gastos de hoy</div>                <div class="stat-value text-error" th:text="${gastoDiario}"><div class="stat-title">Gastos de hoy</div>
-                <div class="stat-value text-error">$1,420.00</div></div>
+                <div class="stat-title">Gastos de hoy</div>
+                <div class="stat-value text-error" th:text="${gastoDiario}">
+                  <div class="stat-title">Gastos de hoy</div>
+                  <div class="stat-value text-error">$1,420.00</div>
+                </div>
                 <div class="stat-desc">Total egresos</div>
               </div>
             </div>
@@ -675,7 +715,8 @@
                 <div class="card-body">
                   <div class="flex items-center justify-between">
                     <h3 class="card-title">Mis movimientos recientes</h3>
-                    <div class="badge badge-info" th:text="'Ultimo registro: ' + ${ultimoRegistro}">Ultimo registro: -</div>
+                    <div class="badge badge-info" th:text="'Ultimo registro: ' + ${ultimoRegistro}">Ultimo registro: -
+                    </div>
                   </div>
 
                   <div class="overflow-x-auto">
@@ -691,7 +732,7 @@
                           <th>Estado</th>
                         </tr>
                       </thead>
-                                            <tbody>
+                      <tbody>
                         <tr class="hover" th:each="m : ${misMovimientos}">
                           <td th:text="${m.fecha}">2025-10-10</td>
                           <td><span class="badge badge-ghost" th:text="${'#' + m.partidaId}">#0</span></td>
@@ -701,7 +742,9 @@
                           <td class="text-right" th:text="${m.credito > 0} ? ${m.credito} : ''">0.00</td>
                           <td><span class="badge" th:text="${m.estado}">-</span></td>
                         </tr>
-                        <tr th:if="${#lists.isEmpty(misMovimientos)}"><td colspan="7" class="text-center opacity-70">No hay ningun movimiento reciente</td></tr>
+                        <tr th:if="${#lists.isEmpty(misMovimientos)}">
+                          <td colspan="7" class="text-center opacity-70">No hay ningun movimiento reciente</td>
+                        </tr>
                       </tbody>
                     </table>
                   </div>
@@ -800,19 +843,16 @@
     <div th:replace="~{layout :: sidebar('dashboard')}"></div>
   </div>
 
+
+  <script th:inline="javascript">
+    const userId = /*[[${userId}]]*/ null;
+
+    if (userId) {
+        sessionStorage.setItem("userId", userId);
+        console.log("User ID guardado:", userId);
+    }
+</script>
+
 </body>
 
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
