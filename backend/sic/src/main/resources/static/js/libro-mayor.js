@@ -146,7 +146,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!periodoId) {
         // Mostrar notificación de advertencia
-        mostrarToast('Por favor seleccione un período contable antes de filtrar', 'warning', 4000)
+        mostrarToast('Por favor seleccione un período contable antes de filtrar.', 'warning', 4000)
         return;
     }
 

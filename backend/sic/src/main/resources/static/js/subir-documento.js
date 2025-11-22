@@ -20,6 +20,18 @@ async function cargarTiposDocumento() {
   }
 }
 
+// Para cuando se redireccione desde crear partida
+const urlParams = new URLSearchParams(window.location.search);
+const partidaId = urlParams.get("partidaId");
+function mensajePartidaCreada() {
+   
+    if (partidaId) {
+       mostrarToast("Partida creada exitosamente. Id de partida-> " + partidaId, "success");
+    }
+}
+document.addEventListener("DOMContentLoaded", mensajePartidaCreada);
+
+
 // Llamar automáticamente al cargar la página
 document.addEventListener("DOMContentLoaded", cargarTiposDocumento);
 
@@ -62,6 +74,9 @@ async function cargarPartidas() {
       option.value = p.id;
       option.textContent = `${p.id} - Descripción: ${p.descripcion}`;
       select.appendChild(option);
+      if(p.id == partidaId){
+        select.value = p.id;
+      }
     });
   } catch (error) {
     console.error("Error cargando partidas con filtro:", error);
