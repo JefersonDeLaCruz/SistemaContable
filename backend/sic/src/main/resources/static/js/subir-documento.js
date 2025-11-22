@@ -373,6 +373,7 @@ async function renderizarTabla() {
       tr.innerHTML = `
                     <td>${fechaSubida}</td>
                     <td>${nombreTipo}</td>
+                    <td>${doc.archivo}</td>
                     <td>${idPartida}</td>
                     <td class="text-center">${nombreUsuario}</td>
                     <td class="text-center">
