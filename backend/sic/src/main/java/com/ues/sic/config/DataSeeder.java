@@ -3,21 +3,28 @@ package com.ues.sic.config;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ues.sic.cuentas.CuentaModel;
 import com.ues.sic.cuentas.CuentaRepository;
+import com.ues.sic.detalle_partida.DetallePartidaModel;
+import com.ues.sic.detalle_partida.DetallePartidaRepository;
 import com.ues.sic.periodos.PeriodoContableModel;
 import com.ues.sic.periodos.PeriodoContableRepository;
 import com.ues.sic.tipoDocumentos.TipoDocumentoModel;
 import com.ues.sic.tipoDocumentos.TipoDocumentoRepository;
 import com.ues.sic.usuarios.UsuariosModel;
 import com.ues.sic.usuarios.UsuariosRepository;
+
+import com.ues.sic.partidas.PartidasModel;
+import com.ues.sic.partidas.PartidasRepository;
 
 import java.io.InputStream;
 import java.time.LocalDateTime;
@@ -161,6 +168,139 @@ public class DataSeeder {
             }
         };
     }
+
+   @Bean
+   @Order(1)
+CommandLineRunner seedPartidas(PartidasRepository partidasRepo) {
+    return args -> {
+
+        // Si ya hay registros, no hacemos seed
+        if (partidasRepo.count() > 0) {
+            System.out.println("\n Las partidas ya existen - omitiendo seed");
+            return;
+        }
+
+        System.out.println("\n========================================");
+        System.out.println("      INICIANDO SEED DE PARTIDAS");
+        System.out.println("========================================\n");
+
+        try {
+            // Leer el archivo JSON desde resources/data/partidas.json
+            ClassPathResource resource = new ClassPathResource("data/partidas.json");
+            InputStream inputStream = resource.getInputStream();
+
+            ObjectMapper mapper = new ObjectMapper();
+
+            // Leemos el JSON como una lista de Maps (id, descripcion, fecha, idPeriodo, idUsuario)
+            List<Map<String, Object>> partidasJson = mapper.readValue(
+                    inputStream,
+                    new TypeReference<List<Map<String, Object>>>() {}
+            );
+
+            int contador = 0;
+
+            for (Map<String, Object> pJson : partidasJson) {
+
+                PartidasModel p = new PartidasModel();
+
+                // OJO: no usamos el id del JSON para dejar que JPA lo genere
+                p.setDescripcion((String) pJson.get("descripcion"));
+                p.setFecha((String) pJson.get("fecha"));
+
+                // idPeriodo e idUsuario vienen como "1" en el JSON, los convertimos a String igual
+                p.setIdPeriodo(String.valueOf(pJson.get("idPeriodo")));
+                p.setIdUsuario(String.valueOf(pJson.get("idUsuario")));
+
+                partidasRepo.save(p);
+                contador++;
+            }
+
+            System.out.println(" Total de partidas insertadas: " + contador);
+            System.out.println("\n========================================");
+            System.out.println("      SEED DE PARTIDAS COMPLETADO");
+            System.out.println("========================================\n");
+
+        } catch (Exception e) {
+            System.err.println("ERROR al cargar las partidas: " + e.getMessage());
+            e.printStackTrace();
+        }
+    };
+}
+
+
+
+@Bean
+@Order(2)
+CommandLineRunner seedDetallePartidas(
+        DetallePartidaRepository detalleRepo,
+        PartidasRepository partidasRepo
+) {
+    return args -> {
+
+        // Si ya existen registros, no sembramos nada
+        if (detalleRepo.count() > 0) {
+            System.out.println("\n Los detalles de partidas ya existen - omitiendo seed");
+            return;
+        }
+
+        System.out.println("\n========================================");
+        System.out.println("    INICIANDO SEED DE DETALLE PARTIDA");
+        System.out.println("========================================\n");
+
+        try {
+            // Leer JSON desde resources/data/detallePartidas.json
+            ClassPathResource resource = new ClassPathResource("data/detallesPartidas.json");
+            InputStream inputStream = resource.getInputStream();
+
+            ObjectMapper mapper = new ObjectMapper();
+
+            List<Map<String, Object>> detallesJson = mapper.readValue(
+                    inputStream,
+                    new TypeReference<List<Map<String, Object>>>() {}
+            );
+
+            int contador = 0;
+
+            for (Map<String, Object> dJson : detallesJson) {
+
+                // Buscar Partida real según el "partidaId" del JSON
+                Long partidaId = Long.valueOf(dJson.get("partidaId").toString());
+
+                PartidasModel partida = partidasRepo.findById(partidaId)
+                        .orElse(null);
+
+                if (partida == null) {
+                    System.err.println(" ⚠️ No se encontró la partida con id: " + partidaId);
+                    continue;
+                }
+
+                // Crear el modelo
+                DetallePartidaModel detalle = new DetallePartidaModel();
+
+                detalle.setPartida(partida);
+                detalle.setIdCuenta((String) dJson.get("idCuenta"));
+                detalle.setDescripcion((String) dJson.get("descripcion"));
+
+                // Convertir Double correctamente
+                detalle.setDebito( Double.valueOf(dJson.get("debito").toString()) );
+                detalle.setCredito( Double.valueOf(dJson.get("credito").toString()) );
+
+                detalleRepo.save(detalle);
+                contador++;
+            }
+
+            System.out.println(" Total de detalles insertados: " + contador);
+            System.out.println("\n========================================");
+            System.out.println(" SEED DETALLE PARTIDA COMPLETADO");
+            System.out.println("========================================\n");
+
+        } catch (Exception e) {
+            System.err.println("ERROR al cargar los detalles: " + e.getMessage());
+            e.printStackTrace();
+        }
+    };
+}
+
 
     @Bean
     CommandLineRunner seedTipoDocumentos(TipoDocumentoRepository tipoRepo) {
