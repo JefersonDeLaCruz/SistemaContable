@@ -141,12 +141,13 @@ public class ClasificadorCuentasEFE {
             return true;
         }
 
-        // Verificar por nombre
+        // Verificar por nombre - incluye explícitamente RETIROS
         if (nombre.contains("PRESTAMO") || 
             nombre.contains("PRÉSTAMO") ||
             nombre.contains("FINANCIAMIENTO") ||
             nombre.contains("CAPITAL SOCIAL") ||
             nombre.contains("APORTE") ||
+            nombre.contains("RETIRO") ||  // AGREGADO: captura retiros del propietario
             nombre.contains("DIVIDENDO")) {
             return true;
         }
