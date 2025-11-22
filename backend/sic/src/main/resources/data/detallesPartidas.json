@@ -10,7 +10,7 @@
     {
         "id": 2,
         "partidaId": 1,
-        "idCuenta": "28",
+        "idCuenta": "30",
         "descripcion": "Smith invierte $35,000. El negocio recibe $35,000 en efectivo y con ello le proporciona capital a Smith.",
         "debito": 0.0,
         "credito": 35000.0
@@ -19,7 +19,7 @@
     {
         "id": 3,
         "partidaId": 2,
-        "idCuenta": "43",
+        "idCuenta": "45",
         "descripcion": "Compra a crédito $350 de suministros de oficina.",
         "debito": 350.0,
         "credito": 0.0
@@ -61,7 +61,7 @@
     {
         "id": 8,
         "partidaId": 4,
-        "idCuenta": "33",
+        "idCuenta": "38",
         "descripcion": "Localiza apartamentos para unos clientes y recibe $1,900 en efectivo.",
         "debito": 0.0,
         "credito": 1900.0
@@ -95,7 +95,7 @@
     {
         "id": 12,
         "partidaId": 6,
-        "idCuenta": "40",
+        "idCuenta": "42",
         "descripcion": "Paga gastos en efectivo por la renta de la oficina, $400, y por servicios generales, $100.",
         "debito": 400.0,
         "credito": 0.0
@@ -103,7 +103,7 @@
     {
         "id": 13,
         "partidaId": 6,
-        "idCuenta": "42",
+        "idCuenta": "44",
         "descripcion": "Paga gastos en efectivo por la renta de la oficina, $400, y por servicios generales, $100.",
         "debito": 100.0,
         "credito": 0.0
@@ -112,7 +112,7 @@
     {
         "id": 14,
         "partidaId": 7,
-        "idCuenta": "43",
+        "idCuenta": "45",
         "descripcion": "Devuelve suministros de oficina por $150 de la transacción 2.",
         "debito": 0.0,
         "credito": 150.0
@@ -137,7 +137,7 @@
     {
         "id": 17,
         "partidaId": 8,
-        "idCuenta": "32",
+        "idCuenta": "34",
         "descripcion": "El propietario retira $1,200.",
         "debito": 1200.0,
         "credito": 0.0
