@@ -40,34 +40,34 @@
 
   
 
-  { "codigo": "4",        "nombre": "INGRESOS",                            "tipo": "INGRESO",  "saldoNormal": "ACREEDOR" },
-  { "codigo": "4.1",      "nombre": "VENTAS",                              "tipo": "INGRESO",  "saldoNormal": "ACREEDOR", "idPadre": "4" },
-  { "codigo": "4.2",      "nombre": "DESCUENTOS SOBRE VENTAS",             "tipo": "INGRESO",  "saldoNormal": "DEUDOR",   "idPadre": "4" },
-  { "codigo": "4.3",      "nombre": "OTROS INGRESOS",                      "tipo": "INGRESO",  "saldoNormal": "ACREEDOR", "idPadre": "4" },
+  { "codigo": "4",        "nombre": "INGRESOS",                            "tipo": "INGRESOS",  "saldoNormal": "ACREEDOR" },
+  { "codigo": "4.1",      "nombre": "VENTAS",                              "tipo": "INGRESOS",  "saldoNormal": "ACREEDOR", "idPadre": "4" },
+  { "codigo": "4.2",      "nombre": "DESCUENTOS SOBRE VENTAS",             "tipo": "INGRESOS",  "saldoNormal": "DEUDOR",   "idPadre": "4" },
+  { "codigo": "4.3",      "nombre": "OTROS INGRESOS",                      "tipo": "INGRESOS",  "saldoNormal": "ACREEDOR", "idPadre": "4" },
 
-  
 
-  { "codigo": "5",        "nombre": "COSTO DE VENTAS",                     "tipo": "GASTO",    "saldoNormal": "DEUDOR" },
-  { "codigo": "5.1",      "nombre": "COSTO DE MERCADERÍAS VENDIDAS",       "tipo": "GASTO",    "saldoNormal": "DEUDOR", "idPadre": "5" },
 
-  
+  { "codigo": "5",        "nombre": "COSTO DE VENTAS",                     "tipo": "GASTOS",    "saldoNormal": "DEUDOR" },
+  { "codigo": "5.1",      "nombre": "COSTO DE MERCADERÍAS VENDIDAS",       "tipo": "GASTOS",    "saldoNormal": "DEUDOR", "idPadre": "5" },
 
-  { "codigo": "6",        "nombre": "GASTOS DE OPERACIÓN",                 "tipo": "GASTO",    "saldoNormal": "DEUDOR" },
 
-  { "codigo": "6.1",      "nombre": "GASTOS DE ADMINISTRACIÓN",            "tipo": "GASTO",    "saldoNormal": "DEUDOR", "idPadre": "6" },
-  { "codigo": "6.1.01",   "nombre": "SUELDOS Y SALARIOS",                  "tipo": "GASTO",    "saldoNormal": "DEUDOR", "idPadre": "6.1" },
-  { "codigo": "6.1.02",   "nombre": "SERVICIOS BÁSICOS",                   "tipo": "GASTO",    "saldoNormal": "DEUDOR", "idPadre": "6.1" },
-  { "codigo": "6.1.03",   "nombre": "PAPELERÍA Y ÚTILES",                  "tipo": "GASTO",    "saldoNormal": "DEUDOR", "idPadre": "6.1" },
 
-  { "codigo": "6.2",      "nombre": "GASTOS DE VENTAS",                    "tipo": "GASTO",    "saldoNormal": "DEUDOR", "idPadre": "6" },
-  { "codigo": "6.2.01",   "nombre": "PUBLICIDAD Y PROPAGANDA",             "tipo": "GASTO",    "saldoNormal": "DEUDOR", "idPadre": "6.2" },
+  { "codigo": "6",        "nombre": "GASTOS DE OPERACIÓN",                 "tipo": "GASTOS",    "saldoNormal": "DEUDOR" },
 
-  
+  { "codigo": "6.1",      "nombre": "GASTOS DE ADMINISTRACIÓN",            "tipo": "GASTOS",    "saldoNormal": "DEUDOR", "idPadre": "6" },
+  { "codigo": "6.1.01",   "nombre": "SUELDOS Y SALARIOS",                  "tipo": "GASTOS",    "saldoNormal": "DEUDOR", "idPadre": "6.1" },
+  { "codigo": "6.1.02",   "nombre": "SERVICIOS BÁSICOS",                   "tipo": "GASTOS",    "saldoNormal": "DEUDOR", "idPadre": "6.1" },
+  { "codigo": "6.1.03",   "nombre": "PAPELERÍA Y ÚTILES",                  "tipo": "GASTOS",    "saldoNormal": "DEUDOR", "idPadre": "6.1" },
 
-  { "codigo": "7",        "nombre": "GASTOS NO OPERATIVOS",                "tipo": "GASTO",    "saldoNormal": "DEUDOR" },
-  { "codigo": "7.1",      "nombre": "GASTOS FINANCIEROS",                  "tipo": "GASTO",    "saldoNormal": "DEUDOR", "idPadre": "7" },
+  { "codigo": "6.2",      "nombre": "GASTOS DE VENTAS",                    "tipo": "GASTOS",    "saldoNormal": "DEUDOR", "idPadre": "6" },
+  { "codigo": "6.2.01",   "nombre": "PUBLICIDAD Y PROPAGANDA",             "tipo": "GASTOS",    "saldoNormal": "DEUDOR", "idPadre": "6.2" },
 
-  
 
-  { "codigo": "6.3",      "nombre": "DEPRECIACIÓN DEL PERIODO",           "tipo": "GASTO",    "saldoNormal": "DEUDOR", "idPadre": "6" }
+
+  { "codigo": "7",        "nombre": "GASTOS NO OPERATIVOS",                "tipo": "GASTOS",    "saldoNormal": "DEUDOR" },
+  { "codigo": "7.1",      "nombre": "GASTOS FINANCIEROS",                  "tipo": "GASTOS",    "saldoNormal": "DEUDOR", "idPadre": "7" },
+
+
+
+  { "codigo": "6.3",      "nombre": "DEPRECIACIÓN DEL PERIODO",           "tipo": "GASTOS",    "saldoNormal": "DEUDOR", "idPadre": "6" }
 ]

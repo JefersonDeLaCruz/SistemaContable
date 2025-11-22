@@ -128,63 +128,193 @@ function renderBalance(data) {
   `;
 }function renderEstadoResultados(data) {
   const cont = document.getElementById('balanceContainer');
+
   const header = `
-    <div class="alert">
-      <span>Periodo: <b>${data.periodo.inicio}</b> a <b>${data.periodo.fin}</b></span>
+    <div class="alert alert-info">
+      <span>Estado de Resultados - Periodo: <b>${data.periodo.inicio}</b> a <b>${data.periodo.fin}</b></span>
     </div>
   `;
 
-  const renderERSeccion = (titulo, dataSec) => {
-    const filas = (dataSec.cuentas || []).map(c => `
-      <tr class="border-t border-base-200">
-        <td class="px-4 py-2 text-sm tabular-nums">${c.codigo}</td>
-        <td class="px-4 py-2">${c.nombre}</td>
-        <td class="px-4 py-2 text-right font-mono">${fmtMoneda(c.monto)}</td>
+  const renderCuentas = (cuentas) => {
+    if (!cuentas || cuentas.length === 0) return '<tr><td colspan="3" class="px-2 py-1 text-sm opacity-50">Sin movimientos</td></tr>';
+    return cuentas.map(c => `
+      <tr>
+        <td class="px-2 py-1 text-sm tabular-nums">${c.codigo}</td>
+        <td class="px-2 py-1 text-sm">${c.nombre}</td>
+        <td class="px-2 py-1 text-right font-mono text-sm">${fmtMoneda(c.monto)}</td>
       </tr>
     `).join('');
+  };
 
-    return `
-      <div class="card bg-base-100 shadow">
-        <div class="card-body">
-          <h3 class="card-title">${titulo}</h3>
-          <div class="overflow-x-auto">
-            <table class="table w-full">
-              <thead>
-                <tr>
-                  <th class="w-28">Código</th>
-                  <th>Cuenta</th>
-                  <th class="w-40 text-right">Monto</th>
+  const estadoHTML = `
+    ${header}
+    <div class="card bg-base-100 shadow-lg">
+      <div class="card-body p-6">
+        <h2 class="card-title text-2xl mb-4">ESTADO DE RESULTADOS</h2>
+
+        <!-- INGRESOS -->
+        <div class="mb-4">
+          <h3 class="font-bold text-lg mb-2 bg-primary text-primary-content px-3 py-2 rounded">INGRESOS</h3>
+          <table class="table w-full table-sm">
+            <tbody>
+              ${renderCuentas(data.ventas.cuentas)}
+              ${data.ventas.total > 0 ? `
+                <tr class="font-semibold border-t">
+                  <td colspan="2" class="px-2 py-2 text-right">Total Ventas:</td>
+                  <td class="px-2 py-2 text-right font-mono">${fmtMoneda(data.ventas.total)}</td>
                 </tr>
-              </thead>
-              <tbody>
-                ${filas || '<tr><td colspan="3" class="px-4 py-2 opacity-70">Sin datos</td></tr>'}
-              </tbody>
-              <tfoot>
-                <tr class="font-bold border-t-2 border-primary">
-                  <td colspan="2" class="text-right">TOTAL ${titulo.toUpperCase()}:</td>
-                  <td class="text-right font-mono text-primary">${fmtMoneda(dataSec.total)}</td>
+              ` : ''}
+              ${data.descuentos.cuentas && data.descuentos.cuentas.length > 0 ? `
+                ${renderCuentas(data.descuentos.cuentas)}
+                <tr class="font-semibold text-error">
+                  <td colspan="2" class="px-2 py-2 text-right">(-) Descuentos sobre Ventas:</td>
+                  <td class="px-2 py-2 text-right font-mono">(${fmtMoneda(data.descuentos.total)})</td>
                 </tr>
-              </tfoot>
-            </table>
+              ` : ''}
+              ${data.otrosIngresos.cuentas && data.otrosIngresos.cuentas.length > 0 ? `
+                ${renderCuentas(data.otrosIngresos.cuentas)}
+                <tr class="font-semibold">
+                  <td colspan="2" class="px-2 py-2 text-right">Otros Ingresos:</td>
+                  <td class="px-2 py-2 text-right font-mono">${fmtMoneda(data.otrosIngresos.total)}</td>
+                </tr>
+              ` : ''}
+              <tr class="font-bold bg-success text-success-content border-t-2">
+                <td colspan="2" class="px-3 py-2 text-right text-base">INGRESOS NETOS:</td>
+                <td class="px-3 py-2 text-right font-mono text-base">${fmtMoneda(data.ingresosNetos)}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- COSTO DE VENTAS -->
+        ${data.costoVentas.total > 0 ? `
+        <div class="mb-4">
+          <h3 class="font-bold text-lg mb-2 bg-error text-error-content px-3 py-2 rounded">COSTO DE VENTAS</h3>
+          <table class="table w-full table-sm">
+            <tbody>
+              ${renderCuentas(data.costoVentas.cuentas)}
+              <tr class="font-bold bg-error text-error-content border-t-2">
+                <td colspan="2" class="px-3 py-2 text-right text-base">TOTAL COSTO DE VENTAS:</td>
+                <td class="px-3 py-2 text-right font-mono text-base">(${fmtMoneda(data.costoVentas.total)})</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- UTILIDAD BRUTA -->
+        <div class="mb-4">
+          <div class="alert ${data.utilidadBruta >= 0 ? 'alert-success' : 'alert-error'}">
+            <div class="flex justify-between w-full">
+              <span class="font-bold text-lg">UTILIDAD BRUTA</span>
+              <span class="font-bold text-xl font-mono">${fmtMoneda(data.utilidadBruta)}</span>
+            </div>
+          </div>
+        </div>
+        ` : ''}
+
+        <!-- GASTOS DE OPERACIÓN -->
+        ${(data.gastosAdministracion.total + data.gastosVentas.total + data.depreciacion.total) > 0 ? `
+        <div class="mb-4">
+          <h3 class="font-bold text-lg mb-2 bg-warning text-warning-content px-3 py-2 rounded">GASTOS DE OPERACIÓN</h3>
+          <table class="table w-full table-sm">
+            <tbody>
+              ${data.gastosAdministracion.cuentas && data.gastosAdministracion.cuentas.length > 0 ? `
+                <tr class="bg-base-200"><td colspan="3" class="px-2 py-1 font-semibold text-sm">Gastos de Administración</td></tr>
+                ${renderCuentas(data.gastosAdministracion.cuentas)}
+                <tr class="font-semibold">
+                  <td colspan="2" class="px-2 py-2 text-right">Subtotal Administración:</td>
+                  <td class="px-2 py-2 text-right font-mono">${fmtMoneda(data.gastosAdministracion.total)}</td>
+                </tr>
+              ` : ''}
+              ${data.gastosVentas.cuentas && data.gastosVentas.cuentas.length > 0 ? `
+                <tr class="bg-base-200"><td colspan="3" class="px-2 py-1 font-semibold text-sm">Gastos de Ventas</td></tr>
+                ${renderCuentas(data.gastosVentas.cuentas)}
+                <tr class="font-semibold">
+                  <td colspan="2" class="px-2 py-2 text-right">Subtotal Ventas:</td>
+                  <td class="px-2 py-2 text-right font-mono">${fmtMoneda(data.gastosVentas.total)}</td>
+                </tr>
+              ` : ''}
+              ${data.depreciacion.cuentas && data.depreciacion.cuentas.length > 0 ? `
+                <tr class="bg-base-200"><td colspan="3" class="px-2 py-1 font-semibold text-sm">Depreciación</td></tr>
+                ${renderCuentas(data.depreciacion.cuentas)}
+                <tr class="font-semibold">
+                  <td colspan="2" class="px-2 py-2 text-right">Subtotal Depreciación:</td>
+                  <td class="px-2 py-2 text-right font-mono">${fmtMoneda(data.depreciacion.total)}</td>
+                </tr>
+              ` : ''}
+              <tr class="font-bold bg-warning text-warning-content border-t-2">
+                <td colspan="2" class="px-3 py-2 text-right text-base">TOTAL GASTOS OPERATIVOS:</td>
+                <td class="px-3 py-2 text-right font-mono text-base">(${fmtMoneda(data.totalGastosOperativos)})</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- UTILIDAD DE OPERACIÓN -->
+        <div class="mb-4">
+          <div class="alert ${data.utilidadOperacion >= 0 ? 'alert-info' : 'alert-error'}">
+            <div class="flex justify-between w-full">
+              <span class="font-bold text-lg">UTILIDAD DE OPERACIÓN</span>
+              <span class="font-bold text-xl font-mono">${fmtMoneda(data.utilidadOperacion)}</span>
+            </div>
+          </div>
+        </div>
+        ` : ''}
+
+        <!-- GASTOS NO OPERATIVOS -->
+        ${data.gastosFinancieros.total > 0 ? `
+        <div class="mb-4">
+          <h3 class="font-bold text-lg mb-2 bg-secondary text-secondary-content px-3 py-2 rounded">GASTOS NO OPERATIVOS</h3>
+          <table class="table w-full table-sm">
+            <tbody>
+              ${renderCuentas(data.gastosFinancieros.cuentas)}
+              <tr class="font-bold bg-secondary text-secondary-content border-t-2">
+                <td colspan="2" class="px-3 py-2 text-right text-base">TOTAL GASTOS FINANCIEROS:</td>
+                <td class="px-3 py-2 text-right font-mono text-base">(${fmtMoneda(data.gastosFinancieros.total)})</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        ` : ''}
+
+        <!-- RESULTADO NETO -->
+        <div class="divider"></div>
+        <div class="alert ${data.utilidadNeta >= 0 ? 'alert-success' : 'alert-error'} shadow-lg">
+          <div class="flex justify-between w-full items-center">
+            <div>
+              <h3 class="font-bold text-2xl">${data.resultado === 'Utilidad' ? 'UTILIDAD NETA' : 'PÉRDIDA NETA'}</h3>
+              <p class="text-sm opacity-80">Resultado del período</p>
+            </div>
+            <div class="text-right">
+              <div class="font-bold text-3xl font-mono">${fmtMoneda(Math.abs(data.utilidadNeta))}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Resumen de Métricas -->
+        <div class="divider mt-6">Métricas Clave</div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+          <div class="stat bg-base-200 rounded-lg">
+            <div class="stat-title">Margen Bruto</div>
+            <div class="stat-value text-sm">${data.ingresosNetos > 0 ? ((data.utilidadBruta / data.ingresosNetos) * 100).toFixed(2) : '0.00'}%</div>
+            <div class="stat-desc">${fmtMoneda(data.utilidadBruta)} / ${fmtMoneda(data.ingresosNetos)}</div>
+          </div>
+          <div class="stat bg-base-200 rounded-lg">
+            <div class="stat-title">Margen Operativo</div>
+            <div class="stat-value text-sm">${data.ingresosNetos > 0 ? ((data.utilidadOperacion / data.ingresosNetos) * 100).toFixed(2) : '0.00'}%</div>
+            <div class="stat-desc">${fmtMoneda(data.utilidadOperacion)} / ${fmtMoneda(data.ingresosNetos)}</div>
+          </div>
+          <div class="stat bg-base-200 rounded-lg">
+            <div class="stat-title">Margen Neto</div>
+            <div class="stat-value text-sm">${data.ingresosNetos > 0 ? ((data.utilidadNeta / data.ingresosNetos) * 100).toFixed(2) : '0.00'}%</div>
+            <div class="stat-desc">${fmtMoneda(data.utilidadNeta)} / ${fmtMoneda(data.ingresosNetos)}</div>
           </div>
         </div>
       </div>
-    `;
-  };
-
-  cont.innerHTML = `
-    ${header}
-    <div class="space-y-6">
-      ${renderERSeccion('Ingresos', data.ingresos)}
-      ${renderERSeccion('Gastos', data.gastos)}
-      <div class="card bg-base-100 shadow">
-        <div class="card-body">
-          <div class="text-xl">Resultado del período: <b>${data.resultado}</b></div>
-          <div class="text-3xl font-bold">${fmtMoneda(data.utilidadNeta)}</div>
-        </div>
-      </div>
     </div>
   `;
+
+  cont.innerHTML = estadoHTML;
 }
 window.addEventListener('DOMContentLoaded', () => {
   cargarPeriodosBalance();

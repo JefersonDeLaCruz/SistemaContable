@@ -160,10 +160,24 @@ public class BalanceController {
 
         List<Object[]> filas = detalleRepo.estadoResultadosEntre(sFi, sFf);
 
-        List<Map<String, Object>> ingresos = new ArrayList<>();
-        List<Map<String, Object>> gastos = new ArrayList<>();
-        double totalIngresos = 0.0;
-        double totalGastos = 0.0;
+        // Clasificar cuentas por sección
+        List<Map<String, Object>> ventas = new ArrayList<>();
+        List<Map<String, Object>> descuentos = new ArrayList<>();
+        List<Map<String, Object>> otrosIngresos = new ArrayList<>();
+        List<Map<String, Object>> costoVentas = new ArrayList<>();
+        List<Map<String, Object>> gastosAdmin = new ArrayList<>();
+        List<Map<String, Object>> gastosVentas = new ArrayList<>();
+        List<Map<String, Object>> depreciacion = new ArrayList<>();
+        List<Map<String, Object>> gastosFinancieros = new ArrayList<>();
+
+        double totalVentas = 0.0;
+        double totalDescuentos = 0.0;
+        double totalOtrosIngresos = 0.0;
+        double totalCostoVentas = 0.0;
+        double totalGastosAdmin = 0.0;
+        double totalGastosVentas = 0.0;
+        double totalDepreciacion = 0.0;
+        double totalGastosFinancieros = 0.0;
 
         for (Object[] r : filas) {
             String tipo = (String) r[0];
@@ -174,39 +188,125 @@ public class BalanceController {
             double totalCredito = r[6] != null ? ((Number) r[6]).doubleValue() : 0.0;
 
             double monto;
+
+            // INGRESOS (código 4.x)
             if ("INGRESOS".equalsIgnoreCase(tipo) || codigo.startsWith("4")) {
-                monto = totalCredito - totalDebito;
-                if (Math.abs(monto) < 0.005) continue;
-                Map<String, Object> item = new LinkedHashMap<>();
-                item.put("codigo", codigo);
-                item.put("nombre", nombre);
-                item.put("monto", round2(Math.abs(monto)));
-                ingresos.add(item);
-                totalIngresos += monto;
-            } else if ("GASTOS".equalsIgnoreCase(tipo) || codigo.startsWith("5")) {
+                if (codigo.equals("4.1")) {
+                    // Ventas
+                    monto = totalCredito - totalDebito;
+                    if (Math.abs(monto) >= 0.005) {
+                        Map<String, Object> item = new LinkedHashMap<>();
+                        item.put("codigo", codigo);
+                        item.put("nombre", nombre);
+                        item.put("monto", round2(Math.abs(monto)));
+                        ventas.add(item);
+                        totalVentas += monto;
+                    }
+                } else if (codigo.equals("4.2")) {
+                    // Descuentos sobre ventas (saldo deudor, resta de ingresos)
+                    monto = totalDebito - totalCredito;
+                    if (Math.abs(monto) >= 0.005) {
+                        Map<String, Object> item = new LinkedHashMap<>();
+                        item.put("codigo", codigo);
+                        item.put("nombre", nombre);
+                        item.put("monto", round2(Math.abs(monto)));
+                        descuentos.add(item);
+                        totalDescuentos += monto;
+                    }
+                } else if (codigo.equals("4.3")) {
+                    // Otros ingresos
+                    monto = totalCredito - totalDebito;
+                    if (Math.abs(monto) >= 0.005) {
+                        Map<String, Object> item = new LinkedHashMap<>();
+                        item.put("codigo", codigo);
+                        item.put("nombre", nombre);
+                        item.put("monto", round2(Math.abs(monto)));
+                        otrosIngresos.add(item);
+                        totalOtrosIngresos += monto;
+                    }
+                }
+            }
+            // COSTO DE VENTAS (código 5.x)
+            else if (codigo.startsWith("5")) {
                 monto = totalDebito - totalCredito;
-                if (Math.abs(monto) < 0.005) continue;
-                Map<String, Object> item = new LinkedHashMap<>();
-                item.put("codigo", codigo);
-                item.put("nombre", nombre);
-                item.put("monto", round2(Math.abs(monto)));
-                gastos.add(item);
-                totalGastos += monto;
+                if (Math.abs(monto) >= 0.005) {
+                    Map<String, Object> item = new LinkedHashMap<>();
+                    item.put("codigo", codigo);
+                    item.put("nombre", nombre);
+                    item.put("monto", round2(Math.abs(monto)));
+                    costoVentas.add(item);
+                    totalCostoVentas += monto;
+                }
+            }
+            // GASTOS DE OPERACIÓN (código 6.x)
+            else if (codigo.startsWith("6")) {
+                monto = totalDebito - totalCredito;
+                if (Math.abs(monto) >= 0.005) {
+                    Map<String, Object> item = new LinkedHashMap<>();
+                    item.put("codigo", codigo);
+                    item.put("nombre", nombre);
+                    item.put("monto", round2(Math.abs(monto)));
+
+                    if (codigo.startsWith("6.1")) {
+                        gastosAdmin.add(item);
+                        totalGastosAdmin += monto;
+                    } else if (codigo.startsWith("6.2")) {
+                        gastosVentas.add(item);
+                        totalGastosVentas += monto;
+                    } else if (codigo.startsWith("6.3")) {
+                        depreciacion.add(item);
+                        totalDepreciacion += monto;
+                    }
+                }
+            }
+            // GASTOS NO OPERATIVOS (código 7.x)
+            else if (codigo.startsWith("7")) {
+                monto = totalDebito - totalCredito;
+                if (Math.abs(monto) >= 0.005) {
+                    Map<String, Object> item = new LinkedHashMap<>();
+                    item.put("codigo", codigo);
+                    item.put("nombre", nombre);
+                    item.put("monto", round2(Math.abs(monto)));
+                    gastosFinancieros.add(item);
+                    totalGastosFinancieros += monto;
+                }
             }
         }
 
-        Double ingresoCalc = detalleRepo.ingresoEntre(sFi, sFf);
-        Double gastoCalc = detalleRepo.gastoEntre(sFi, sFf);
-        double totalIng = ingresoCalc != null ? ingresoCalc : totalIngresos;
-        double totalGas = gastoCalc != null ? gastoCalc : totalGastos;
-        double utilidad = totalIng - totalGas;
+        // Cálculos de las utilidades
+        double ingresosNetos = totalVentas - totalDescuentos + totalOtrosIngresos;
+        double utilidadBruta = ingresosNetos - totalCostoVentas;
+        double totalGastosOperativos = totalGastosAdmin + totalGastosVentas + totalDepreciacion;
+        double utilidadOperacion = utilidadBruta - totalGastosOperativos;
+        double utilidadNeta = utilidadOperacion - totalGastosFinancieros;
 
         Map<String, Object> resp = new LinkedHashMap<>();
         resp.put("periodo", Map.of("inicio", sFi, "fin", sFf));
-        resp.put("ingresos", Map.of("cuentas", ingresos, "total", round2(totalIng)));
-        resp.put("gastos", Map.of("cuentas", gastos, "total", round2(totalGas)));
-        resp.put("utilidadNeta", round2(utilidad));
-        resp.put("resultado", utilidad >= 0 ? "Utilidad" : "PÃ©rdida");
+
+        // Sección de Ingresos
+        resp.put("ventas", Map.of("cuentas", ventas, "total", round2(totalVentas)));
+        resp.put("descuentos", Map.of("cuentas", descuentos, "total", round2(totalDescuentos)));
+        resp.put("otrosIngresos", Map.of("cuentas", otrosIngresos, "total", round2(totalOtrosIngresos)));
+        resp.put("ingresosNetos", round2(ingresosNetos));
+
+        // Costo de Ventas
+        resp.put("costoVentas", Map.of("cuentas", costoVentas, "total", round2(totalCostoVentas)));
+        resp.put("utilidadBruta", round2(utilidadBruta));
+
+        // Gastos de Operación
+        resp.put("gastosAdministracion", Map.of("cuentas", gastosAdmin, "total", round2(totalGastosAdmin)));
+        resp.put("gastosVentas", Map.of("cuentas", gastosVentas, "total", round2(totalGastosVentas)));
+        resp.put("depreciacion", Map.of("cuentas", depreciacion, "total", round2(totalDepreciacion)));
+        resp.put("totalGastosOperativos", round2(totalGastosOperativos));
+        resp.put("utilidadOperacion", round2(utilidadOperacion));
+
+        // Gastos No Operativos
+        resp.put("gastosFinancieros", Map.of("cuentas", gastosFinancieros, "total", round2(totalGastosFinancieros)));
+
+        // Resultado Final
+        resp.put("utilidadNeta", round2(utilidadNeta));
+        resp.put("resultado", utilidadNeta >= 0 ? "Utilidad" : "Pérdida");
+
         return resp;
     }
 
