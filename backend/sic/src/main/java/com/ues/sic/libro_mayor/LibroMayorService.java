@@ -50,7 +50,7 @@ public class LibroMayorService {
                     .comparing(AsientoMayorRow::getFecha)
                     .thenComparing(AsientoMayorRow::getIdPartida));
 
-             String nombreCuenta = movimientos.get(0).getNombreCuenta(); // <- nuevo
+            String nombreCuenta = movimientos.get(0).getNombreCuenta(); // <- nuevo
 
             BigDecimal saldo = BigDecimal.ZERO;
             BigDecimal totalDeb = BigDecimal.ZERO;
@@ -68,13 +68,13 @@ public class LibroMayorService {
 
                 BigDecimal saldoTotal;
 
-if (totalDeb.compareTo(totalCred) > 0) {
-    // Deudor
-    saldoTotal = totalDeb.subtract(totalCred);
-} else {
-    // Acreedor
-    saldoTotal = totalCred.subtract(totalDeb);
-}
+                if (totalDeb.compareTo(totalCred) > 0) {
+                    // Deudor
+                    saldoTotal = totalDeb.subtract(totalCred);
+                } else {
+                    // Acreedor
+                    saldoTotal = totalCred.subtract(totalDeb);
+                }
 
                 asientos.add(new AsientoMayorDTO(
                         r.getIdPartida(),
@@ -82,29 +82,26 @@ if (totalDeb.compareTo(totalCred) > 0) {
                         r.getDescripcionPartida(),
                         deb,
                         cred,
-                        saldoTotal
-                ));
+                        saldoTotal));
             }
 
-           BigDecimal saldoTotal;
+            BigDecimal saldoTotal;
 
-if (totalDeb.compareTo(totalCred) > 0) {
-    // Deudor
-    saldoTotal = totalDeb.subtract(totalCred);
-} else {
-    // Acreedor
-    saldoTotal = totalCred.subtract(totalDeb);
-}
+            if (totalDeb.compareTo(totalCred) > 0) {
+                // Deudor
+                saldoTotal = totalDeb.subtract(totalCred);
+            } else {
+                // Acreedor
+                saldoTotal = totalCred.subtract(totalDeb);
+            }
 
-cuentas.add(new CuentaMayorDTO(
-        idCuenta,
-        nombreCuenta,
-        asientos,
-        totalDeb,
-        totalCred,
-        saldoTotal
-));
-
+            cuentas.add(new CuentaMayorDTO(
+                    idCuenta,
+                    nombreCuenta,
+                    asientos,
+                    totalDeb,
+                    totalCred,
+                    saldoTotal));
         }
 
         // Resumen global del período

@@ -142,7 +142,15 @@ document.addEventListener("DOMContentLoaded", () => {
   btnFiltrar.addEventListener("click", async (event) => {
     event.preventDefault();
 
-    const periodoId = document.getElementById("selectPeriodo")?.value || 1;
+    const periodoId = document.getElementById("selectPeriodo")?.value;
+
+    if (!periodoId) {
+        // Mostrar notificación de advertencia
+        mostrarToast('Por favor seleccione un período contable antes de filtrar', 'warning', 4000)
+        return;
+    }
+
+    mostrarToast('Libro mayor cargado exitosamente', 'success', 4000)
 
     btnFiltrar.disabled = true;
     btnFiltrar.dataset._oldText = btnFiltrar.textContent;
