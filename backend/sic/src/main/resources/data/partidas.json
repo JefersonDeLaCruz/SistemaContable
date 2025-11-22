@@ -1,0 +1,58 @@
+[
+    {
+        "id": 1,
+        "descripcion": "Smith invierte $35,000. El negocio recibe $35,000 en efectivo y con ello le proporciona capital a Smith.",
+        "fecha": "2025-11-21",
+        "idPeriodo": "1",
+        "idUsuario": "1"
+    },
+    {
+        "id": 2,
+        "descripcion": "Compra a crédito $350 de suministros de oficina.",
+        "fecha": "2025-11-21",
+        "idPeriodo": "1",
+        "idUsuario": "1"
+    },
+    {
+        "id": 3,
+        "descripcion": "Paga en efectivo $30,000 para adquirir un lote cerca del campus. Smith tiene la intención de usar el terreno como el sitio del futuro edificio para las oficinas de la empresa.",
+        "fecha": "2025-11-21",
+        "idPeriodo": "1",
+        "idUsuario": "1"
+    },
+    {
+        "id": 4,
+        "descripcion": "Localiza apartamentos para unos clientes y recibe $1,900 en efectivo.",
+        "fecha": "2025-11-21",
+        "idPeriodo": "1",
+        "idUsuario": "1"
+    },
+    {
+        "id": 5,
+        "descripcion": "Paga $100 a la cuenta por cobrar que creó en la transacción 2.",
+        "fecha": "2025-11-21",
+        "idPeriodo": "1",
+        "idUsuario": "1"
+    },
+    {
+        "id": 6,
+        "descripcion": "Paga gastos en efectivo por la renta de la oficina, $400, y por servicios generales, $100.",
+        "fecha": "2025-11-21",
+        "idPeriodo": "1",
+        "idUsuario": "1"
+    },
+    {
+        "id": 7,
+        "descripcion": "Devuelve suministros de oficina por $150 de la transacción 2.",
+        "fecha": "2025-11-21",
+        "idPeriodo": "1",
+        "idUsuario": "1"
+    },
+    {
+        "id": 8,
+        "descripcion": "El propietario retira $1,200.",
+        "fecha": "2025-11-21",
+        "idPeriodo": "1",
+        "idUsuario": "1"
+    }
+]

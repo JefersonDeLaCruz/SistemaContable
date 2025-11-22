@@ -63,6 +63,8 @@ public class AuthController {
         Map<String, Integer> semana = dashboardService.contarPartidasSemanaActual();
         int semanaMax = dashboardService.maxPartidasSemanaActual(semana);
         if (user != null) {
+            // ID AL FRONT
+            model.addAttribute("userId", user.getId());
             model.addAttribute("usuario", user);
             model.addAttribute("titulo", "Dashboard");
             

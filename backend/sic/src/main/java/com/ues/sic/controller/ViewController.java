@@ -240,7 +240,7 @@ public class ViewController {
     }
 
     @PostMapping("/partida")
-    public ResponseEntity<?> crearPartida(@ModelAttribute PartidaConDetallesDTO dto) {
+    public String crearPartida(@ModelAttribute PartidaConDetallesDTO dto) {
         try {
             System.out.println("=== DEBUG: Datos recibidos ===");
             System.out.println("Descripción: " + dto.getDescripcion());
@@ -281,11 +281,11 @@ public class ViewController {
                 System.out.println("Detalle guardado: " + detalle.getIdCuenta() + " - Débito: " + detalle.getDebito() + " - Crédito: " + detalle.getCredito());
             }
             
-            return ResponseEntity.ok("Partida creada exitosamente con ID: " + partidaGuardada.getId());
+            return "redirect:/subir-documento?partidaId=" + partidaGuardada.getId();
             
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.badRequest().body("Error al crear la partida: " + e.getMessage());
+            return "redirect:/registrar-partida";
         }
     }
     

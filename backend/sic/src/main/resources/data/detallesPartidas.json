@@ -1,0 +1,145 @@
+[
+    {
+        "id": 1,
+        "partidaId": 1,
+        "idCuenta": "3",
+        "descripcion": "Smith invierte $35,000. El negocio recibe $35,000 en efectivo y con ello le proporciona capital a Smith.",
+        "debito": 35000.0,
+        "credito": 0.0
+    },
+    {
+        "id": 2,
+        "partidaId": 1,
+        "idCuenta": "28",
+        "descripcion": "Smith invierte $35,000. El negocio recibe $35,000 en efectivo y con ello le proporciona capital a Smith.",
+        "debito": 0.0,
+        "credito": 35000.0
+    },
+
+    {
+        "id": 3,
+        "partidaId": 2,
+        "idCuenta": "43",
+        "descripcion": "Compra a crédito $350 de suministros de oficina.",
+        "debito": 350.0,
+        "credito": 0.0
+    },
+    {
+        "id": 4,
+        "partidaId": 2,
+        "idCuenta": "20",
+        "descripcion": "Compra a crédito $350 de suministros de oficina.",
+        "debito": 0.0,
+        "credito": 350.0
+    },
+
+    {
+        "id": 5,
+        "partidaId": 3,
+        "idCuenta": "3",
+        "descripcion": "Paga en efectivo $30,000 para adquirir un lote cerca del campus. Smith tiene la intención de usar el terreno como el sitio del futuro edificio para las oficinas de la empresa.",
+        "debito": 0.0,
+        "credito": 30000.0
+    },
+    {
+        "id": 6,
+        "partidaId": 3,
+        "idCuenta": "13",
+        "descripcion": "Paga en efectivo $30,000 para adquirir un lote cerca del campus. Smith tiene la intención de usar el terreno como el sitio del futuro edificio para las oficinas de la empresa.",
+        "debito": 30000.0,
+        "credito": 0.0
+    },
+
+    {
+        "id": 7,
+        "partidaId": 4,
+        "idCuenta": "3",
+        "descripcion": "Localiza apartamentos para unos clientes y recibe $1,900 en efectivo.",
+        "debito": 1900.0,
+        "credito": 0.0
+    },
+    {
+        "id": 8,
+        "partidaId": 4,
+        "idCuenta": "33",
+        "descripcion": "Localiza apartamentos para unos clientes y recibe $1,900 en efectivo.",
+        "debito": 0.0,
+        "credito": 1900.0
+    },
+
+    {
+        "id": 9,
+        "partidaId": 5,
+        "idCuenta": "3",
+        "descripcion": "Paga $100 a la cuenta por cobrar que creó en la transacción 2.",
+        "debito": 0.0,
+        "credito": 100.0
+    },
+    {
+        "id": 10,
+        "partidaId": 5,
+        "idCuenta": "20",
+        "descripcion": "Paga $100 a la cuenta por cobrar que creó en la transacción 2.",
+        "debito": 100.0,
+        "credito": 0.0
+    },
+
+    {
+        "id": 11,
+        "partidaId": 6,
+        "idCuenta": "3",
+        "descripcion": "Paga gastos en efectivo por la renta de la oficina, $400, y por servicios generales, $100.",
+        "debito": 0.0,
+        "credito": 500.0
+    },
+    {
+        "id": 12,
+        "partidaId": 6,
+        "idCuenta": "40",
+        "descripcion": "Paga gastos en efectivo por la renta de la oficina, $400, y por servicios generales, $100.",
+        "debito": 400.0,
+        "credito": 0.0
+    },
+    {
+        "id": 13,
+        "partidaId": 6,
+        "idCuenta": "42",
+        "descripcion": "Paga gastos en efectivo por la renta de la oficina, $400, y por servicios generales, $100.",
+        "debito": 100.0,
+        "credito": 0.0
+    },
+
+    {
+        "id": 14,
+        "partidaId": 7,
+        "idCuenta": "43",
+        "descripcion": "Devuelve suministros de oficina por $150 de la transacción 2.",
+        "debito": 0.0,
+        "credito": 150.0
+    },
+    {
+        "id": 15,
+        "partidaId": 7,
+        "idCuenta": "20",
+        "descripcion": "Devuelve suministros de oficina por $150 de la transacción 2.",
+        "debito": 150.0,
+        "credito": 0.0
+    },
+
+    {
+        "id": 16,
+        "partidaId": 8,
+        "idCuenta": "3",
+        "descripcion": "El propietario retira $1,200.",
+        "debito": 0.0,
+        "credito": 1200.0
+    },
+    {
+        "id": 17,
+        "partidaId": 8,
+        "idCuenta": "32",
+        "descripcion": "El propietario retira $1,200.",
+        "debito": 1200.0,
+        "credito": 0.0
+    }
+]

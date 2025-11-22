@@ -167,6 +167,8 @@ public class EstadoFlujosEfectivoService {
         double ingresos = 0.0;
         double gastos = 0.0;
         
+        System.out.println("=== CÁLCULO UTILIDAD NETA ===");
+        
         for (Object[] r : movimientos) {
             Integer idCuenta = ((Number) r[0]).intValue();
             CuentaModel cuenta = cuentasMap.get(idCuenta);
@@ -174,33 +176,35 @@ public class EstadoFlujosEfectivoService {
             if (cuenta != null) {
                 String tipo = cuenta.getTipo();
                 String codigo = cuenta.getCodigo();
+                String nombre = cuenta.getNombre().toUpperCase();
                 double debito = r[3] != null ? ((Number) r[3]).doubleValue() : 0.0;
                 double credito = r[4] != null ? ((Number) r[4]).doubleValue() : 0.0;
                 
                 // Ingresos (normalmente acreedor): crédito - débito
                 if ("INGRESOS".equalsIgnoreCase(tipo) || "INGRESO".equalsIgnoreCase(tipo) || codigo.startsWith("4")) {
-                    ingresos += (credito - debito);
+                    double monto = credito - debito;
+                    ingresos += monto;
+                    System.out.println("  INGRESO: " + codigo + " - " + nombre + " | " + monto);
                 }
                 // Gastos (normalmente deudor): débito - crédito
                 // Incluye códigos 5.X, 6.X, 7.X (costo de ventas, gastos operativos, otros gastos)
+                // IMPORTANTE: Solo cuentas de tipo GASTO o con códigos 5,6,7
                 else if ("GASTOS".equalsIgnoreCase(tipo) || "GASTO".equalsIgnoreCase(tipo) || 
                          codigo.startsWith("5") || codigo.startsWith("6") || codigo.startsWith("7")) {
-                    gastos += (debito - credito);
+                    double monto = debito - credito;
+                    gastos += monto;
+                    System.out.println("  GASTO: " + codigo + " - " + nombre + " | " + monto);
                 }
+                // Las cuentas de activo/pasivo NO afectan la utilidad directamente
             }
         }
         
+        System.out.println("Total Ingresos: " + ingresos);
+        System.out.println("Total Gastos: " + gastos);
+        System.out.println("Utilidad Neta: " + (ingresos - gastos));
+        System.out.println("=== FIN CÁLCULO UTILIDAD ===");
+        
         return ingresos - gastos;
-    }
-
-    /**
-     * Calcula la utilidad neta del período (DEPRECATED - usar calcularUtilidadNetaPorPeriodo)
-     */
-    @Deprecated
-    private double calcularUtilidadNeta(String inicio, String fin) {
-        Double ingreso = detalleRepo.ingresoEntre(inicio, fin);
-        Double gasto = detalleRepo.gastoEntre(inicio, fin);
-        return (ingreso != null ? ingreso : 0.0) - (gasto != null ? gasto : 0.0);
     }
 
     /**
@@ -305,25 +309,71 @@ public class EstadoFlujosEfectivoService {
         operacion.setTotalAjustesNoEfectivo(round2(totalAjustes));
 
         // 2. Cambios en capital de trabajo (activos y pasivos corrientes)
+        // REGLA CLAVE DEL MÉTODO INDIRECTO:
+        // - Partimos de la utilidad neta (base devengado)
+        // - Ajustamos por cambios en cuentas de balance que NO son efectivo
+        // - Aumento en activos corrientes = uso de efectivo → RESTA
+        // - Disminución en activos corrientes = fuente de efectivo → SUMA
+        // - Aumento en pasivos corrientes = fuente de efectivo → SUMA
+        // - Disminución en pasivos corrientes = uso de efectivo → RESTA
+        //
+        // CASO ESPECIAL: Si un GASTO fue devengado a crédito (aumenta Proveedores),
+        // ya está en la utilidad neta pero NO salió efectivo, entonces:
+        // - El aumento en Proveedores se SUMA al flujo (fuente)
+        // - Esto cancela el gasto que se restó en la utilidad
+        
         List<MovimientoCuenta> operativos = movimientos.get(CategoriaEFE.OPERACION);
+        
+        System.out.println("=== CAMBIOS CAPITAL DE TRABAJO ===");
+        
         for (MovimientoCuenta mov : operativos) {
             CuentaModel cuenta = cuentasMap.get(mov.idCuenta);
             if (cuenta == null) continue;
 
             String tipo = cuenta.getTipo();
+            String nombre = cuenta.getNombre().toUpperCase();
             
             // Saltar cuentas de resultado (ingresos/gastos) ya están en utilidad neta
-            if ("INGRESO".equals(tipo) || "GASTO".equals(tipo)) {
+            // EXCEPCIÓN: Si un gasto está en la cuenta pero fue a crédito, 
+            // el cambio en el pasivo (proveedores) lo compensará
+            if ("INGRESO".equals(tipo)) {
+                continue; // Los ingresos ya están en utilidad neta
+            }
+            
+            // Para cuentas de GASTO: solo aparecen aquí si tienen movimientos
+            // Pero los gastos YA están en la utilidad neta, no hay que ajustarlos aquí
+            // SOLO ajustamos si es una cuenta de balance (activo/pasivo corriente)
+            // 
+            // NOTA: Si un gasto fue registrado a crédito (aumentando proveedores),
+            // el efecto es:
+            //   - Utilidad disminuye por el gasto (ya reflejado)
+            //   - Proveedores aumenta (se ajusta abajo como fuente de efectivo)
+            //   - Efecto neto: el gasto devengado se cancela en el flujo
+            if ("GASTO".equals(tipo) || "GASTOS".equals(tipo)) {
+                System.out.println("  SALTANDO GASTO (ya en utilidad): " + mov.codigo + " - " + nombre);
                 continue;
             }
 
-            // Cambios en activo corriente y pasivo corriente
+            // Cambios en activo corriente y pasivo corriente (incluyendo inventarios, cuentas por cobrar, proveedores, etc.)
             double cambio = calcularCambioCapitalTrabajo(mov, tipo);
             
             if (Math.abs(cambio) >= 0.01) {
-                String descripcion = cambio > 0 
-                    ? "Disminución en " + mov.nombre 
-                    : "Aumento en " + mov.nombre;
+                String descripcion;
+                
+                // Lógica de etiquetas diferenciada para Activos y Pasivos
+                if ("ACTIVO".equals(tipo)) {
+                    // Para Activos: Fuente (+) es Disminución, Uso (-) es Aumento
+                    descripcion = cambio > 0 
+                        ? "Disminución en " + mov.nombre 
+                        : "Aumento en " + mov.nombre;
+                } else {
+                    // Para Pasivos: Fuente (+) es Aumento, Uso (-) es Disminución
+                    descripcion = cambio > 0 
+                        ? "Aumento en " + mov.nombre 
+                        : "Disminución en " + mov.nombre;
+                }
+                
+                System.out.println("  AJUSTE: " + mov.codigo + " - " + descripcion + " | Cambio: " + cambio);
                 
                 operacion.getCambiosCapitalTrabajo().add(
                     new DetalleMovimientoDTO(mov.codigo, descripcion, round2(Math.abs(cambio)))
@@ -331,6 +381,10 @@ public class EstadoFlujosEfectivoService {
                 totalCambiosCapital += cambio;
             }
         }
+        
+        System.out.println("Total Cambios Capital: " + totalCambiosCapital);
+        System.out.println("=== FIN CAMBIOS CAPITAL ===");
+        
         operacion.setTotalCambiosCapitalTrabajo(round2(totalCambiosCapital));
 
         // 3. Calcular flujo neto de operación
@@ -397,6 +451,8 @@ public class EstadoFlujosEfectivoService {
 
     /**
      * Procesa las actividades de financiamiento
+     * IMPORTANTE: Retiros del propietario tienen saldo normal DEUDOR, 
+     * por lo que un aumento (variación positiva) es una SALIDA de efectivo
      */
     private void procesarActividadesFinanciamiento(
             EstadoFlujosEfectivoDTO efe,
@@ -410,23 +466,40 @@ public class EstadoFlujosEfectivoService {
         
         for (MovimientoCuenta mov : financMov) {
             double variacion = mov.variacion;
-            String nombre = mov.nombre;
+            String nombre = mov.nombre.toUpperCase();
             
-            if (variacion > 0.01) {
-                // Aumento en pasivos/capital = entrada de efectivo
+            // CASO ESPECIAL: Retiros del propietario (saldo normal DEUDOR)
+            // Aumento en retiros = salida de efectivo
+            if (nombre.contains("RETIRO")) {
+                if (variacion > 0.01) {
+                    financiamiento.getSalidas().add(
+                        new DetalleMovimientoDTO(mov.codigo, "Retiro del propietario", round2(variacion))
+                    );
+                    totalSalidas += variacion;
+                } else if (variacion < -0.01) {
+                    // Reversión de retiro (poco común)
+                    financiamiento.getEntradas().add(
+                        new DetalleMovimientoDTO(mov.codigo, "Reversión de retiro", round2(Math.abs(variacion)))
+                    );
+                    totalEntradas += Math.abs(variacion);
+                }
+            }
+            // CASO NORMAL: Capital social, aportes, préstamos (saldo normal ACREEDOR)
+            else if (variacion > 0.01) {
+                // Aumento en pasivos/capital acreedor = entrada de efectivo
                 String descripcion = nombre.contains("CAPITAL") || nombre.contains("APORTE")
-                    ? "Aporte de " + nombre
-                    : "Préstamo recibido - " + nombre;
+                    ? "Aporte de capital"
+                    : "Préstamo recibido";
                     
                 financiamiento.getEntradas().add(
                     new DetalleMovimientoDTO(mov.codigo, descripcion, round2(variacion))
                 );
                 totalEntradas += variacion;
             } else if (variacion < -0.01) {
-                // Disminución en pasivos/capital = salida de efectivo
+                // Disminución en pasivos/capital acreedor = salida de efectivo
                 String descripcion = nombre.contains("DIVIDENDO")
                     ? "Pago de dividendos"
-                    : "Pago de préstamo - " + nombre;
+                    : "Pago de préstamo";
                     
                 financiamiento.getSalidas().add(
                     new DetalleMovimientoDTO(mov.codigo, descripcion, round2(Math.abs(variacion)))

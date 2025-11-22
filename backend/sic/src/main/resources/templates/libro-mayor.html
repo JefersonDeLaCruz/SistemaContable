@@ -1,117 +1,58 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="corporate">
 
-<head th:replace="layout :: head"></head>
+<head th:insert="layout :: head">
+
+</head>
 
 <body>
     <div class="drawer">
-
         <input id="my-drawer-3" type="checkbox" class="drawer-toggle" />
-
-
         <div class="drawer-content flex flex-col">
-
-
             <!-- Navbar -->
-            <div th:replace="layout :: navbar">
-
+            <div th:replace="~{layout :: navbar}">
+                
             </div>
+            
+            <!-- Page content here -->
+            <div class="w-full p-4 sm:p-6 lg:p-10 bg-base-100">
+                
+                <!-- Header Section -->
+                <div class="mb-6">
+                    <h1 class="text-3xl font-bold text-center mb-6 mes-actual">Libro Mayor</h1>
+                    
+                    <!-- Filtros -->
+                    <div class="flex flex-col sm:flex-row gap-4 items-center justify-center bg-base-200 p-4 rounded-lg shadow-md">
 
-            <!-- contenido -->
-            <div>
-                <!-- Filtros -->
-                <div class="p-7 md:p-6 px-6 py-6 ms-10 border-gray-100">
-                    <h2 class="text-2xl font-bold">
-                        Filtrar en el Libro Mayor
-                    </h2>
-                    <form class="p-4 flex flex-col gap-3 md:flex-row md:items-center md:gap-4"
-                        th:action="@{/libro-mayor}" method="get">
-                        <label class="form-control max-w-xs">
-                            <span class="fieldset-legend">Periodo:</span>
-                            <select id="selectPeriodo" class="select" required>
+                        <div class="form-control w-full sm:w-auto">
+                            <label class="label">
+                                <span class="label-text font-semibold">Período Contable:</span>
+                            </label>
+                            <select id="selectPeriodo" class="select select-bordered w-full sm:w-64">
                                 <option value="">Seleccionar periodo...</option>
-                                <!-- traer cuentas de db -->
+                                <!-- traer periodos de db -->
                             </select>
-                        </label>
+                        </div>
 
-                        <label class="form-control max-w-xs">
-                            <span class="fieldset-legend">Cuenta:</span>
-                            <select id="selectCuenta" class="select" required>
-                                <option value="">Seleccionar cuenta...</option>
-                                <!-- traer cuentas de db -->
-                            </select>
-                        </label>
-                        <button class="btn btn-sm btn-primary mt-2 md:mt-7">Filtrar</button>
-                    </form>
+                        <div class="form-control w-full sm:w-auto self-start">
+                            <button class="btn btn-primary w-full sm:w-auto" id="filtrar">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                                </svg>
+                                Filtrar
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
+                <div class="p-4 m-4" id="libroMayor" ></div>
 
-                <div class="w-full p-4 md:p-6">
-                    <!-- Encabezado de la cuenta -->
-                    <header class="px-6 py-6 bg-base-200 mb-1">
-                        <h2 class="text-2xl font-bold text-center">
-                            1101 - Banco
-                        </h2>
-                    </header>
-
-                    <!-- Tabla de movimientos -->
-                    <table class="table-auto w-full">
-                        <thead class="bg-base-200 text-sm uppercase">
-                            <tr>
-                                <th class="px-6 py-3 text-left">Fecha</th>
-                                <th class="px-6 py-3 text-left">Referencia</th>
-                                <th class="px-6 py-3 text-left">Descripción</th>
-                                <th class="px-6 py-3 text-left">Débito</th>
-                                <th class="px-6 py-3 text-left">Crédito</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-sm">
-                            <tr class="border-t border-gray-100">
-                                <td class="px-6 py-3">2025-09-01</td>
-                                <td class="px-6 py-3">Saldo inicial</td>
-                                <td class="px-6 py-3">-</td>
-                                <td class="px-6 py-3 text-green-600 font-medium">10,000.00</td>
-                                <td class="px-6 py-3 text-red-600 font-medium">0.00</td>
-                            </tr>
-                            <tr class="border-t border-gray-100">
-                                <td class="px-6 py-3">2025-09-10</td>
-                                <td class="px-6 py-3">PD-2025-09-10-001</td>
-                                <td class="px-6 py-3">Pago a proveedores</td>
-                                <td class="px-6 py-3 text-green-600 font-medium">0.00</td>
-                                <td class="px-6 py-3 text-red-600 font-medium">1,250.00</td>
-                            </tr>
-                            <tr class="border-t border-gray-100">
-                                <td class="px-6 py-3"></td>
-                                <td class="px-6 py-3"></td>
-                                <td class="px-6 py-3 font-bold">SUMA</td>
-                                <td class="px-6 py-3 text-green-600 font-medium">10,000.00</td>
-                                <td class="px-6 py-3 text-red-600 font-medium">1,250.00</td>
-                            </tr>
-                            <tr class="border-t border-gray-100">
-                                <td class="px-6 py-3"></td>
-                                <td class="px-6 py-3"></td>
-                                <td class="px-6 py-3 font-bold">SALDO</td>
-                                <td class="px-6 py-3 text-green-600 font-medium">8,750.00</td>
-                                <td class="px-6 py-3 text-red-600 font-medium"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-
-
+            </div>  
         </div>
-
-
-        <div th:replace="layout :: sidebar('libro-mayor')">
-
-        </div>
-
-
+        
+        <div th:replace="layout :: sidebar('libro-mayor')"></div>
     </div>
 
-    <!-- Script -->
     <script th:src="@{/js/libro-mayor.js}"></script>
 </body>
 

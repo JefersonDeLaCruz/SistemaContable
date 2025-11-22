@@ -36,8 +36,14 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/", "/login", "/css/**", "/js/**", "/images/**", "/api/cuentas/**", "/api/periodos/**").permitAll()
-                .requestMatchers("/api/usuarios/**").hasRole("ADMIN")
+                .requestMatchers("/", "/login", "/css/**", "/js/**", "/images/**").permitAll()
+                .requestMatchers("/api/usuarios/**").hasAnyRole("ADMIN", "CONTADOR", "AUDITOR")
+                .requestMatchers("/api/cuentas/**").hasAnyRole("ADMIN", "CONTADOR", "AUDITOR")
+                .requestMatchers("/api/periodos/**").hasAnyRole("ADMIN", "CONTADOR", "AUDITOR")
+                .requestMatchers("/api/libromayor/**").hasAnyRole("ADMIN", "CONTADOR", "AUDITOR")
+                .requestMatchers("/api/documentos/**").hasAnyRole("ADMIN", "CONTADOR", "AUDITOR")
+                .requestMatchers("/api/partidas/**").hasAnyRole("ADMIN", "CONTADOR", "AUDITOR")
+                .requestMatchers("/api/tipos-documento/**").hasAnyRole("ADMIN", "CONTADOR", "AUDITOR")
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/auditor/**").hasAnyRole("AUDITOR", "ADMIN")
                 .requestMatchers("/contador/**").hasRole("CONTADOR")
@@ -65,6 +71,7 @@ public class SecurityConfig {
             // Configurar headers de seguridad para evitar cache
             .headers(headers -> headers
                 .frameOptions(frameOptions -> frameOptions.deny())
+                .frameOptions(frame -> frame.sameOrigin())
                 .httpStrictTransportSecurity(hstsHeaderWriter -> hstsHeaderWriter.disable())
             );
 
