@@ -445,4 +445,36 @@ public class BalanceController {
     public EstadoCambiosPatrimonioDTO cambiosPatrimonio(@RequestParam("periodo") Integer periodoId) {
         return patrimonioService.calcularCambiosPatrimonio(periodoId);
     }
+
+    /**
+     * Endpoint temporal para verificar si existen movimientos en cuentas GRUPO
+     * Debería retornar una lista vacía si todo está correcto
+     */
+    @GetMapping("/verificar-cuentas-grupo")
+    public Map<String, Object> verificarCuentasGrupo() {
+        List<Object[]> movimientos = detalleRepo.verificarMovimientosCuentasGrupo();
+
+        List<Map<String, Object>> resultados = new ArrayList<>();
+        for (Object[] r : movimientos) {
+            Map<String, Object> item = new LinkedHashMap<>();
+            item.put("partida_id", r[0]);
+            item.put("fecha", r[1]);
+            item.put("codigo", r[2]);
+            item.put("nombre", r[3]);
+            item.put("debito", r[4]);
+            item.put("credito", r[5]);
+            item.put("usuario", r[6]);
+            resultados.add(item);
+        }
+
+        Map<String, Object> resp = new LinkedHashMap<>();
+        resp.put("total_movimientos_incorrectos", resultados.size());
+        resp.put("correcto", resultados.isEmpty());
+        resp.put("mensaje", resultados.isEmpty()
+            ? "✅ No se encontraron movimientos en cuentas GRUPO. El sistema está correcto."
+            : "⚠️ Se encontraron " + resultados.size() + " movimientos en cuentas GRUPO que deben corregirse.");
+        resp.put("movimientos", resultados);
+
+        return resp;
+    }
 }
