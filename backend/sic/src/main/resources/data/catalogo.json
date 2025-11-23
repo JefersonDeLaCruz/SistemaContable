@@ -60,7 +60,8 @@
   { "codigo": "6.2",      "nombre": "GASTOS DE VENTAS",                    "tipo": "GASTO",    "saldoNormal": "DEUDOR", "idPadre": "6" },
   { "codigo": "6.2.1",   "nombre": "PUBLICIDAD Y PROPAGANDA",             "tipo": "GASTO",    "saldoNormal": "DEUDOR", "idPadre": "6.2" },
 
-  { "codigo": "6.3",      "nombre": "DEPRECIACIÓN DEL PERIODO",           "tipo": "GASTO",    "saldoNormal": "DEUDOR", "idPadre": "6" },
+  { "codigo": "6.3",      "nombre": "OTROS GASTOS OPERATIVOS",           "tipo": "GASTO",    "saldoNormal": "DEUDOR", "idPadre": "6" },
+  { "codigo": "6.3.1",      "nombre": "DEPRECIACIÓN DEL PERIODO",           "tipo": "GASTO",    "saldoNormal": "DEUDOR", "idPadre": "6.3" },
 
   { "codigo": "7",        "nombre": "GASTOS NO OPERATIVOS",                "tipo": "GASTO",    "saldoNormal": "DEUDOR" },
 
