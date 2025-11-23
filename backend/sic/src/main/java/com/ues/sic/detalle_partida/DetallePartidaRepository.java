@@ -105,6 +105,7 @@ public interface DetallePartidaRepository extends JpaRepository<DetallePartidaMo
             LEFT JOIN detalle_partida d ON CAST(d.id_cuenta AS INTEGER) = c.id_cuenta
             LEFT JOIN partidas p ON p.id = d.id_partida
             WHERE c.tipo IN ('ACTIVO','PASIVO','CAPITAL CONTABLE')
+              AND c.codigo NOT IN ('1', '1.1', '1.2', '2', '2.1', '2.2', '3')
               AND (p.fecha IS NULL OR CAST(p.fecha AS DATE) <= CAST(:fechaCorte AS DATE))
             GROUP BY c.tipo, c.id_cuenta, c.codigo, c.nombre, c.saldo_normal
             ORDER BY c.codigo
@@ -152,6 +153,7 @@ public interface DetallePartidaRepository extends JpaRepository<DetallePartidaMo
             LEFT JOIN detalle_partida d ON CAST(d.id_cuenta AS INTEGER) = c.id_cuenta
             LEFT JOIN partidas p ON p.id = d.id_partida
             WHERE (c.tipo = 'INGRESOS' OR c.codigo LIKE '4%' OR c.tipo = 'GASTOS' OR c.codigo LIKE '5%' OR c.codigo LIKE '6%' OR c.codigo LIKE '7%')
+              AND c.codigo NOT IN ('4', '5', '6', '6.1', '6.2', '7')
               AND (p.fecha IS NULL OR (CAST(p.fecha AS DATE) BETWEEN CAST(:inicio AS DATE) AND CAST(:fin AS DATE)))
             GROUP BY c.tipo, c.id_cuenta, c.codigo, c.nombre, c.saldo_normal
             ORDER BY c.codigo
@@ -195,7 +197,8 @@ public interface DetallePartidaRepository extends JpaRepository<DetallePartidaMo
             LEFT JOIN detalle_partida d ON CAST(d.id_cuenta AS INTEGER) = c.id_cuenta
             LEFT JOIN partidas p ON p.id = d.id_partida
             LEFT JOIN periodos_contables pc ON CAST(p.id_periodo AS INTEGER) = pc.id_periodo
-            WHERE (p.id_periodo IS NULL OR pc.fecha_inicio < (SELECT fecha_inicio FROM periodos_contables WHERE id_periodo = CAST(:periodoId AS INTEGER)))
+            WHERE c.codigo NOT IN ('1', '1.1', '1.2', '2', '2.1', '2.2', '3', '4', '5', '6', '6.1', '6.2', '7')
+              AND (p.id_periodo IS NULL OR pc.fecha_inicio < (SELECT fecha_inicio FROM periodos_contables WHERE id_periodo = CAST(:periodoId AS INTEGER)))
             GROUP BY c.id_cuenta, c.codigo, c.nombre, c.saldo_normal
             ORDER BY c.codigo
             """,
@@ -214,7 +217,8 @@ public interface DetallePartidaRepository extends JpaRepository<DetallePartidaMo
             FROM cuentas c
             LEFT JOIN detalle_partida d ON CAST(d.id_cuenta AS INTEGER) = c.id_cuenta
             LEFT JOIN partidas p ON p.id = d.id_partida
-            WHERE (p.fecha IS NULL OR CAST(p.fecha AS DATE) <= CAST(:fecha AS DATE))
+            WHERE c.codigo NOT IN ('1', '1.1', '1.2', '2', '2.1', '2.2', '3', '4', '5', '6', '6.1', '6.2', '7')
+              AND (p.fecha IS NULL OR CAST(p.fecha AS DATE) <= CAST(:fecha AS DATE))
             GROUP BY c.id_cuenta, c.codigo, c.nombre, c.saldo_normal
             ORDER BY c.codigo
             """,
