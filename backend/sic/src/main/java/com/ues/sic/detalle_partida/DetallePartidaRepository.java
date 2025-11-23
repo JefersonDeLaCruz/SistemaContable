@@ -263,4 +263,23 @@ public interface DetallePartidaRepository extends JpaRepository<DetallePartidaMo
             """,
            nativeQuery = true)
     List<Object[]> movimientosEntreTodos(@Param("inicio") String inicio, @Param("fin") String fin);
+
+    // Verificar si existen movimientos en cuentas GRUPO
+    @Query(value = """
+            SELECT
+              p.id AS partida_id,
+              p.fecha,
+              c.codigo,
+              c.nombre,
+              d.debito,
+              d.credito,
+              p.id_usuario
+            FROM detalle_partida d
+            JOIN partidas p ON p.id = d.id_partida
+            JOIN cuentas c ON c.id_cuenta = CAST(d.id_cuenta AS INTEGER)
+            WHERE c.codigo IN ('1', '1.1', '1.2', '2', '2.1', '2.2', '3', '4', '5', '6', '6.1', '6.2', '7')
+            ORDER BY p.fecha DESC, c.codigo
+            """,
+           nativeQuery = true)
+    List<Object[]> verificarMovimientosCuentasGrupo();
 }
