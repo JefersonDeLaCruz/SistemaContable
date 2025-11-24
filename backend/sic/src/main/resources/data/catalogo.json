@@ -34,7 +34,7 @@
 
   { "codigo": "3",        "nombre": "CAPITAL CONTABLE",                    "tipo": "CAPITAL CONTABLE", "saldoNormal": "ACREEDOR" },
 
-  { "codigo": "3.1",      "nombre": "CAPITAL SOCIAL",                      "tipo": "CAPITAL CONTABLE", "saldoNormal": "ACREEDOR", "idPadre": "3" },
+  { "codigo": "3.1",      "nombre": "CAPITAL SOCIAL INICIAL",                      "tipo": "CAPITAL CONTABLE", "saldoNormal": "ACREEDOR", "idPadre": "3" },
   { "codigo": "3.2",      "nombre": "APORTACIONES DE SOCIOS",              "tipo": "CAPITAL CONTABLE", "saldoNormal": "ACREEDOR", "idPadre": "3" },
   { "codigo": "3.3",      "nombre": "UTILIDADES RETENIDAS",                "tipo": "CAPITAL CONTABLE", "saldoNormal": "ACREEDOR", "idPadre": "3" },
   { "codigo": "3.4",      "nombre": "RESULTADO DEL EJERCICIO",             "tipo": "CAPITAL CONTABLE", "saldoNormal": "ACREEDOR", "idPadre": "3" },

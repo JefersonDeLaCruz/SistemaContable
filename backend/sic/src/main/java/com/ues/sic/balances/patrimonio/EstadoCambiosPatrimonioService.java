@@ -67,12 +67,17 @@ public class EstadoCambiosPatrimonioService {
         // PASO 3: Obtener movimientos del período en cuentas de patrimonio (solo 3.X)
         procesarMovimientosPatrimonio(periodoId, cuentasMap);
 
-        // PASO 4: Agregar resultado del ejercicio
-        if (Math.abs(utilidadNeta) >= 0.01) {
-            CuentaPatrimonioDTO resultadoEjercicio = cuentasMap.computeIfAbsent("3.999", 
-                k -> new CuentaPatrimonioDTO("3.999", utilidadNeta >= 0 ? "UTILIDAD DEL EJERCICIO" : "PÉRDIDA DEL EJERCICIO"));
-            resultadoEjercicio.setUtilidadPeriodo(round2(utilidadNeta));
-        }
+        // Cuenta real para el resultado del ejercicio
+CuentaPatrimonioDTO c34 = cuentasMap.computeIfAbsent("3.4",
+    k -> new CuentaPatrimonioDTO("3.4", 
+         utilidadNeta >= 0 ? "RESULTADO DEL EJERCICIO" : "PÉRDIDA DEL EJERCICIO"));
+
+// Registrar utilidad o pérdida del período en su campo correcto
+c34.setUtilidadPeriodo(
+    round2(c34.getUtilidadPeriodo() + utilidadNeta)
+);
+
+
 
         // PASO 5: Calcular saldos finales y totales
         TotalesPatrimonioDTO totales = calcularTotales(cuentasMap);
@@ -126,42 +131,70 @@ public class EstadoCambiosPatrimonioService {
         return utilidadNeta;
     }
 
-    /**
-     * Obtiene saldos iniciales de cuentas de patrimonio (períodos anteriores)
-     * Solo procesa cuentas con código 3.X
-     */
-    private Map<String, CuentaPatrimonioDTO> obtenerSaldosInicialesPatrimonio(Integer periodoId) {
-        List<Object[]> saldosIniciales = detalleRepo.saldosHastaPeriodo(periodoId);
-        Map<String, CuentaPatrimonioDTO> cuentasMap = new HashMap<>();
+   /**
+ * Obtiene saldos iniciales de cuentas de patrimonio (períodos anteriores)
+ * Solo procesa cuentas con código 3.X
+ */
+private Map<String, CuentaPatrimonioDTO> obtenerSaldosInicialesPatrimonio(Integer periodoId) {
+    List<Object[]> saldosIniciales = detalleRepo.saldosHastaPeriodo(periodoId);
+    Map<String, CuentaPatrimonioDTO> cuentasMap = new HashMap<>();
 
-        for (Object[] r : saldosIniciales) {
-            String codigo = (String) r[1];
-            String nombre = (String) r[2];
-            String saldoNormal = (String) r[3];
-            double tDeb = r[4] != null ? ((Number) r[4]).doubleValue() : 0.0;
-            double tCre = r[5] != null ? ((Number) r[5]).doubleValue() : 0.0;
-            
-            // SOLO cuentas de patrimonio (código 3.X)
-            if (!codigo.startsWith("3")) {
-                continue;
-            }
-            
-            // Patrimonio normalmente es acreedor: crédito - débito
-            double saldoInicial = "DEUDOR".equalsIgnoreCase(saldoNormal) 
-                ? (tDeb - tCre) 
-                : (tCre - tDeb);
-            
-            // Solo agregar si tiene saldo inicial
-            if (Math.abs(saldoInicial) >= 0.01) {
-                CuentaPatrimonioDTO cuenta = new CuentaPatrimonioDTO(codigo, nombre);
-                cuenta.setSaldoInicial(round2(saldoInicial));
-                cuentasMap.put(codigo, cuenta);
-                System.out.println("  Saldo inicial: " + codigo + " - " + nombre + " = " + saldoInicial);
-            }
+    System.out.println("=== DEBUG SALDOS INICIALES PATRIMONIO ===");
+    System.out.println("PeriodoId: " + periodoId + " - filas devueltas: " + saldosIniciales.size());
+
+    for (Object[] r : saldosIniciales) {
+        // 0: id_cuenta
+        // 1: codigo
+        // 2: nombre
+        // 3: saldo_normal
+        // 4: total_debito
+        // 5: total_credito
+
+        String codigo      = (String) r[1];
+        String nombre      = (String) r[2];
+        String saldoNormal = (String) r[3];
+
+        double tDeb = r[4] != null ? ((Number) r[4]).doubleValue() : 0.0;
+        double tCre = r[5] != null ? ((Number) r[5]).doubleValue() : 0.0;
+
+        // SOLO cuentas de patrimonio (código 3.X)
+        if (!codigo.startsWith("3")) {
+            continue;
         }
 
-        return cuentasMap;
+        // NO arrastrar como saldo inicial:
+        // - 3.4 Resultado del ejercicio (la utilidad vieja debería haberse pasado a 3.3)
+        // - 3.5 Retiros del propietario (solo interesan los del período actual)
+        // - 3.999 o similares si las usaste antes como "UTILIDAD DEL EJERCICIO"
+        if (codigo.startsWith("3.4") || codigo.startsWith("3.5") || codigo.startsWith("3.999")) {
+            System.out.println("  (NO arrastro saldo inicial para " + codigo + " - " + nombre + ")");
+            continue;
+        }
+
+        System.out.println("Cuenta: " + codigo + " - " + nombre
+                + " | saldoNormal=" + saldoNormal
+                + " | totalDeb=" + tDeb
+                + " | totalCre=" + tCre);
+
+        double saldoInicial;
+        if ("DEUDOR".equalsIgnoreCase(saldoNormal)) {
+            saldoInicial = tDeb - tCre;
+        } else {
+            saldoInicial = tCre - tDeb;
+        }
+
+        System.out.println("  -> Saldo inicial calculado: " + saldoInicial);
+
+        CuentaPatrimonioDTO cuenta = cuentasMap.computeIfAbsent(codigo,
+                k -> new CuentaPatrimonioDTO(codigo, nombre));
+        cuenta.setSaldoInicial(round2(saldoInicial));
     }
+
+    System.out.println("Cuentas de patrimonio con saldo inicial calculado: " + cuentasMap.size());
+    System.out.println("=== FIN DEBUG SALDOS INICIALES PATRIMONIO ===");
+
+    return cuentasMap;
+}
 
     /**
      * Procesa movimientos del período en cuentas de patrimonio

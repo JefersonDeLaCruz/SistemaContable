@@ -206,7 +206,7 @@ public class BalanceController {
         resp.put("ingresos", Map.of("cuentas", ingresos, "total", round2(totalIng)));
         resp.put("gastos", Map.of("cuentas", gastos, "total", round2(totalGas)));
         resp.put("utilidadNeta", round2(utilidad));
-        resp.put("resultado", utilidad >= 0 ? "Utilidad" : "PÃ©rdida");
+        resp.put("resultado", utilidad >= 0 ? "Utilidad" : "Perdida");
         return resp;
     }
 

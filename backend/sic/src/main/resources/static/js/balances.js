@@ -454,7 +454,7 @@ window.addEventListener('DOMContentLoaded', () => {
       if (tipo === 'estado') renderEstadoResultados(data); 
       else if (tipo === 'comprobacion') renderBalanceComprobacion(data); 
       else if (tipo === 'flujos') renderFlujosEfectivo(data);
-      else if (tipo === 'patrimonio') await renderCambiosPatrimonio();
+      else if (tipo === 'patrimonio') renderCambiosPatrimonio(data);
       else renderBalance(data);
       mostrarToast('Reporte actualizado', 'success', 2500);
     } catch (e) {
@@ -468,6 +468,7 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 function renderBalanceComprobacion(data) {
+  console.log(data)
   const cont = document.getElementById('balanceContainer');
   const filas = (data.cuentas || []).map(c => `
     <tr class="border-t border-base-200">
@@ -530,9 +531,183 @@ function renderFlujosEfectivo(data) {
 }
 
 
-// Estado de Cambios en el Patrimonio
-async function renderCambiosPatrimonio() {
- 
+// Obtener una cuenta de patrimonio por código (3, 3.1, 3.2, etc.)
+function getCuenta(data, codigo) {
+  return data.cuentas.find(c => c.codigo === codigo) || {
+    codigo: codigo,
+    nombre: "",
+    saldoInicial: 0,
+    aumentos: 0,
+    disminuciones: 0,
+    utilidadPeriodo: 0,
+    saldoFinal: 0
+  };
 }
 
+// Calcula el monto actual = aumentos - disminuciones + utilidadPeriodo
+function getMontoActual(cuenta) {
+  return (
+    parseFloat(cuenta.aumentos) -
+    parseFloat(cuenta.disminuciones) +
+    parseFloat(cuenta.utilidadPeriodo)
+  );
+}
 
+// Formato bonito para números
+function f(n) {
+  return parseFloat(n).toFixed(2);
+}
+
+// Estado de Cambios en el Patrimonio
+function renderCambiosPatrimonio(data) {
+
+  console.log("DATA RECIBIDA:", data);
+
+  const cont = document.getElementById('balanceContainer');
+
+  // Obtener todas las cuentas relevantes
+  const c3   = getCuenta(data, "3");
+  const c31  = getCuenta(data, "3.1");
+  const c32  = getCuenta(data, "3.2");
+  const c33  = getCuenta(data, "3.3");
+  const c34  = getCuenta(data, "3.4");
+  const c35  = getCuenta(data, "3.5");
+
+  // Totales desde el backend
+  const t = data.totales || {};
+
+  // Total aumentos del patrimonio = suma de saldos finales de 3, 3.2, 3.3 y 3.4
+  const totalAumentosManual =
+    Number(c3.saldoFinal || 0) +
+    Number(c32.saldoFinal || 0) +
+    Number(c33.saldoFinal || 0) +
+    Number(c34.saldoFinal || 0);
+
+  cont.innerHTML = `
+<div class="w-full bg-blue-100 border border-blue-300 rounded-lg p-4 text-center shadow-sm">
+  <p class="text-lg font-bold">ESTADO DE CAMBIOS EN EL PATRIMONIO NETO</p>
+  <p class="text-sm mt-1">
+    <span class="font-semibold">Periodo:</span> ${data.periodo.inicio} - ${data.periodo.fin} <br>
+    (Expresado en dólares de los Estados Unidos de América)
+  </p>
+</div>
+
+<table class="min-w-full text-sm mt-4">
+  <thead class="bg-sky-950 text-slate-200">
+    <tr>
+      <th class="px-4 py-3 text-left font-semibold uppercase tracking-wide text-xs">Código</th>
+      <th class="px-4 py-3 text-left font-semibold uppercase tracking-wide text-xs">Cuenta</th>
+      <th class="px-4 py-3 text-right font-semibold uppercase tracking-wide text-xs">Monto Inicial ($)</th>
+      <th class="px-4 py-3 text-right font-semibold uppercase tracking-wide text-xs">Monto Actual ($)</th>
+      <th class="px-4 py-3 text-right font-semibold uppercase tracking-wide text-xs">Monto Total ($)</th>
+    </tr>
+  </thead>
+
+  <tbody class="divide-y divide-slate-800">
+
+    <!-- I. PATRIMONIO INICIAL -->
+    <tr class="bg-emerald-400">
+      <td colspan="5" class="px-4 py-2 font-semibold uppercase tracking-wide text-xs">
+        I. PATRIMONIO INICIAL
+      </td>
+    </tr>
+
+    <tr>
+      <td class="px-4 py-2">3.1</td>
+      <td class="px-4 py-2">Capital Social Inicial</td>
+      <td class="px-4 py-2 text-right font-mono">$ ${f(c31.saldoInicial)}</td>
+      <td class="px-4 py-2 text-right font-mono">$ ${f(getMontoActual(c31))}</td>
+      <td class="px-4 py-2 text-right font-mono">$ ${f(c31.saldoFinal)}</td>
+    </tr>
+
+    <tr class="bg-slate-900/60">
+      <td></td>
+      <td class="px-4 py-2 text-xs font-semibold">Total capital inicial</td>
+      <td></td><td></td>
+      <td class="px-4 py-2 text-right font-mono font-semibold text-emerald-300">$ ${f(c31.saldoFinal)}</td>
+    </tr>
+
+    <!-- II. AUMENTOS DEL PATRIMONIO -->
+    <tr class="bg-emerald-400">
+      <td colspan="5" class="px-4 py-2 font-semibold uppercase tracking-wide text-xs">
+        II. AUMENTOS DEL PATRIMONIO
+      </td>
+    </tr>
+
+    <tr>
+      <td class="px-4 py-2">3</td>
+      <td class="px-4 py-2">Capital Contable</td>
+      <td class="px-4 py-2 text-right font-mono">$ ${f(c3.saldoInicial)}</td>
+      <td class="px-4 py-2 text-right font-mono">$ ${f(getMontoActual(c3))}</td>
+      <td class="px-4 py-2 text-right font-mono">$ ${f(c3.saldoFinal)}</td>
+    </tr>
+
+    <tr>
+      <td class="px-4 py-2">3.2</td>
+      <td class="px-4 py-2">Aportaciones de socios</td>
+      <td class="px-4 py-2 text-right font-mono">$ ${f(c32.saldoInicial)}</td>
+      <td class="px-4 py-2 text-right font-mono">$ ${f(getMontoActual(c32))}</td>
+      <td class="px-4 py-2 text-right font-mono">$ ${f(c32.saldoFinal)}</td>
+    </tr>
+
+    <tr>
+      <td class="px-4 py-2">3.3</td>
+      <td class="px-4 py-2">Utilidades retenidas</td>
+      <td class="px-4 py-2 text-right font-mono">$ ${f(c33.saldoInicial)}</td>
+      <td class="px-4 py-2 text-right font-mono">$ ${f(getMontoActual(c33))}</td>
+      <td class="px-4 py-2 text-right font-mono">$ ${f(c33.saldoFinal)}</td>
+    </tr>
+
+    <tr>
+      <td class="px-4 py-2">3.4</td>
+      <td class="px-4 py-2">Resultado del ejercicio (utilidad neta)</td>
+      <td class="px-4 py-2 text-right font-mono">$ ${f(c34.saldoInicial)}</td>
+      <td class="px-4 py-2 text-right font-mono">$ ${f(getMontoActual(c34))}</td>
+      <td class="px-4 py-2 text-right font-mono">$ ${f(c34.saldoFinal)}</td>
+    </tr>
+
+    <tr class="bg-slate-900/60">
+      <td></td>
+      <td class="px-4 py-2 text-xs font-semibold">Total aumentos del patrimonio</td>
+      <td></td><td></td>
+      <td class="px-4 py-2 text-right font-mono font-semibold text-sky-200">
+        $ ${f(totalAumentosManual)}
+      </td>
+    </tr>
+
+    <!-- III. DISMINUCIONES -->
+    <tr class="bg-emerald-400">
+      <td colspan="5" class="px-4 py-2 font-semibold uppercase tracking-wide text-xs">
+        III. DISMINUCIONES DEL PATRIMONIO
+      </td>
+    </tr>
+
+    <tr>
+      <td class="px-4 py-2">3.5</td>
+      <td class="px-4 py-2">(-) Retiros del propietario</td>
+      <td class="px-4 py-2 text-right font-mono">$ ${f(c35.saldoInicial)}</td>
+      <td class="px-4 py-2 text-right font-mono">$ ${f(getMontoActual(c35))}</td>
+      <td class="px-4 py-2 text-right font-mono">$ ${f(c35.saldoFinal)}</td>
+    </tr>
+
+    <tr class="bg-slate-900/60">
+      <td></td>
+      <td class="px-4 py-2 text-xs font-semibold">Total retiros del propietario</td>
+      <td></td><td></td>
+      <td class="px-4 py-2 text-right font-mono font-semibold text-rose-200">$ ${f(t.disminuciones)}</td>
+    </tr>
+
+    <!-- IV. PATRIMONIO FINAL -->
+    <tr class="bg-emerald-400">
+      <td colspan="4" class="px-4 py-3 text-xs font-semibold uppercase">
+        IV. PATRIMONIO FINAL (Patrimonio Inicial + Aumentos - Disminuciones)
+      </td>
+      <td class="px-4 py-3 text-right font-mono text-lg font-bold text-yellow-300">
+        $ ${f(t.saldoFinal)}
+      </td>
+    </tr>
+
+  </tbody>
+</table>
+  `;
+}
