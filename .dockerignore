@@ -1,0 +1,44 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+README.md
+DOCUMENTACION_FLUJOS_EFECTIVO.md
+
+# IDE
+.vscode
+.idea
+*.iml
+*.iws
+*.ipr
+
+# Build artifacts
+**/target/
+**/node_modules/
+**/.mvn/wrapper/maven-wrapper.jar
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp_segment.txt
+**/temp/
+**/.tmp/
+
+# Docker files (no need to copy into image)
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
+**/test/
+**/*Test.java
+**/*Tests.java
