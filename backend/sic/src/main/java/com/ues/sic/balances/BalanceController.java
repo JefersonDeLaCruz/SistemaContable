@@ -183,7 +183,7 @@ public class BalanceController {
                 item.put("monto", round2(Math.abs(monto)));
                 ingresos.add(item);
                 totalIngresos += monto;
-            } else if ("GASTOS".equalsIgnoreCase(tipo) || codigo.startsWith("5")) {
+            } else if ("GASTOS".equalsIgnoreCase(tipo) || codigo.startsWith("5") || codigo.startsWith("6") || codigo.startsWith("7")) {
                 monto = totalDebito - totalCredito;
                 if (Math.abs(monto) < 0.005) continue;
                 Map<String, Object> item = new LinkedHashMap<>();

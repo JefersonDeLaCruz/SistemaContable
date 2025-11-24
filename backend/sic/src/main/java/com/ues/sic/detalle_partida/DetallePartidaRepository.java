@@ -45,7 +45,7 @@ public interface DetallePartidaRepository extends JpaRepository<DetallePartidaMo
       JOIN partidas p ON p.id = d.id_partida
       LEFT JOIN cuentas c ON c.id_cuenta = CAST(d.id_cuenta AS INTEGER)
       WHERE CAST(p.fecha AS DATE) = CAST(:hoy AS DATE)
-        AND (c.tipo = 'GASTOS' OR c.codigo LIKE '5%')
+        AND (c.tipo = 'GASTOS' OR c.codigo LIKE '5%' OR c.codigo LIKE '6%' OR c.codigo LIKE '7%')
       """, nativeQuery = true)
   Double gastoDiario(@Param("hoy") String hoy);
 
@@ -124,7 +124,7 @@ public interface DetallePartidaRepository extends JpaRepository<DetallePartidaMo
       JOIN partidas p ON p.id = d.id_partida
       LEFT JOIN cuentas c ON c.id_cuenta = CAST(d.id_cuenta AS INTEGER)
       WHERE CAST(p.fecha AS DATE) <= CAST(:fechaCorte AS DATE)
-        AND (c.tipo = 'GASTOS' OR c.codigo LIKE '5%')
+        AND (c.tipo = 'GASTOS' OR c.codigo LIKE '5%' OR c.codigo LIKE '6%' OR c.codigo LIKE '7%')
       """, nativeQuery = true)
   Double gastoAcumulado(@Param("fechaCorte") String fechaCorte);
 
@@ -141,7 +141,9 @@ public interface DetallePartidaRepository extends JpaRepository<DetallePartidaMo
       FROM cuentas c
       LEFT JOIN detalle_partida d ON CAST(d.id_cuenta AS INTEGER) = c.id_cuenta
       LEFT JOIN partidas p ON p.id = d.id_partida
-      WHERE (c.tipo = 'INGRESOS' OR c.codigo LIKE '4%' OR c.tipo = 'GASTOS' OR c.codigo LIKE '5%')
+      WHERE (c.tipo = 'INGRESOS' OR c.codigo LIKE '4%'
+             OR c.tipo = 'GASTOS' OR c.codigo LIKE '5%'
+             OR c.codigo LIKE '6%' OR c.codigo LIKE '7%')
         AND (p.fecha IS NULL OR (CAST(p.fecha AS DATE) BETWEEN CAST(:inicio AS DATE) AND CAST(:fin AS DATE)))
       GROUP BY c.tipo, c.id_cuenta, c.codigo, c.nombre, c.saldo_normal
       ORDER BY c.codigo
@@ -164,7 +166,7 @@ public interface DetallePartidaRepository extends JpaRepository<DetallePartidaMo
       JOIN partidas p ON p.id = d.id_partida
       LEFT JOIN cuentas c ON c.id_cuenta = CAST(d.id_cuenta AS INTEGER)
       WHERE CAST(p.fecha AS DATE) BETWEEN CAST(:inicio AS DATE) AND CAST(:fin AS DATE)
-        AND (c.tipo = 'GASTOS' OR c.codigo LIKE '5%')
+        AND (c.tipo = 'GASTOS' OR c.codigo LIKE '5%' OR c.codigo LIKE '6%' OR c.codigo LIKE '7%')
       """, nativeQuery = true)
   Double gastoEntre(@Param("inicio") String inicio, @Param("fin") String fin);
 

@@ -138,74 +138,87 @@ function getSaldo(data, nombreCuenta) {
   return cuenta ? Number(cuenta.saldoFinal) : 0.00;
 }
 
-// Estado de Resultados
-async function renderEstadoResultados() {
+// Estado de Resultados - Usa el endpoint del backend
+async function renderEstadoResultados(dataFromBackend = null) {
   const cont = document.getElementById("balanceContainer");
   const periodoId = Number(document.getElementById("selectPeriodo").value);
-  let data = null; // libro mayor
+  let data = dataFromBackend; // datos del estado de resultados
   let periodos = null; // periodos
-  let periodoActivo = null; // periodo seleccionado para crear estado de resultados
+  let periodoActivo = null; // periodo seleccionado
 
-  // Utilizamos la API de libro mayor para traer la informacion
-  // del saldo de cada cuenta, esta informacion es necesaria para
-  // crear el estado de resultados
-  try {
-    data = await fetch(`/api/libromayor?periodoId=${periodoId}`).then((r) =>
-      r.json()
-    );
-    periodos = await fetch(`/api/periodos`).then((r) => r.json()); // Todos los periodos
-    periodoActivo = periodos.find((p) => p.idPeriodo === periodoId) || null; // Filtramos
-    console.log(data);
-  } catch (err) {
-    console.error("Error cargando datos para crear estado de resultados", err);
-    return;
+  // Si no se pasaron datos, obtenerlos del backend
+  if (!data) {
+    try {
+      data = await fetch(`/api/balances/estado?periodo=${periodoId}`).then((r) => r.json());
+      periodos = await fetch(`/api/periodos`).then((r) => r.json());
+      periodoActivo = periodos.find((p) => p.idPeriodo === periodoId) || null;
+      console.log("Estado de Resultados:", data);
+    } catch (err) {
+      console.error("Error cargando estado de resultados", err);
+      mostrarToast('Error al cargar el estado de resultados', 'error');
+      return;
+    }
+  } else {
+    // Si se pasaron datos, obtener solo los periodos
+    try {
+      periodos = await fetch(`/api/periodos`).then((r) => r.json());
+      periodoActivo = periodos.find((p) => p.idPeriodo === periodoId) || null;
+    } catch (err) {
+      console.error("Error cargando periodos", err);
+    }
   }
 
-  // DATOS NECESARIOS PARA HACER CALCULOS
-  // Total Ingresos
-  let ingresos = getSaldo(data, "INGRESOS");
-  let ventas = getSaldo(data, "VENTAS");
-  let descuentoSobreVentas = getSaldo(data, "DESCUENTOS SOBRE VENTAS");
-  let otrosIngresos = getSaldo(data, "OTROS INGRESOS");
-  let totalIngresos = ingresos + ventas  - descuentoSobreVentas + otrosIngresos;
+  // DATOS DEL BACKEND
+  const ingresosCuentas = data.ingresos?.cuentas || [];
+  const gastosCuentas = data.gastos?.cuentas || [];
+  const totalIngresos = data.ingresos?.total || 0;
+  const totalGastos = data.gastos?.total || 0;
+  const utilidadNeta = data.utilidadNeta || 0;
 
-  // Utilidad Bruta
-  let costoDeVentas = getSaldo(data, "COSTO DE VENTAS");
-  let costoMercaderiasVendidas = getSaldo(data, "COSTO DE MERCADERÍAS VENDIDAS");
-  let utilidadBruta = totalIngresos - (costoDeVentas + costoMercaderiasVendidas)
+  // Función auxiliar para obtener cuenta por código
+  const getCuentaPorCodigo = (cuentas, codigo) => {
+    return cuentas.find(c => c.codigo === codigo) || { monto: 0 };
+  };
 
-  // Gastos de operacion
-  let gastosDeOperacion = getSaldo(data, "GASTOS DE OPERACIÓN");
+  // Clasificar cuentas por código
+  // INGRESOS (4.X)
+  const ingresos = getCuentaPorCodigo(ingresosCuentas, "4");
+  const ventas = getCuentaPorCodigo(ingresosCuentas, "4.1");
+  const descuentoSobreVentas = getCuentaPorCodigo(ingresosCuentas, "4.2");
+  const otrosIngresos = getCuentaPorCodigo(ingresosCuentas, "4.3");
 
-  // Gastos de Administracion
-  let gastosDeAdministracion = getSaldo(data, "GASTOS DE ADMINISTRACIÓN");
-  let sueldosSalarios = getSaldo(data, "SUELDOS Y SALARIOS");
-  let serviciosBasicos = getSaldo(data, "SERVICIOS BÁSICOS");
-  let papeleriaUtiles = getSaldo(data, "PAPELERÍA Y ÚTILES");
-  let subtotalGastosAdministracion = gastosDeAdministracion + sueldosSalarios + serviciosBasicos + papeleriaUtiles;
+  // COSTO DE VENTAS (5.X)
+  const costoDeVentas = getCuentaPorCodigo(gastosCuentas, "5");
+  const costoMercaderiasVendidas = getCuentaPorCodigo(gastosCuentas, "5.1");
+  const totalCostoVentas = (costoDeVentas.monto || 0) + (costoMercaderiasVendidas.monto || 0);
+  const utilidadBruta = totalIngresos - totalCostoVentas;
 
-   // Gastos de Venta
-  let gastosDeVenta = getSaldo(data, "GASTOS DE VENTAS");
-  let publicidadPropaganda = getSaldo(data, "PUBLICIDAD Y PROPAGANDA");
-  let subtotalGastosVenta = gastosDeVenta + publicidadPropaganda;
+  // GASTOS DE OPERACIÓN (6.X)
+  const gastosDeOperacion = getCuentaPorCodigo(gastosCuentas, "6");
+  const gastosDeAdministracion = getCuentaPorCodigo(gastosCuentas, "6.1");
+  const sueldosSalarios = getCuentaPorCodigo(gastosCuentas, "6.1.1");
+  const serviciosBasicos = getCuentaPorCodigo(gastosCuentas, "6.1.2");
+  const papeleriaUtiles = getCuentaPorCodigo(gastosCuentas, "6.1.3");
+  const subtotalGastosAdministracion = (gastosDeAdministracion.monto || 0) + (sueldosSalarios.monto || 0) + (serviciosBasicos.monto || 0) + (papeleriaUtiles.monto || 0);
 
-  // Otros gastos operativos
-  let otrosGastosOperativos = getSaldo(data, "OTROS GASTOS OPERATIVOS");
-  let depreciacionDelPeriodo = getSaldo(data, "DEPRECIACIÓN DEL PERIODO");
-  let subtotalOtrosGastosOperativos = otrosGastosOperativos + depreciacionDelPeriodo;
+  const gastosDeVenta = getCuentaPorCodigo(gastosCuentas, "6.2");
+  const publicidadPropaganda = getCuentaPorCodigo(gastosCuentas, "6.2.1");
+  const subtotalGastosVenta = (gastosDeVenta.monto || 0) + (publicidadPropaganda.monto || 0);
 
-  let totalGastosDeOperacion = gastosDeOperacion + subtotalGastosAdministracion + subtotalGastosVenta + subtotalOtrosGastosOperativos;
+  const otrosGastosOperativos = getCuentaPorCodigo(gastosCuentas, "6.3");
+  const depreciacionDelPeriodo = getCuentaPorCodigo(gastosCuentas, "6.3.1");
+  const subtotalOtrosGastosOperativos = (otrosGastosOperativos.monto || 0) + (depreciacionDelPeriodo.monto || 0);
 
-  // Utilidad operativa
-  let utilidadOperativa = utilidadBruta - totalGastosDeOperacion;
+  const totalGastosDeOperacion = (gastosDeOperacion.monto || 0) + subtotalGastosAdministracion + subtotalGastosVenta + subtotalOtrosGastosOperativos;
+  const utilidadOperativa = utilidadBruta - totalGastosDeOperacion;
 
-  // Gastos No Operativos
-  let gastosNoOperativos = getSaldo(data, "GASTOS NO OPERATIVOS");
-  let gastosFinancieros = getSaldo(data, "GASTOS FINANCIEROS");
-  let totalGatosNoOperativos = gastosNoOperativos + gastosFinancieros;
+  // GASTOS NO OPERATIVOS (7.X)
+  const gastosNoOperativos = getCuentaPorCodigo(gastosCuentas, "7");
+  const gastosFinancieros = getCuentaPorCodigo(gastosCuentas, "7.1");
+  const totalGastosNoOperativos = (gastosNoOperativos.monto || 0) + (gastosFinancieros.monto || 0);
 
   // UTILIDAD DEL PERIODO
-  let utilidadDelPeriodo = utilidadOperativa - totalGatosNoOperativos;
+  const utilidadDelPeriodo = utilidadOperativa - totalGastosNoOperativos;
 
   const estadoHTML = `
    <div class="w-full bg-blue-100 border border-blue-300 rounded-lg p-4 text-center shadow-sm">
@@ -214,8 +227,8 @@ async function renderEstadoResultados() {
       </p>
       <p class="text-sm mt-1">
         <span class="font-semibold">Periodo:</span> ${
-          periodoActivo.fechaInicio
-        } - ${periodoActivo.fechaFin} <br>
+          periodoActivo ? periodoActivo.fechaInicio : data.periodo?.inicio || 'N/A'
+        } - ${periodoActivo ? periodoActivo.fechaFin : data.periodo?.fin || 'N/A'} <br>
          (Expresado en dólares de los Estados Unidos de América)
       </p>
    </div>
@@ -240,35 +253,35 @@ async function renderEstadoResultados() {
             <td class="px-4 py-2">4</td>
             <td class="px-4 py-2">Ingresos</td>
             <td class="px-4 py-2 text-right font-mono">$ ${
-              parseFloat(ingresos).toFixed(2)
+              parseFloat(ingresos.monto || 0).toFixed(2)
             }</td>
           </tr>
           <tr>
             <td class="px-4 py-2">4.1</td>
             <td class="px-4 py-2">Ventas</td>
             <td class="px-4 py-2 text-right font-mono">$ ${
-              parseFloat(ventas).toFixed(2)
+              parseFloat(ventas.monto || 0).toFixed(2)
             }</td>
           </tr>
           <tr>
             <td class="px-4 py-2">4.2</td>
             <td class="px-4 py-2">(-) Descuentos sobre ventas</td>
             <td class="px-4 py-2 text-right font-mono">$ ${
-              parseFloat(descuentoSobreVentas).toFixed(2)
+              parseFloat(descuentoSobreVentas.monto || 0).toFixed(2)
             }</td>
           </tr>
           <tr>
             <td class="px-4 py-2">4.3</td>
             <td class="px-4 py-2">Otros ingresos</td>
             <td class="px-4 py-2 text-right font-mono">$ ${
-              parseFloat(otrosIngresos).toFixed(2)
+              parseFloat(otrosIngresos.monto || 0).toFixed(2)
             }</td>
           </tr>
           <tr class="bg-slate-900/60">
             <td class="px-4 py-2 text-xs font-semibold text-slate-400"></td>
             <td class="px-4 py-2 text-xs font-semibold">Total ingresos</td>
             <td class="px-4 py-2 text-right font-mono font-semibold text-emerald-300">$ ${
-              parseFloat(totalIngresos).toFixed(2) 
+              parseFloat(totalIngresos).toFixed(2)
             }</td>
           </tr>
 
@@ -281,12 +294,12 @@ async function renderEstadoResultados() {
           <tr>
             <td class="px-4 py-2">5</td>
             <td class="px-4 py-2">Costo de Ventas</td>
-            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(costoDeVentas).toFixed(2)}</td>
+            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(costoDeVentas.monto || 0).toFixed(2)}</td>
           </tr>
           <tr>
             <td class="px-4 py-2">5.1</td>
             <td class="px-4 py-2">Costo de mercaderías vendidas</td>
-            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(costoMercaderiasVendidas).toFixed(2)}</td>
+            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(costoMercaderiasVendidas.monto || 0).toFixed(2)}</td>
           </tr>
           <tr class="bg-slate-900/60">
             <td class="px-4 py-2 text-xs font-semibold text-slate-400"></td>
@@ -303,27 +316,27 @@ async function renderEstadoResultados() {
           <tr>
             <td class="px-4 py-2">6</td>
             <td class="px-4 py-2">Gastos de Operacion</td>
-            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(gastosDeOperacion).toFixed(2)}</td>
+            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(gastosDeOperacion.monto || 0).toFixed(2)}</td>
           </tr>
           <tr>
             <td class="px-4 py-2">6.1</td>
             <td class="px-4 py-2">Gastos de Administración</td>
-            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(gastosDeAdministracion).toFixed(2)}</td>
+            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(gastosDeAdministracion.monto || 0).toFixed(2)}</td>
           </tr>
           <tr>
             <td class="px-4 py-2">6.1.1</td>
             <td class="px-4 py-2">Sueldos y salarios</td>
-            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(sueldosSalarios).toFixed(2)}</td>
+            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(sueldosSalarios.monto || 0).toFixed(2)}</td>
           </tr>
           <tr>
             <td class="px-4 py-2">6.1.2</td>
             <td class="px-4 py-2">Servicios básicos</td>
-            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(serviciosBasicos).toFixed(2)}</td>
+            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(serviciosBasicos.monto || 0).toFixed(2)}</td>
           </tr>
           <tr>
             <td class="px-4 py-2">6.1.3</td>
             <td class="px-4 py-2">Papelería y útiles</td>
-            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(papeleriaUtiles).toFixed(2)}</td>
+            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(papeleriaUtiles.monto || 0).toFixed(2)}</td>
           </tr>
           <tr class="bg-slate-900/60">
             <td class="px-4 py-2 text-xs font-semibold text-slate-400"></td>
@@ -337,12 +350,12 @@ async function renderEstadoResultados() {
           <tr>
             <td class="px-4 py-2">6.2</td>
             <td class="px-4 py-2">Gastos de Ventas</td>
-            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(gastosDeVenta).toFixed(2)}</td>
+            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(gastosDeVenta.monto || 0).toFixed(2)}</td>
           </tr>
           <tr>
             <td class="px-4 py-2">6.2.1</td>
             <td class="px-4 py-2">Publicidad y propaganda</td>
-            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(publicidadPropaganda).toFixed(2)}</td>
+            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(publicidadPropaganda.monto || 0).toFixed(2)}</td>
           </tr>
           <tr class="bg-slate-900/60">
             <td class="px-4 py-2 text-xs font-semibold text-slate-400"></td>
@@ -356,12 +369,12 @@ async function renderEstadoResultados() {
           <tr>
             <td class="px-4 py-2">6.3</td>
             <td class="px-4 py-2">Otros gastos operativos</td>
-            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(otrosGastosOperativos).toFixed(2)}</td>
+            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(otrosGastosOperativos.monto || 0).toFixed(2)}</td>
           </tr>
           <tr>
             <td class="px-4 py-2">6.3.1</td>
             <td class="px-4 py-2">Depreciación del período</td>
-            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(depreciacionDelPeriodo).toFixed(2)}</td>
+            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(depreciacionDelPeriodo.monto || 0).toFixed(2)}</td>
           </tr>
           <tr class="bg-slate-900/60">
             <td class="px-4 py-2 text-xs font-semibold text-slate-400"></td>
@@ -385,37 +398,37 @@ async function renderEstadoResultados() {
             <td class="px-4 py-2 text-right font-mono font-semibold text-emerald-300">$ ${parseFloat(utilidadOperativa).toFixed(2)}</td>
           </tr>
 
-          <!-- IV. GASTOS NO OPERATIVOS -->
+          <!-- V. GASTOS NO OPERATIVOS -->
           <tr class="bg-emerald-400">
             <td colspan="3" class="px-4 py-2 font-semibold uppercase tracking-wide text-xs">
-              IV. GASTOS NO OPERATIVOS
+              V. GASTOS NO OPERATIVOS
             </td>
           </tr>
           <tr>
             <td class="px-4 py-2">7</td>
             <td class="px-4 py-2">Gastos No Operativos</td>
-            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(gastosNoOperativos).toFixed(2)}</td>
+            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(gastosNoOperativos.monto || 0).toFixed(2)}</td>
           </tr>
           <tr>
             <td class="px-4 py-2">7.1</td>
             <td class="px-4 py-2">Gastos financieros</td>
-            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(gastosFinancieros).toFixed(2)}</td>
+            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(gastosFinancieros.monto || 0).toFixed(2)}</td>
           </tr>
           <tr class="bg-slate-900/60">
             <td class="px-4 py-2 text-xs font-semibold text-slate-400"></td>
             <td class="px-4 py-2 text-xs font-semibold">
               Total gastos no operativos
             </td>
-            <td class="px-4 py-2 text-right font-mono font-semibold text-rose-200">$ ${parseFloat(totalGatosNoOperativos).toFixed(2)}</td>
+            <td class="px-4 py-2 text-right font-mono font-semibold text-rose-200">$ ${parseFloat(totalGastosNoOperativos).toFixed(2)}</td>
           </tr>
 
-          <!-- V. UTILIDAD NETA DEL PERIODO -->
+          <!-- VI. UTILIDAD NETA DEL PERIODO -->
           <tr class="bg-emerald-400">
             <td colspan="2" class="px-4 py-3 text-xs font-semibold uppercase">
-              V. UTILIDAD NETA DEL PERIODO
+              VI. UTILIDAD NETA DEL PERIODO
             </td>
             <td class="px-4 py-3 text-right font-mono text-lg font-bold text-rose-200">
-              $ ${parseFloat(utilidadDelPeriodo).toFixed(2)}
+              $ ${parseFloat(utilidadNeta).toFixed(2)}
             </td>
           </tr>
 
