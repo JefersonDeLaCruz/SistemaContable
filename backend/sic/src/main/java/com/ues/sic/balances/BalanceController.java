@@ -87,7 +87,14 @@ public class BalanceController {
                 totalPasivo += saldo;
             } else if ("CAPITAL CONTABLE".equalsIgnoreCase(tipo)) {
                 capital.add(item);
-                totalCapital += saldo;
+                // Los retiros del propietario restan del capital, no suman
+                // Verificamos por código (3.2, 3.5, etc.) o por nombre que contenga "RETIRO"
+                if (codigo.startsWith("3.2") || codigo.startsWith("3.5") ||
+                    nombre.toUpperCase().contains("RETIRO")) {
+                    totalCapital -= saldo;
+                } else {
+                    totalCapital += saldo;
+                }
             }
         }
 
