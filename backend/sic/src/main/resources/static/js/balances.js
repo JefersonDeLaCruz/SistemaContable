@@ -126,66 +126,320 @@ function renderBalance(data) {
       </div>
     </div>
   `;
-}function renderEstadoResultados(data) {
-  const cont = document.getElementById('balanceContainer');
-  const header = `
-    <div class="alert">
-      <span>Periodo: <b>${data.periodo.inicio}</b> a <b>${data.periodo.fin}</b></span>
-    </div>
-  `;
+}
 
-  const renderERSeccion = (titulo, dataSec) => {
-    const filas = (dataSec.cuentas || []).map(c => `
-      <tr class="border-t border-base-200">
-        <td class="px-4 py-2 text-sm tabular-nums">${c.codigo}</td>
-        <td class="px-4 py-2">${c.nombre}</td>
-        <td class="px-4 py-2 text-right font-mono">${fmtMoneda(c.monto)}</td>
-      </tr>
-    `).join('');
 
-    return `
-      <div class="card bg-base-100 shadow">
-        <div class="card-body">
-          <h3 class="card-title">${titulo}</h3>
-          <div class="overflow-x-auto">
-            <table class="table w-full">
-              <thead>
-                <tr>
-                  <th class="w-28">Código</th>
-                  <th>Cuenta</th>
-                  <th class="w-40 text-right">Monto</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${filas || '<tr><td colspan="3" class="px-4 py-2 opacity-70">Sin datos</td></tr>'}
-              </tbody>
-              <tfoot>
-                <tr class="font-bold border-t-2 border-primary">
-                  <td colspan="2" class="text-right">TOTAL ${titulo.toUpperCase()}:</td>
-                  <td class="text-right font-mono text-primary">${fmtMoneda(dataSec.total)}</td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-        </div>
-      </div>
-    `;
+// Utilidad - Obtiene saldo final de una cuenta
+function getSaldo(data, nombreCuenta) {
+  if (!data || !data.cuentas) return 0.00;
+
+  const cuenta = data.cuentas.find(c => c.nombreCuenta === nombreCuenta);
+
+  return cuenta ? Number(cuenta.saldoFinal) : 0.00;
+}
+
+// Estado de Resultados - Usa el endpoint del backend
+async function renderEstadoResultados(dataFromBackend = null) {
+  const cont = document.getElementById("balanceContainer");
+  const periodoId = Number(document.getElementById("selectPeriodo").value);
+  let data = dataFromBackend; // datos del estado de resultados
+  let periodos = null; // periodos
+  let periodoActivo = null; // periodo seleccionado
+
+  // Si no se pasaron datos, obtenerlos del backend
+  if (!data) {
+    try {
+      data = await fetch(`/api/balances/estado?periodo=${periodoId}`).then((r) => r.json());
+      periodos = await fetch(`/api/periodos`).then((r) => r.json());
+      periodoActivo = periodos.find((p) => p.idPeriodo === periodoId) || null;
+      console.log("Estado de Resultados:", data);
+    } catch (err) {
+      console.error("Error cargando estado de resultados", err);
+      mostrarToast('Error al cargar el estado de resultados', 'error');
+      return;
+    }
+  } else {
+    // Si se pasaron datos, obtener solo los periodos
+    try {
+      periodos = await fetch(`/api/periodos`).then((r) => r.json());
+      periodoActivo = periodos.find((p) => p.idPeriodo === periodoId) || null;
+    } catch (err) {
+      console.error("Error cargando periodos", err);
+    }
+  }
+
+  // DATOS DEL BACKEND
+  const ingresosCuentas = data.ingresos?.cuentas || [];
+  const gastosCuentas = data.gastos?.cuentas || [];
+  const totalIngresos = data.ingresos?.total || 0;
+  const totalGastos = data.gastos?.total || 0;
+  const utilidadNeta = data.utilidadNeta || 0;
+
+  // Función auxiliar para obtener cuenta por código
+  const getCuentaPorCodigo = (cuentas, codigo) => {
+    return cuentas.find(c => c.codigo === codigo) || { monto: 0 };
   };
 
-  cont.innerHTML = `
-    ${header}
-    <div class="space-y-6">
-      ${renderERSeccion('Ingresos', data.ingresos)}
-      ${renderERSeccion('Gastos', data.gastos)}
-      <div class="card bg-base-100 shadow">
-        <div class="card-body">
-          <div class="text-xl">Resultado del período: <b>${data.resultado}</b></div>
-          <div class="text-3xl font-bold">${fmtMoneda(data.utilidadNeta)}</div>
-        </div>
-      </div>
-    </div>
+  // Clasificar cuentas por código
+  // INGRESOS (4.X)
+  const ingresos = getCuentaPorCodigo(ingresosCuentas, "4");
+  const ventas = getCuentaPorCodigo(ingresosCuentas, "4.1");
+  const descuentoSobreVentas = getCuentaPorCodigo(ingresosCuentas, "4.2");
+  const otrosIngresos = getCuentaPorCodigo(ingresosCuentas, "4.3");
+
+  // COSTO DE VENTAS (5.X)
+  const costoDeVentas = getCuentaPorCodigo(gastosCuentas, "5");
+  const costoMercaderiasVendidas = getCuentaPorCodigo(gastosCuentas, "5.1");
+  const totalCostoVentas = (costoDeVentas.monto || 0) + (costoMercaderiasVendidas.monto || 0);
+  const utilidadBruta = totalIngresos - totalCostoVentas;
+
+  // GASTOS DE OPERACIÓN (6.X)
+  const gastosDeOperacion = getCuentaPorCodigo(gastosCuentas, "6");
+  const gastosDeAdministracion = getCuentaPorCodigo(gastosCuentas, "6.1");
+  const sueldosSalarios = getCuentaPorCodigo(gastosCuentas, "6.1.1");
+  const serviciosBasicos = getCuentaPorCodigo(gastosCuentas, "6.1.2");
+  const papeleriaUtiles = getCuentaPorCodigo(gastosCuentas, "6.1.3");
+  const subtotalGastosAdministracion = (gastosDeAdministracion.monto || 0) + (sueldosSalarios.monto || 0) + (serviciosBasicos.monto || 0) + (papeleriaUtiles.monto || 0);
+
+  const gastosDeVenta = getCuentaPorCodigo(gastosCuentas, "6.2");
+  const publicidadPropaganda = getCuentaPorCodigo(gastosCuentas, "6.2.1");
+  const subtotalGastosVenta = (gastosDeVenta.monto || 0) + (publicidadPropaganda.monto || 0);
+
+  const otrosGastosOperativos = getCuentaPorCodigo(gastosCuentas, "6.3");
+  const depreciacionDelPeriodo = getCuentaPorCodigo(gastosCuentas, "6.3.1");
+  const subtotalOtrosGastosOperativos = (otrosGastosOperativos.monto || 0) + (depreciacionDelPeriodo.monto || 0);
+
+  const totalGastosDeOperacion = (gastosDeOperacion.monto || 0) + subtotalGastosAdministracion + subtotalGastosVenta + subtotalOtrosGastosOperativos;
+  const utilidadOperativa = utilidadBruta - totalGastosDeOperacion;
+
+  // GASTOS NO OPERATIVOS (7.X)
+  const gastosNoOperativos = getCuentaPorCodigo(gastosCuentas, "7");
+  const gastosFinancieros = getCuentaPorCodigo(gastosCuentas, "7.1");
+  const totalGastosNoOperativos = (gastosNoOperativos.monto || 0) + (gastosFinancieros.monto || 0);
+
+  // UTILIDAD DEL PERIODO
+  const utilidadDelPeriodo = utilidadOperativa - totalGastosNoOperativos;
+
+  const estadoHTML = `
+   <div class="w-full bg-blue-100 border border-blue-300 rounded-lg p-4 text-center shadow-sm">
+      <p class="text-lg font-bold">
+        ESTADO DE RESULTADOS
+      </p>
+      <p class="text-sm mt-1">
+        <span class="font-semibold">Periodo:</span> ${
+          periodoActivo ? periodoActivo.fechaInicio : data.periodo?.inicio || 'N/A'
+        } - ${periodoActivo ? periodoActivo.fechaFin : data.periodo?.fin || 'N/A'} <br>
+         (Expresado en dólares de los Estados Unidos de América)
+      </p>
+   </div>
+
+   <table class="min-w-full text-sm">
+        <thead class="bg-sky-950 text-slate-200">
+          <tr>
+            <th class="px-4 py-3 text-left font-semibold uppercase tracking-wide text-xs">Código</th>
+            <th class="px-4 py-3 text-left font-semibold uppercase tracking-wide text-xs">Cuenta</th>
+            <th class="px-4 py-3 text-right font-semibold uppercase tracking-wide text-xs">Monto ($)</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-800">
+
+          <!-- I. INGRESOS -->
+          <tr class="bg-emerald-400">
+            <td colspan="3" class="px-4 py-2 font-semibold uppercase tracking-wide text-xs">
+              I. INGRESOS
+            </td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2">4</td>
+            <td class="px-4 py-2">Ingresos</td>
+            <td class="px-4 py-2 text-right font-mono">$ ${
+              parseFloat(ingresos.monto || 0).toFixed(2)
+            }</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2">4.1</td>
+            <td class="px-4 py-2">Ventas</td>
+            <td class="px-4 py-2 text-right font-mono">$ ${
+              parseFloat(ventas.monto || 0).toFixed(2)
+            }</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2">4.2</td>
+            <td class="px-4 py-2">(-) Descuentos sobre ventas</td>
+            <td class="px-4 py-2 text-right font-mono">$ ${
+              parseFloat(descuentoSobreVentas.monto || 0).toFixed(2)
+            }</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2">4.3</td>
+            <td class="px-4 py-2">Otros ingresos</td>
+            <td class="px-4 py-2 text-right font-mono">$ ${
+              parseFloat(otrosIngresos.monto || 0).toFixed(2)
+            }</td>
+          </tr>
+          <tr class="bg-slate-900/60">
+            <td class="px-4 py-2 text-xs font-semibold text-slate-400"></td>
+            <td class="px-4 py-2 text-xs font-semibold">Total ingresos</td>
+            <td class="px-4 py-2 text-right font-mono font-semibold text-emerald-300">$ ${
+              parseFloat(totalIngresos).toFixed(2)
+            }</td>
+          </tr>
+
+          <!-- II. COSTO DE VENTAS -->
+          <tr class="bg-emerald-400">
+            <td colspan="3" class="px-4 py-2 font-semibold uppercase tracking-wide text-xs">
+              II. COSTO DE VENTAS
+            </td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2">5</td>
+            <td class="px-4 py-2">Costo de Ventas</td>
+            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(costoDeVentas.monto || 0).toFixed(2)}</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2">5.1</td>
+            <td class="px-4 py-2">Costo de mercaderías vendidas</td>
+            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(costoMercaderiasVendidas.monto || 0).toFixed(2)}</td>
+          </tr>
+          <tr class="bg-slate-900/60">
+            <td class="px-4 py-2 text-xs font-semibold text-slate-400"></td>
+            <td class="px-4 py-2 text-xs font-semibold">UTILIDAD BRUTA</td>
+            <td class="px-4 py-2 text-right font-mono font-semibold text-emerald-300">$ ${parseFloat(utilidadBruta).toFixed(2)}</td>
+          </tr>
+
+          <!-- III. GASTOS DE OPERACIÓN -->
+          <tr class="bg-emerald-400">
+            <td colspan="3" class="px-4 py-2 font-semibold uppercase tracking-wide text-xs">
+              III. GASTOS DE OPERACIÓN
+            </td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2">6</td>
+            <td class="px-4 py-2">Gastos de Operacion</td>
+            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(gastosDeOperacion.monto || 0).toFixed(2)}</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2">6.1</td>
+            <td class="px-4 py-2">Gastos de Administración</td>
+            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(gastosDeAdministracion.monto || 0).toFixed(2)}</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2">6.1.1</td>
+            <td class="px-4 py-2">Sueldos y salarios</td>
+            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(sueldosSalarios.monto || 0).toFixed(2)}</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2">6.1.2</td>
+            <td class="px-4 py-2">Servicios básicos</td>
+            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(serviciosBasicos.monto || 0).toFixed(2)}</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2">6.1.3</td>
+            <td class="px-4 py-2">Papelería y útiles</td>
+            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(papeleriaUtiles.monto || 0).toFixed(2)}</td>
+          </tr>
+          <tr class="bg-slate-900/60">
+            <td class="px-4 py-2 text-xs font-semibold text-slate-400"></td>
+            <td class="px-4 py-2 text-xs font-semibold">
+              Subtotal gastos de administración
+            </td>
+            <td class="px-4 py-2 text-right font-mono font-semibold text-sky-200">$ ${parseFloat(subtotalGastosAdministracion).toFixed(2)}</td>
+          </tr>
+
+          <!-- b) Gastos de Ventas -->
+          <tr>
+            <td class="px-4 py-2">6.2</td>
+            <td class="px-4 py-2">Gastos de Ventas</td>
+            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(gastosDeVenta.monto || 0).toFixed(2)}</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2">6.2.1</td>
+            <td class="px-4 py-2">Publicidad y propaganda</td>
+            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(publicidadPropaganda.monto || 0).toFixed(2)}</td>
+          </tr>
+          <tr class="bg-slate-900/60">
+            <td class="px-4 py-2 text-xs font-semibold text-slate-400"></td>
+            <td class="px-4 py-2 text-xs font-semibold">
+              Subtotal gastos de ventas
+            </td>
+            <td class="px-4 py-2 text-right font-mono font-semibold text-sky-200">$ ${parseFloat(subtotalGastosVenta).toFixed(2)}</td>
+          </tr>
+
+          <!-- c) Otros gastos operativos -->
+          <tr>
+            <td class="px-4 py-2">6.3</td>
+            <td class="px-4 py-2">Otros gastos operativos</td>
+            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(otrosGastosOperativos.monto || 0).toFixed(2)}</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2">6.3.1</td>
+            <td class="px-4 py-2">Depreciación del período</td>
+            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(depreciacionDelPeriodo.monto || 0).toFixed(2)}</td>
+          </tr>
+          <tr class="bg-slate-900/60">
+            <td class="px-4 py-2 text-xs font-semibold text-slate-400"></td>
+            <td class="px-4 py-2 text-xs font-semibold">
+              Subtotal otros gastos operativos
+            </td>
+            <td class="px-4 py-2 text-right font-mono font-semibold text-sky-200">$ ${parseFloat(subtotalOtrosGastosOperativos).toFixed(2)}</td>
+          </tr>
+          <tr class="bg-slate-900/60">
+            <td class="px-4 py-2 text-xs font-semibold text-slate-400"></td>
+            <td class="px-4 py-2 text-xs font-semibold">
+               Total gastos de operación
+            </td>
+            <td class="px-4 py-2 text-right font-mono font-semibold text-sky-200">$ ${parseFloat(totalGastosDeOperacion).toFixed(2)}</td>
+          </tr>
+
+          <!-- IV. UTILIDAD OPERATIVA -->
+          <tr class="bg-slate-900/60">
+            <td class="px-4 py-2 text-xs font-semibold text-slate-400"></td>
+            <td class="px-4 py-2 text-xs font-semibold">UTILIDAD OPERATIVA</td>
+            <td class="px-4 py-2 text-right font-mono font-semibold text-emerald-300">$ ${parseFloat(utilidadOperativa).toFixed(2)}</td>
+          </tr>
+
+          <!-- V. GASTOS NO OPERATIVOS -->
+          <tr class="bg-emerald-400">
+            <td colspan="3" class="px-4 py-2 font-semibold uppercase tracking-wide text-xs">
+              V. GASTOS NO OPERATIVOS
+            </td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2">7</td>
+            <td class="px-4 py-2">Gastos No Operativos</td>
+            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(gastosNoOperativos.monto || 0).toFixed(2)}</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2">7.1</td>
+            <td class="px-4 py-2">Gastos financieros</td>
+            <td class="px-4 py-2 text-right font-mono">$ ${parseFloat(gastosFinancieros.monto || 0).toFixed(2)}</td>
+          </tr>
+          <tr class="bg-slate-900/60">
+            <td class="px-4 py-2 text-xs font-semibold text-slate-400"></td>
+            <td class="px-4 py-2 text-xs font-semibold">
+              Total gastos no operativos
+            </td>
+            <td class="px-4 py-2 text-right font-mono font-semibold text-rose-200">$ ${parseFloat(totalGastosNoOperativos).toFixed(2)}</td>
+          </tr>
+
+          <!-- VI. UTILIDAD NETA DEL PERIODO -->
+          <tr class="bg-emerald-400">
+            <td colspan="2" class="px-4 py-3 text-xs font-semibold uppercase">
+              VI. UTILIDAD NETA DEL PERIODO
+            </td>
+            <td class="px-4 py-3 text-right font-mono text-lg font-bold text-rose-200">
+              $ ${parseFloat(utilidadNeta).toFixed(2)}
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
   `;
+
+  cont.innerHTML = estadoHTML;
 }
+
+
 window.addEventListener('DOMContentLoaded', () => {
   cargarPeriodosBalance();
   const btn = document.getElementById('btnCalcular');
@@ -227,6 +481,7 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 function renderBalanceComprobacion(data) {
+  console.log(data)
   const cont = document.getElementById('balanceContainer');
   const filas = (data.cuentas || []).map(c => `
     <tr class="border-t border-base-200">
@@ -288,84 +543,184 @@ function renderFlujosEfectivo(data) {
   cont.innerHTML = `${header}${resumen}${secOp}${secInv}${secFin}${totales}`;
 }
 
-function renderCambiosPatrimonio(data) {
-  const cont = document.getElementById('balanceContainer');
-  
-  const filas = (data.cuentas || []).map(c => {
-    const mostrarUtilidad = Math.abs(c.utilidadPeriodo) >= 0.01;
-    return `
-      <tr class="border-t border-base-200">
-        <td class="px-4 py-2 text-sm tabular-nums">${c.codigo}</td>
-        <td class="px-4 py-2">${c.nombre}</td>
-        <td class="px-4 py-2 text-right font-mono">${fmtMoneda(c.saldoInicial)}</td>
-        <td class="px-4 py-2 text-right font-mono text-success">${c.aumentos > 0 ? fmtMoneda(c.aumentos) : '-'}</td>
-        <td class="px-4 py-2 text-right font-mono text-error">${c.disminuciones > 0 ? fmtMoneda(c.disminuciones) : '-'}</td>
-        <td class="px-4 py-2 text-right font-mono ${c.utilidadPeriodo >= 0 ? 'text-success' : 'text-error'}">${mostrarUtilidad ? fmtMoneda(c.utilidadPeriodo) : '-'}</td>
-        <td class="px-4 py-2 text-right font-mono font-semibold">${fmtMoneda(c.saldoFinal)}</td>
-      </tr>
-    `;
-  }).join('');
 
-  cont.innerHTML = `
-    <div class="alert alert-info">
-      <span>Período: <b>${data.periodo.nombre}</b> (${data.periodo.inicio} - ${data.periodo.fin})</span>
-    </div>
-    
-    <div class="card bg-base-100 shadow">
-      <div class="card-body">
-        <h3 class="card-title text-2xl mb-4">Estado de Cambios en el Patrimonio Neto</h3>
-        
-        <div class="overflow-x-auto">
-          <table class="table w-full">
-            <thead>
-              <tr class="bg-base-200">
-                <th class="w-28">Código</th>
-                <th>Cuenta</th>
-                <th class="w-32 text-right">Saldo Inicial</th>
-                <th class="w-32 text-right">Aumentos</th>
-                <th class="w-32 text-right">Disminuciones</th>
-                <th class="w-32 text-right">Utilidad/Pérdida</th>
-                <th class="w-32 text-right">Saldo Final</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${filas || '<tr><td colspan="7" class="px-4 py-2 opacity-70 text-center">Sin movimientos de patrimonio</td></tr>'}
-            </tbody>
-            <tfoot>
-              <tr class="font-bold border-t-2 border-primary bg-base-200">
-                <td colspan="2" class="text-right">TOTALES:</td>
-                <td class="text-right font-mono text-info">${fmtMoneda(data.totales.saldoInicial)}</td>
-                <td class="text-right font-mono text-success">${fmtMoneda(data.totales.aumentos)}</td>
-                <td class="text-right font-mono text-error">${fmtMoneda(data.totales.disminuciones)}</td>
-                <td class="text-right font-mono ${data.totales.utilidadPeriodo >= 0 ? 'text-success' : 'text-error'}">${fmtMoneda(data.totales.utilidadPeriodo)}</td>
-                <td class="text-right font-mono text-primary text-lg">${fmtMoneda(data.totales.saldoFinal)}</td>
-              </tr>
-            </tfoot>
-          </table>
-        </div>
-        
-        <div class="divider"></div>
-        
-        <div class="stats stats-vertical lg:stats-horizontal shadow">
-          <div class="stat">
-            <div class="stat-title">Patrimonio Inicial</div>
-            <div class="stat-value text-sm text-info">${fmtMoneda(data.totales.saldoInicial)}</div>
-          </div>
-          <div class="stat">
-            <div class="stat-title">Variación Neta</div>
-            <div class="stat-value text-sm ${(data.totales.saldoFinal - data.totales.saldoInicial) >= 0 ? 'text-success' : 'text-error'}">
-              ${fmtMoneda(data.totales.saldoFinal - data.totales.saldoInicial)}
-            </div>
-            <div class="stat-desc">Aumentos - Disminuciones + Resultado</div>
-          </div>
-          <div class="stat">
-            <div class="stat-title">Patrimonio Final</div>
-            <div class="stat-value text-sm text-primary">${fmtMoneda(data.totales.saldoFinal)}</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
+// Obtener una cuenta de patrimonio por código (3, 3.1, 3.2, etc.)
+function getCuenta(data, codigo) {
+  return data.cuentas.find(c => c.codigo === codigo) || {
+    codigo: codigo,
+    nombre: "",
+    saldoInicial: 0,
+    aumentos: 0,
+    disminuciones: 0,
+    utilidadPeriodo: 0,
+    saldoFinal: 0
+  };
 }
 
+// Calcula el monto actual = aumentos - disminuciones + utilidadPeriodo
+function getMontoActual(cuenta) {
+  return (
+    parseFloat(cuenta.aumentos) -
+    parseFloat(cuenta.disminuciones) +
+    parseFloat(cuenta.utilidadPeriodo)
+  );
+}
 
+// Formato bonito para números
+function f(n) {
+  return parseFloat(n).toFixed(2);
+}
+
+// Estado de Cambios en el Patrimonio
+function renderCambiosPatrimonio(data) {
+
+  console.log("DATA RECIBIDA:", data);
+
+  const cont = document.getElementById('balanceContainer');
+
+  // Obtener todas las cuentas relevantes
+  const c3   = getCuenta(data, "3");
+  const c31  = getCuenta(data, "3.1");
+  const c32  = getCuenta(data, "3.2");
+  const c33  = getCuenta(data, "3.3");
+  const c34  = getCuenta(data, "3.4");
+  const c35  = getCuenta(data, "3.5");
+
+  // Totales desde el backend
+  const t = data.totales || {};
+
+  // Total aumentos del patrimonio = suma de saldos finales de 3, 3.2, 3.3 y 3.4
+  const totalAumentosManual =
+    Number(c3.saldoFinal || 0) +
+    Number(c32.saldoFinal || 0) +
+    Number(c33.saldoFinal || 0) +
+    Number(c34.saldoFinal || 0);
+
+  cont.innerHTML = `
+<div class="w-full bg-blue-100 border border-blue-300 rounded-lg p-4 text-center shadow-sm">
+  <p class="text-lg font-bold">ESTADO DE CAMBIOS EN EL PATRIMONIO NETO</p>
+  <p class="text-sm mt-1">
+    <span class="font-semibold">Periodo:</span> ${data.periodo.inicio} - ${data.periodo.fin} <br>
+    (Expresado en dólares de los Estados Unidos de América)
+  </p>
+</div>
+
+<table class="min-w-full text-sm mt-4">
+  <thead class="bg-sky-950 text-slate-200">
+    <tr>
+      <th class="px-4 py-3 text-left font-semibold uppercase tracking-wide text-xs">Código</th>
+      <th class="px-4 py-3 text-left font-semibold uppercase tracking-wide text-xs">Cuenta</th>
+      <th class="px-4 py-3 text-right font-semibold uppercase tracking-wide text-xs">Monto Inicial ($)</th>
+      <th class="px-4 py-3 text-right font-semibold uppercase tracking-wide text-xs">Monto Actual ($)</th>
+      <th class="px-4 py-3 text-right font-semibold uppercase tracking-wide text-xs">Monto Total ($)</th>
+    </tr>
+  </thead>
+
+  <tbody class="divide-y divide-slate-800">
+
+    <!-- I. PATRIMONIO INICIAL -->
+    <tr class="bg-emerald-400">
+      <td colspan="5" class="px-4 py-2 font-semibold uppercase tracking-wide text-xs">
+        I. PATRIMONIO INICIAL
+      </td>
+    </tr>
+
+    <tr>
+      <td class="px-4 py-2">3.1</td>
+      <td class="px-4 py-2">Capital Social Inicial</td>
+      <td class="px-4 py-2 text-right font-mono">$ ${f(c31.saldoInicial)}</td>
+      <td class="px-4 py-2 text-right font-mono">$ ${f(getMontoActual(c31))}</td>
+      <td class="px-4 py-2 text-right font-mono">$ ${f(c31.saldoFinal)}</td>
+    </tr>
+
+    <tr class="bg-slate-900/60">
+      <td></td>
+      <td class="px-4 py-2 text-xs font-semibold">Total capital inicial</td>
+      <td></td><td></td>
+      <td class="px-4 py-2 text-right font-mono font-semibold text-emerald-300">$ ${f(c31.saldoFinal)}</td>
+    </tr>
+
+    <!-- II. AUMENTOS DEL PATRIMONIO -->
+    <tr class="bg-emerald-400">
+      <td colspan="5" class="px-4 py-2 font-semibold uppercase tracking-wide text-xs">
+        II. AUMENTOS DEL PATRIMONIO
+      </td>
+    </tr>
+
+    <tr>
+      <td class="px-4 py-2">3</td>
+      <td class="px-4 py-2">Capital Contable</td>
+      <td class="px-4 py-2 text-right font-mono">$ ${f(c3.saldoInicial)}</td>
+      <td class="px-4 py-2 text-right font-mono">$ ${f(getMontoActual(c3))}</td>
+      <td class="px-4 py-2 text-right font-mono">$ ${f(c3.saldoFinal)}</td>
+    </tr>
+
+    <tr>
+      <td class="px-4 py-2">3.2</td>
+      <td class="px-4 py-2">Aportaciones de socios</td>
+      <td class="px-4 py-2 text-right font-mono">$ ${f(c32.saldoInicial)}</td>
+      <td class="px-4 py-2 text-right font-mono">$ ${f(getMontoActual(c32))}</td>
+      <td class="px-4 py-2 text-right font-mono">$ ${f(c32.saldoFinal)}</td>
+    </tr>
+
+    <tr>
+      <td class="px-4 py-2">3.3</td>
+      <td class="px-4 py-2">Utilidades retenidas</td>
+      <td class="px-4 py-2 text-right font-mono">$ ${f(c33.saldoInicial)}</td>
+      <td class="px-4 py-2 text-right font-mono">$ ${f(getMontoActual(c33))}</td>
+      <td class="px-4 py-2 text-right font-mono">$ ${f(c33.saldoFinal)}</td>
+    </tr>
+
+    <tr>
+      <td class="px-4 py-2">3.4</td>
+      <td class="px-4 py-2">Resultado del ejercicio (utilidad neta)</td>
+      <td class="px-4 py-2 text-right font-mono">$ ${f(c34.saldoInicial)}</td>
+      <td class="px-4 py-2 text-right font-mono">$ ${f(getMontoActual(c34))}</td>
+      <td class="px-4 py-2 text-right font-mono">$ ${f(c34.saldoFinal)}</td>
+    </tr>
+
+    <tr class="bg-slate-900/60">
+      <td></td>
+      <td class="px-4 py-2 text-xs font-semibold">Total aumentos del patrimonio</td>
+      <td></td><td></td>
+      <td class="px-4 py-2 text-right font-mono font-semibold text-sky-200">
+        $ ${f(totalAumentosManual)}
+      </td>
+    </tr>
+
+    <!-- III. DISMINUCIONES -->
+    <tr class="bg-emerald-400">
+      <td colspan="5" class="px-4 py-2 font-semibold uppercase tracking-wide text-xs">
+        III. DISMINUCIONES DEL PATRIMONIO
+      </td>
+    </tr>
+
+    <tr>
+      <td class="px-4 py-2">3.5</td>
+      <td class="px-4 py-2">(-) Retiros del propietario</td>
+      <td class="px-4 py-2 text-right font-mono">$ ${f(c35.saldoInicial)}</td>
+      <td class="px-4 py-2 text-right font-mono">$ ${f(getMontoActual(c35))}</td>
+      <td class="px-4 py-2 text-right font-mono">$ ${f(c35.saldoFinal)}</td>
+    </tr>
+
+    <tr class="bg-slate-900/60">
+      <td></td>
+      <td class="px-4 py-2 text-xs font-semibold">Total retiros del propietario</td>
+      <td></td><td></td>
+      <td class="px-4 py-2 text-right font-mono font-semibold text-rose-200">$ ${f(t.disminuciones)}</td>
+    </tr>
+
+    <!-- IV. PATRIMONIO FINAL -->
+    <tr class="bg-emerald-400">
+      <td colspan="4" class="px-4 py-3 text-xs font-semibold uppercase">
+        IV. PATRIMONIO FINAL (Patrimonio Inicial + Aumentos - Disminuciones)
+      </td>
+      <td class="px-4 py-3 text-right font-mono text-lg font-bold text-yellow-300">
+        $ ${f(t.saldoFinal)}
+      </td>
+    </tr>
+
+  </tbody>
+</table>
+  `;
+}

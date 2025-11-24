@@ -118,7 +118,14 @@ public class BalanceController {
                 totalPasivo += saldo;
             } else if ("CAPITAL CONTABLE".equalsIgnoreCase(tipo)) {
                 capital.add(item);
-                totalCapital += saldo;
+                // Los retiros del propietario restan del capital, no suman
+                // Verificamos por código (3.2, 3.5, etc.) o por nombre que contenga "RETIRO"
+                if (codigo.startsWith("3.2") || codigo.startsWith("3.5") ||
+                    nombre.toUpperCase().contains("RETIRO")) {
+                    totalCapital -= saldo;
+                } else {
+                    totalCapital += saldo;
+                }
             }
         }
 
@@ -214,7 +221,7 @@ public class BalanceController {
                 item.put("monto", round2(Math.abs(monto)));
                 ingresos.add(item);
                 totalIngresos += monto;
-            } else if ("GASTOS".equalsIgnoreCase(tipo) || codigo.startsWith("5")) {
+            } else if ("GASTOS".equalsIgnoreCase(tipo) || codigo.startsWith("5") || codigo.startsWith("6") || codigo.startsWith("7")) {
                 monto = totalDebito - totalCredito;
                 if (Math.abs(monto) < 0.005) continue;
                 Map<String, Object> item = new LinkedHashMap<>();
@@ -237,7 +244,7 @@ public class BalanceController {
         resp.put("ingresos", Map.of("cuentas", ingresos, "total", round2(totalIng)));
         resp.put("gastos", Map.of("cuentas", gastos, "total", round2(totalGas)));
         resp.put("utilidadNeta", round2(utilidad));
-        resp.put("resultado", utilidad >= 0 ? "Utilidad" : "PÃ©rdida");
+        resp.put("resultado", utilidad >= 0 ? "Utilidad" : "Perdida");
         return resp;
     }
 
