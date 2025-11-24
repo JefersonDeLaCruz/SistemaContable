@@ -30,6 +30,37 @@ public class BalanceController {
     @Autowired
     private EstadoCambiosPatrimonioService patrimonioService;
 
+    /**
+     * Obtiene los IDs de todos los períodos que están incluidos dentro del rango
+     * de fechas del período seleccionado.
+     * Por ejemplo, si se selecciona "Primer Trimestre", incluirá Enero, Febrero y Marzo.
+     */
+    private List<Integer> obtenerPeriodosIncluidos(Integer periodoId) {
+        List<Integer> periodosIncluidos = new ArrayList<>();
+        
+        Optional<PeriodoContableModel> periodoOpt = periodoRepo.findById(periodoId);
+        if (periodoOpt.isEmpty()) {
+            return periodosIncluidos;
+        }
+        
+        PeriodoContableModel periodoSeleccionado = periodoOpt.get();
+        List<PeriodoContableModel> todosPeriodos = periodoRepo.findAll();
+        
+        for (PeriodoContableModel periodo : todosPeriodos) {
+            // Verificar si el período está completamente dentro del rango del período seleccionado
+            boolean inicioEnRango = !periodo.getFechaInicio().isBefore(periodoSeleccionado.getFechaInicio()) 
+                                    && !periodo.getFechaInicio().isAfter(periodoSeleccionado.getFechaFin());
+            boolean finEnRango = !periodo.getFechaFin().isBefore(periodoSeleccionado.getFechaInicio()) 
+                                 && !periodo.getFechaFin().isAfter(periodoSeleccionado.getFechaFin());
+            
+            if (inicioEnRango && finEnRango) {
+                periodosIncluidos.add(periodo.getIdPeriodo());
+            }
+        }
+        
+        return periodosIncluidos;
+    }
+
     @GetMapping("/general")
     public Map<String, Object> balanceGeneral(
             @RequestParam(value = "fecha", required = false) String fecha,
@@ -326,23 +357,27 @@ public class BalanceController {
 
     /**
      * Endpoint para calcular el Estado de Flujos de Efectivo
+     * Considera períodos implícitos (ej: Trimestre incluye meses)
      * 
      * @param periodoId ID del período contable
      * @return DTO con el estado de flujos de efectivo
      */
     @GetMapping("/flujos-efectivo")
     public EstadoFlujosEfectivoDTO flujosEfectivo(@RequestParam("periodo") Integer periodoId) {
-        return efeService.calcularEFE(periodoId);
+        List<Integer> periodosIncluidos = obtenerPeriodosIncluidos(periodoId);
+        return efeService.calcularEFEConPeriodos(periodoId, periodosIncluidos);
     }
 
     /**
      * Endpoint para calcular el Estado de Cambios en el Patrimonio Neto
+     * Considera períodos implícitos (ej: Trimestre incluye meses)
      * 
      * @param periodoId ID del período contable
      * @return DTO con el estado de cambios en el patrimonio
      */
     @GetMapping("/cambios-patrimonio")
     public EstadoCambiosPatrimonioDTO cambiosPatrimonio(@RequestParam("periodo") Integer periodoId) {
-        return patrimonioService.calcularCambiosPatrimonio(periodoId);
+        List<Integer> periodosIncluidos = obtenerPeriodosIncluidos(periodoId);
+        return patrimonioService.calcularCambiosPatrimonioConPeriodos(periodoId, periodosIncluidos);
     }
 }

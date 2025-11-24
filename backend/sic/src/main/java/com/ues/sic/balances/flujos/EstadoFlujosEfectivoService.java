@@ -39,7 +39,20 @@ public class EstadoFlujosEfectivoService {
      * @return DTO con el estado de flujos de efectivo completo
      */
     public EstadoFlujosEfectivoDTO calcularEFE(Integer periodoId) {
-        // Obtener período
+        // Usar el nuevo método que acepta una lista de períodos
+        return calcularEFEConPeriodos(periodoId, Arrays.asList(periodoId));
+    }
+
+    /**
+     * Calcula el Estado de Flujos de Efectivo considerando múltiples períodos incluidos
+     * Útil para períodos compuestos como trimestres o año fiscal
+     * 
+     * @param periodoId ID del período contable principal
+     * @param periodosIncluidos Lista de IDs de períodos a considerar
+     * @return DTO con el estado de flujos de efectivo completo
+     */
+    public EstadoFlujosEfectivoDTO calcularEFEConPeriodos(Integer periodoId, List<Integer> periodosIncluidos) {
+        // Obtener período principal
         Optional<PeriodoContableModel> periodoOpt = periodoRepo.findById(periodoId);
         if (periodoOpt.isEmpty()) {
             throw new IllegalArgumentException("Período no encontrado: " + periodoId);
@@ -55,24 +68,25 @@ public class EstadoFlujosEfectivoService {
         System.out.println("=== DEBUG EFE ===");
         System.out.println("Período: " + periodo.getNombre() + " (" + sInicio + " a " + sFin + ")");
         System.out.println("Período ID: " + periodoId);
+        System.out.println("Períodos incluidos: " + periodosIncluidos);
 
         // Configurar período
         PeriodoDTO periodoDTO = new PeriodoDTO(periodo.getNombre(), sInicio, sFin);
         efe.setPeriodo(periodoDTO);
 
         // PASO 1: Calcular saldo inicial y final de efectivo basado en períodos anteriores
-        calcularSaldosEfectivoPorPeriodo(efe, periodoId);
+        calcularSaldosEfectivoPorPeriodoConMultiples(efe, periodoId, periodosIncluidos);
         System.out.println("Saldo Inicial Efectivo: " + efe.getSaldoInicial());
         System.out.println("Saldo Final Efectivo: " + efe.getSaldoFinal());
 
         // PASO 2: Calcular utilidad neta del período
-        double utilidadNeta = calcularUtilidadNetaPorPeriodo(periodoId);
+        double utilidadNeta = calcularUtilidadNetaPorPeriodosMultiples(periodosIncluidos);
         efe.getOperacion().setUtilidadNeta(round2(utilidadNeta));
         System.out.println("Utilidad Neta: " + utilidadNeta);
 
-        // PASO 3: Obtener todas las cuentas y movimientos del período
-        System.out.println("Obteniendo movimientos del período ID: " + periodoId);
-        List<Object[]> movimientos = detalleRepo.movimientosPorPeriodo(periodoId);
+        // PASO 3: Obtener todas las cuentas y movimientos de los períodos incluidos
+        System.out.println("Obteniendo movimientos de los períodos incluidos: " + periodosIncluidos);
+        List<Object[]> movimientos = detalleRepo.movimientosPorPeriodos(periodosIncluidos);
         List<Object[]> saldosIniciales = detalleRepo.saldosHastaPeriodo(periodoId);
         System.out.println("Total movimientos encontrados: " + movimientos.size());
         System.out.println("Total saldos iniciales: " + saldosIniciales.size());
@@ -110,14 +124,13 @@ public class EstadoFlujosEfectivoService {
     }
 
     /**
-     * Calcula los saldos inicial y final de efectivo basándose en períodos
+     * Calcula los saldos inicial y final de efectivo considerando múltiples períodos
      */
-    private void calcularSaldosEfectivoPorPeriodo(EstadoFlujosEfectivoDTO efe, Integer periodoId) {
+    private void calcularSaldosEfectivoPorPeriodoConMultiples(EstadoFlujosEfectivoDTO efe, Integer periodoId, List<Integer> periodosIncluidos) {
         List<Object[]> saldosIniciales = detalleRepo.saldosHastaPeriodo(periodoId);
         
-        // Para el saldo final, necesitamos incluir el período actual
-        // Podemos calcular: saldo inicial + movimientos del período
-        List<Object[]> movimientosPeriodo = detalleRepo.movimientosPorPeriodo(periodoId);
+        // Para el saldo final, necesitamos incluir los períodos indicados
+        List<Object[]> movimientosPeriodo = detalleRepo.movimientosPorPeriodos(periodosIncluidos);
         
         double saldoInicial = 0.0;
         double movimientosEfectivo = 0.0;
@@ -138,7 +151,7 @@ public class EstadoFlujosEfectivoService {
             }
         }
 
-        // Calcular movimientos de efectivo del período actual
+        // Calcular movimientos de efectivo de los períodos incluidos
         for (Object[] r : movimientosPeriodo) {
             Integer idCuenta = ((Number) r[0]).intValue();
             CuentaModel cuenta = cuentasMap.get(idCuenta);
@@ -157,11 +170,11 @@ public class EstadoFlujosEfectivoService {
     }
 
     /**
-     * Calcula la utilidad neta del período basándose en el ID del período
+     * Calcula la utilidad neta considerando múltiples períodos
      */
-    private double calcularUtilidadNetaPorPeriodo(Integer periodoId) {
-        // Obtener todas las cuentas de ingresos y gastos del período
-        List<Object[]> movimientos = detalleRepo.movimientosPorPeriodo(periodoId);
+    private double calcularUtilidadNetaPorPeriodosMultiples(List<Integer> periodosIds) {
+        // Obtener todas las cuentas de ingresos y gastos de los períodos
+        List<Object[]> movimientos = detalleRepo.movimientosPorPeriodos(periodosIds);
         Map<Integer, CuentaModel> cuentasMap = obtenerMapaCuentas();
         
         double ingresos = 0.0;

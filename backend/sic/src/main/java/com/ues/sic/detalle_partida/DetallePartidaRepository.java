@@ -241,6 +241,25 @@ public interface DetallePartidaRepository extends JpaRepository<DetallePartidaMo
            nativeQuery = true)
     List<Object[]> movimientosPorPeriodo(@Param("periodoId") Integer periodoId);
 
+    // Movimientos considerando múltiples períodos (para trimestres, año fiscal, etc.)
+    @Query(value = """
+            SELECT
+              c.id_cuenta AS id_cuenta,
+              c.codigo AS codigo,
+              c.nombre AS nombre,
+              COALESCE(SUM(d.debito), 0) AS debito,
+              COALESCE(SUM(d.credito), 0) AS credito
+            FROM detalle_partida d
+            JOIN partidas p ON p.id = d.id_partida
+            JOIN cuentas c ON c.id_cuenta = CAST(d.id_cuenta AS INTEGER)
+            WHERE CAST(p.id_periodo AS INTEGER) IN :periodosIds
+            GROUP BY c.id_cuenta, c.codigo, c.nombre
+            HAVING COALESCE(SUM(d.debito), 0) + COALESCE(SUM(d.credito), 0) > 0
+            ORDER BY c.codigo
+            """,
+           nativeQuery = true)
+    List<Object[]> movimientosPorPeriodos(@Param("periodosIds") List<Integer> periodosIds);
+
     // Movimientos del periodo por rango de fechas (para balance de comprobación)
     @Query(value = """
             SELECT

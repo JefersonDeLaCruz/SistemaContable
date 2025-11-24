@@ -32,12 +32,25 @@ public class EstadoCambiosPatrimonioService {
 
     /**
      * Calcula el Estado de Cambios en el Patrimonio para un período específico
+     * Delegado a la versión con múltiples períodos
      * 
      * @param periodoId ID del período contable
      * @return DTO con el estado de cambios en el patrimonio
      */
     public EstadoCambiosPatrimonioDTO calcularCambiosPatrimonio(Integer periodoId) {
-        // Obtener período
+        return calcularCambiosPatrimonioConPeriodos(periodoId, Arrays.asList(periodoId));
+    }
+
+    /**
+     * Calcula el Estado de Cambios en el Patrimonio para múltiples períodos
+     * Útil cuando se selecciona un trimestre o año fiscal que agrupa varios períodos
+     * 
+     * @param periodoId ID del período contable seleccionado
+     * @param periodosIncluidos Lista de IDs de períodos a incluir en el cálculo
+     * @return DTO con el estado de cambios en el patrimonio
+     */
+    public EstadoCambiosPatrimonioDTO calcularCambiosPatrimonioConPeriodos(Integer periodoId, List<Integer> periodosIncluidos) {
+        // Obtener período principal
         Optional<PeriodoContableModel> periodoOpt = periodoRepo.findById(periodoId);
         if (periodoOpt.isEmpty()) {
             throw new IllegalArgumentException("Período no encontrado: " + periodoId);
@@ -51,13 +64,14 @@ public class EstadoCambiosPatrimonioService {
 
         System.out.println("=== DEBUG PATRIMONIO ===");
         System.out.println("Período: " + periodo.getNombre() + " (" + sInicio + " a " + sFin + ")");
+        System.out.println("Períodos incluidos: " + periodosIncluidos);
 
         // Configurar período
         PeriodoDTO periodoDTO = new PeriodoDTO(periodo.getNombre(), sInicio, sFin);
         resultado.setPeriodo(periodoDTO);
 
         // PASO 1: Calcular utilidad neta del período (Estado de Resultados)
-        double utilidadNeta = calcularUtilidadNetaPeriodo(periodoId);
+        double utilidadNeta = calcularUtilidadNetaPorPeriodosMultiples(periodosIncluidos);
         System.out.println("Utilidad del período calculada: " + utilidadNeta);
 
         // PASO 2: Obtener saldos iniciales de patrimonio (períodos anteriores)
@@ -65,7 +79,7 @@ public class EstadoCambiosPatrimonioService {
         System.out.println("Cuentas de patrimonio encontradas: " + cuentasMap.size());
 
         // PASO 3: Obtener movimientos del período en cuentas de patrimonio (solo 3.X)
-        procesarMovimientosPatrimonio(periodoId, cuentasMap);
+        procesarMovimientosPatrimonioPorPeriodos(periodosIncluidos, cuentasMap);
 
         // PASO 4: Agregar resultado del ejercicio
         if (Math.abs(utilidadNeta) >= 0.01) {
@@ -95,9 +109,19 @@ public class EstadoCambiosPatrimonioService {
     /**
      * Calcula la utilidad neta del período basándose en Estado de Resultados
      * Ingresos (4.x) - Costos (5.x) - Gastos (6.x, 7.x)
+     * @deprecated Use calcularUtilidadNetaPorPeriodosMultiples instead
      */
+    @Deprecated
     private double calcularUtilidadNetaPeriodo(Integer periodoId) {
-        List<Object[]> movimientos = detalleRepo.movimientosPorPeriodo(periodoId);
+        return calcularUtilidadNetaPorPeriodosMultiples(Arrays.asList(periodoId));
+    }
+
+    /**
+     * Calcula la utilidad neta agregando múltiples períodos
+     * Ingresos (4.x) - Costos (5.x) - Gastos (6.x, 7.x)
+     */
+    private double calcularUtilidadNetaPorPeriodosMultiples(List<Integer> periodosIncluidos) {
+        List<Object[]> movimientos = detalleRepo.movimientosPorPeriodos(periodosIncluidos);
         
         double ingresos = 0.0;
         double costosYGastos = 0.0;
@@ -167,9 +191,20 @@ public class EstadoCambiosPatrimonioService {
      * Procesa movimientos del período en cuentas de patrimonio
      * Crédito = Aumento del patrimonio
      * Débito = Disminución del patrimonio
+     * @deprecated Use procesarMovimientosPatrimonioPorPeriodos instead
      */
+    @Deprecated
     private void procesarMovimientosPatrimonio(Integer periodoId, Map<String, CuentaPatrimonioDTO> cuentasMap) {
-        List<Object[]> movimientos = detalleRepo.movimientosPorPeriodo(periodoId);
+        procesarMovimientosPatrimonioPorPeriodos(Arrays.asList(periodoId), cuentasMap);
+    }
+
+    /**
+     * Procesa movimientos de múltiples períodos en cuentas de patrimonio
+     * Crédito = Aumento del patrimonio
+     * Débito = Disminución del patrimonio
+     */
+    private void procesarMovimientosPatrimonioPorPeriodos(List<Integer> periodosIncluidos, Map<String, CuentaPatrimonioDTO> cuentasMap) {
+        List<Object[]> movimientos = detalleRepo.movimientosPorPeriodos(periodosIncluidos);
         
         for (Object[] r : movimientos) {
             String codigo = (String) r[1];
