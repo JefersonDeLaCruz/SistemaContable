@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="corporate">
+
+<head th:replace="layout :: head">
+
+</head>
+
+<body>
+
+    <div class="drawer">
+        <input id="my-drawer-3" type="checkbox" class="drawer-toggle" />
+        <div class="drawer-content flex flex-col">
+            <!-- Navbar -->
+            <div th:replace="layout :: navbar"></div>
+
+            <!-- Page content here -->
+
+            <div class="w-full p-4 sm:p-6 lg:p-10 bg-base-100 mt-6">
+
+                <!-- Header -->
+                <div class="mb-6">
+                    <h1 class="text-3xl font-bold text-center mb-2">Editar Partida Contable</h1>
+                    <p class="text-center text-base-content/70">
+                        Modifique la información de la partida y proporcione una razón del cambio para auditoría
+                    </p>
+                </div>
+
+                <!-- Alert de carga -->
+                <div id="alertaCarga" class="alert alert-info mb-4">
+                    <span class="loading loading-spinner"></span>
+                    <span>Cargando datos de la partida...</span>
+                </div>
+
+                <!-- Alert de error -->
+                <div id="alertaError" class="alert alert-error mb-4 hidden">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span id="mensajeError">Error al cargar la partida</span>
+                </div>
+
+                <form id="formEditarPartida" class="bg-base-200 p-6 rounded-lg shadow-lg hidden">
+
+                    <input type="hidden" id="partidaId" name="id" />
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+                    <!-- Información de Auditoría (Solo lectura) -->
+                    <div class="alert alert-info mb-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current shrink-0 w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <div>
+                            <h3 class="font-bold">Información de Auditoría</h3>
+                            <div class="text-xs">
+                                <p id="infoCreacion">Creada por: <span id="creadorInfo">-</span></p>
+                                <p id="infoModificacion" class="hidden">Última modificación: <span id="modificacionInfo">-</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información General de la Partida -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text font-semibold">Descripción de la Partida</span>
+                                <span class="label-text-alt text-error">*</span>
+                            </label>
+                            <input id="descripcion" name="descripcion" type="text" class="input input-bordered w-full"
+                                placeholder="Ejemplo: Compra de mercadería al contado" required />
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text font-semibold">Período Contable</span>
+                                <span class="label-text-alt text-error">*</span>
+                            </label>
+                            <select id="idPeriodo" name="idPeriodo" class="select select-bordered w-full" required>
+                                <option value="">Seleccione un período...</option>
+                            </select>
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text font-semibold">Fecha</span>
+                                <span class="label-text-alt text-error">*</span>
+                            </label>
+                            <input id="fecha" name="fecha" type="date" class="input input-bordered w-full" required />
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text font-semibold">Razón del Cambio (Auditoría)</span>
+                                <span class="label-text-alt text-error">*</span>
+                            </label>
+                            <input id="razonCambio" name="razonCambio" type="text" class="input input-bordered w-full"
+                                placeholder="Ejemplo: Corrección de cuenta contable" required />
+                        </div>
+                    </div>
+
+                    <div class="divider">Movimientos de la Partida</div>
+
+                    <div id="contenedor-movimientos" class="contenedor-movimientos flex flex-col gap-4">
+
+                        <!-- Alerta de advertencia -->
+                        <div role="alert" id="alerta" class="alert alert-warning hidden">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 stroke-current" fill="none"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            <span>Advertencia: Debe haber al menos dos líneas de movimiento.</span>
+                        </div>
+
+                        <!-- Las líneas de movimiento se agregarán dinámicamente aquí -->
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <!-- Botones de acción y totales -->
+                    <div class="flex flex-col gap-4">
+
+                        <!-- Botón agregar movimiento -->
+                        <div class="flex justify-center">
+                            <button type="button" id="btnAgregarMovimiento" class="btn btn-outline btn-primary gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                </svg>
+                                Agregar Movimiento
+                            </button>
+                        </div>
+
+                        <!-- Totales y estado -->
+                        <div class="bg-base-300 p-6 rounded-lg">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                                <!-- Total Débito -->
+                                <div class="stat bg-base-100 rounded-lg shadow">
+                                    <div class="stat-title">Total Débito (Debe)</div>
+                                    <div class="stat-value text-primary" id="total-debito">$0.00</div>
+                                    <div class="stat-desc">Suma de todos los débitos</div>
+                                </div>
+
+                                <!-- Total Crédito -->
+                                <div class="stat bg-base-100 rounded-lg shadow">
+                                    <div class="stat-title">Total Crédito (Haber)</div>
+                                    <div class="stat-value text-secondary" id="total-credito">$0.00</div>
+                                    <div class="stat-desc">Suma de todos los créditos</div>
+                                </div>
+
+                                <!-- Estado -->
+                                <div class="stat bg-base-100 rounded-lg shadow">
+                                    <div class="stat-title">Estado de la Partida</div>
+                                    <div class="stat-value text-base-content" id="estado">
+                                        <span class="loading loading-dots loading-sm"></span>
+                                    </div>
+                                    <div class="stat-desc" id="estado-desc">Esperando valores...</div>
+                                </div>
+
+                            </div>
+
+                            <!-- Ayuda visual -->
+                            <div class="alert alert-warning mt-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    class="stroke-current shrink-0 w-6 h-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                <span><strong>Importante:</strong> Todos los cambios quedarán registrados en el sistema de auditoría con su usuario y fecha</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="sticky bottom-0 left-0 right-0 bg-base-200 p-4 mt-6 rounded-lg shadow-lg z-10">
+                        <div class="flex justify-center gap-4">
+                            <button type="button" id="btnCancelar" class="btn btn-outline gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                                Cancelar
+                            </button>
+                            <button type="button" id="btnVerHistorial" class="btn btn-info gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Ver Historial
+                            </button>
+                            <button type="submit" class="btn btn-success btn-lg gap-2 shadow-xl" id="btnGuardarCambios">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Guardar Cambios
+                            </button>
+                        </div>
+                    </div>
+
+                </form>
+
+                <!-- Modal de Historial -->
+                <dialog id="modalHistorial" class="modal">
+                    <div class="modal-box w-11/12 max-w-5xl">
+                        <h3 class="font-bold text-lg mb-4">Historial de Cambios</h3>
+                        <div id="contenidoHistorial" class="overflow-x-auto">
+                            <div class="flex justify-center p-8">
+                                <span class="loading loading-spinner loading-lg"></span>
+                            </div>
+                        </div>
+                        <div class="modal-action">
+                            <form method="dialog">
+                                <button class="btn">Cerrar</button>
+                            </form>
+                        </div>
+                    </div>
+                </dialog>
+
+            </div>
+
+        </div>
+
+        <!-- Sidebar -->
+        <div th:replace="~{layout :: sidebar('editar-partida')}">
+
+        </div>
+    </div>
+
+    <script th:src="@{/js/scripts.js}"></script>
+    <script th:src="@{/js/editar-partida.js}"></script>
+</body>
+
+</html>

@@ -50,8 +50,6 @@ credentials/
 logs/
 ### CSS compiled files ###
 backend/sic/src/main/resources/static/css/output.css
-tailwind.config.js
-
 NAVIGATION-GUIDE.md
 CREDENCIALES-DEFAULT.md
 DIAGNOSTICO_Y_CORRECCIONES.md

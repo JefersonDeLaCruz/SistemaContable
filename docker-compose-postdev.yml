@@ -1,0 +1,73 @@
+version: '3.9'
+
+# Docker Compose para PRODUCCIÓN - Sistema Contable
+# Incluye compilación automática de Tailwind CSS y Maven build
+
+services:
+  # Base de datos PostgreSQL
+  java_db:
+    container_name: sistema_contable_db
+    image: postgres:12-alpine
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: sistema_contable
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --locale=es_ES.UTF-8"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sistema_contable_network
+
+  # Aplicación Spring Boot
+  java_app:
+    container_name: sistema_contable_app
+    image: sistema-contable/app:1.0.0
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      # Database connection
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://java_db:5432/sistema_contable
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      # JPA/Hibernate settings
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_JPA_SHOW_SQL=false
+      - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQLDialect
+      - SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL=true
+      # Server settings
+      - SERVER_PORT=8080
+      - SPRING_APPLICATION_NAME=SistemaContable
+      # Logging
+      - LOGGING_LEVEL_ROOT=INFO
+      - LOGGING_LEVEL_COM_UES_SIC=INFO
+    depends_on:
+      java_db:
+        condition: service_healthy
+    networks:
+      - sistema_contable_network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+networks:
+  sistema_contable_network:
+    driver: bridge
+
+volumes:
+  pgdata:
+    driver: local

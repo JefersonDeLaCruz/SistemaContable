@@ -59,12 +59,24 @@ public class ViewController {
     public String registrarPartida(Model model){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
-        
+
         UsuariosModel user = usuariosRepository.findByUsername(username);
 
         model.addAttribute("usuario", user);
         model.addAttribute("titulo", "Registrar Partida");
         return "registrar-partida";
+    }
+
+    @GetMapping("/editar-partida")
+    public String editarPartida(Model model){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+
+        UsuariosModel user = usuariosRepository.findByUsername(username);
+
+        model.addAttribute("usuario", user);
+        model.addAttribute("titulo", "Editar Partida");
+        return "editar-partida";
     }
 
     @GetMapping("/libro-mayor")

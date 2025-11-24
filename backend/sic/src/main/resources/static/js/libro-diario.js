@@ -222,6 +222,14 @@ async function renderizarLibroDiario(partidas, mapaCuentas) {
                         <td class="pl-4">${obtenerNombreCuenta(detalle.idCuenta, mapaCuentas)}</td>
                         <td class="text-right font-mono">${detalle.debito > 0 ? formatearMoneda(detalle.debito) : '-'}</td>
                         <td class="text-right font-mono">${detalle.credito > 0 ? formatearMoneda(detalle.credito) : '-'}</td>
+                        <td rowspan="${detalles.length}" class="align-top bg-base-200 text-center">
+                            <button class="btn btn-sm btn-info gap-1" onclick="editarPartida(${partida.id})">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                                Editar
+                            </button>
+                        </td>
                     `;
                 } else {
                     fila.innerHTML = `
@@ -270,6 +278,7 @@ function crearNuevaTabla() {
                 <th class="w-1/3">Cuenta</th>
                 <th class="w-32 text-right">Débito</th>
                 <th class="w-32 text-right">Crédito</th>
+                <th class="w-24 text-center">Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -339,6 +348,11 @@ btnFiltrar.addEventListener('click', async (event) => {
         btnFiltrar.disabled = false;
     }
 });
+
+// Función para redirigir a la página de edición de partida
+function editarPartida(partidaId) {
+    window.location.href = `/editar-partida?id=${partidaId}`;
+}
 
 window.addEventListener('DOMContentLoaded', () => {
     cargarPeriodos();
